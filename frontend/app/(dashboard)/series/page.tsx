@@ -1,10 +1,5 @@
-import { PlaceholderPage } from "@/components/features/app-shell/placeholder-page";
+import { SeriesLibraryScreen } from "@/components/features/series/series-library-screen";
 
 export default function SeriesPage(): React.JSX.Element {
-  return (
-    <PlaceholderPage
-      title="Content Series"
-      description="Manage bilingual recall message sequences."
-    />
-  );
+  return <SeriesLibraryScreen />;
 }

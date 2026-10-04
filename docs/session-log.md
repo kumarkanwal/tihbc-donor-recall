@@ -139,3 +139,10 @@
 - **Verification:** User-run isolated PostgreSQL suite passed all 170 tests with only KI-002. Codex-run Ruff lint and format checks pass, strict mypy passes across 120 source files, and the non-PostgreSQL suite reports 158 passed and 12 skipped with only KI-002. OpenAPI SHA-256 remains `0A6A5D8604688BF516CFD91CE652B8483571D478B7A478A11738301F4A595302`.
 - **Next:** Proceed to Task 2.3, Campaigns: create, launch, pause, and resume.
 - **Blockers:** None. Task 2.2 is complete.
+
+## S-022 — 2026-10-04 — [FE] Content Series pages
+
+- **Done:** Split the batch upload wizard and batch detail screen into focused components; replaced the Content Series placeholder with the paginated table/grid library, complete filters and actions, draft creation, two-column editor, bilingual settings, accessible ordered step cards, media upload, localized quick replies, variable insertion, structured activation feedback, and server-rendered phone preview. Added reusable simulator phone/bubble primitives and enforced archived/coordinator read-only behavior.
+- **Verification:** `pnpm gen:api`, ESLint, strict TypeScript, all 29 Vitest tests, and the Next.js production build pass. Focused tests cover activation problem grouping, variable insertion, the three-button limit, archived read-only controls, and the coordinator editor view. The original batch flow tests continue to pass after the component split.
+- **Next:** Manually verify the admin and coordinator flows against a running seeded API, then proceed to Task 3.7.
+- **Blockers:** None.

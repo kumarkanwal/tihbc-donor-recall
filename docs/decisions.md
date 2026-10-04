@@ -265,3 +265,11 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Status:** Accepted
 - **Decision:** Framework request-validation responses expose only `loc`, `msg`, and `type` for each error. The original submitted `input` value is removed globally before serialization.
 - **Reason:** Validation metadata remains actionable without reflecting donor names, phone numbers, or other personal data in API responses.
+
+## D-102 — Shared simulator presentation and dependency-free step ordering
+
+- **Date:** 2026-10-04
+- **Status:** Accepted
+- **Decision:** Keep simulator-only visual tokens in the shared theme token file and implement the phone frame and message bubble under `components/simulator/` for reuse by series previews and Task 3.8. Series steps use native pointer drag behavior plus explicit Move up/Move down buttons for keyboard operation, without adding a drag-and-drop dependency.
+- **Reason:** The series preview and future simulator must remain visually identical, while explicit movement controls make ordering reliable and accessible without expanding the dependency surface.
+- **Consequences:** Future simulator work should extend the shared simulator primitives instead of creating separate bubble styles, and step order changes continue to submit the complete backend-defined ID sequence.

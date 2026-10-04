@@ -33,6 +33,7 @@ interface DataTableProps<TData extends RowData> {
   onRetry?: () => void;
   emptyTitle?: string;
   emptyDescription?: string;
+  showToolbar?: boolean;
 }
 
 const emptySorting: SortingState = [];
@@ -54,6 +55,7 @@ export function DataTable<TData extends RowData>({
   onRetry,
   emptyTitle = "No results",
   emptyDescription = "Try adjusting your search or filters.",
+  showToolbar = true,
 }: DataTableProps<TData>): React.JSX.Element {
   const rows = useMemo(() => data?.items ?? [], [data]);
   const page = data?.page ?? 1;
@@ -80,11 +82,13 @@ export function DataTable<TData extends RowData>({
 
   return (
     <section className="rounded-card border-border bg-surface shadow-surface overflow-hidden border">
-      <DataTableToolbar
-        onSearchChange={onSearchChange}
-        searchPlaceholder={searchPlaceholder}
-        filterSlot={filterSlot}
-      />
+      {showToolbar ? (
+        <DataTableToolbar
+          onSearchChange={onSearchChange}
+          searchPlaceholder={searchPlaceholder}
+          filterSlot={filterSlot}
+        />
+      ) : null}
 
       {error ? (
         <ErrorState

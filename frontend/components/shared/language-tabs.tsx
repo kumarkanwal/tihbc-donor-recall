@@ -13,6 +13,7 @@ interface LanguageTabsProps {
   value?: LanguageCode;
   onValueChange?: (language: LanguageCode) => void;
   className?: string;
+  languages?: LanguageCode[];
 }
 
 /** Switch between equivalent English and Urdu content. */
@@ -22,10 +23,12 @@ export function LanguageTabs({
   value,
   onValueChange,
   className,
+  languages = ["en", "ur"],
 }: LanguageTabsProps): React.JSX.Element {
+  const defaultLanguage = languages[0] ?? "en";
   return (
     <Tabs.Root
-      defaultValue="en"
+      defaultValue={defaultLanguage}
       value={value}
       onValueChange={(nextValue) => onValueChange?.(nextValue as LanguageCode)}
       className={className}
@@ -34,7 +37,7 @@ export function LanguageTabs({
         aria-label="Content language"
         className="bg-surface-muted rounded-control inline-flex p-1"
       >
-        {(["en", "ur"] as const).map((language) => (
+        {languages.map((language) => (
           <Tabs.Trigger
             key={language}
             value={language}
@@ -47,21 +50,25 @@ export function LanguageTabs({
           </Tabs.Trigger>
         ))}
       </Tabs.List>
-      <Tabs.Content
-        value="en"
-        className="mt-4 focus-visible:outline-none"
-        lang="en"
-      >
-        {english}
-      </Tabs.Content>
-      <Tabs.Content
-        value="ur"
-        className="mt-4 focus-visible:outline-none"
-        lang="ur"
-        dir="rtl"
-      >
-        {urdu}
-      </Tabs.Content>
+      {languages.includes("en") ? (
+        <Tabs.Content
+          value="en"
+          className="mt-4 focus-visible:outline-none"
+          lang="en"
+        >
+          {english}
+        </Tabs.Content>
+      ) : null}
+      {languages.includes("ur") ? (
+        <Tabs.Content
+          value="ur"
+          className="mt-4 focus-visible:outline-none"
+          lang="ur"
+          dir="rtl"
+        >
+          {urdu}
+        </Tabs.Content>
+      ) : null}
     </Tabs.Root>
   );
 }

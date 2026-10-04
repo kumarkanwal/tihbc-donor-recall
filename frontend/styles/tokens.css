@@ -18,6 +18,17 @@
   --card-radius: 0.5rem;
   --control-radius: 0.375rem;
   --surface-shadow: 0 1px 2px rgb(15 27 51 / 6%), 0 4px 12px rgb(15 27 51 / 4%);
+  --sim-header: #008069;
+  --sim-header-text: #ffffff;
+  --sim-wallpaper: #efeae2;
+  --sim-incoming: #ffffff;
+  --sim-outgoing: #d9fdd3;
+  --sim-text: #111b21;
+  --sim-secondary: #667781;
+  --sim-read: #53bdeb;
+  --sim-button: #00a884;
+  --sim-date-chip: rgb(255 255 255 / 90%);
+  --sim-date-text: #54656f;
 }
 
 .dark {
@@ -57,6 +68,17 @@
   --color-danger: var(--danger);
   --color-info: var(--info);
   --color-ring: var(--ring);
+  --color-sim-header: var(--sim-header);
+  --color-sim-header-text: var(--sim-header-text);
+  --color-sim-wallpaper: var(--sim-wallpaper);
+  --color-sim-incoming: var(--sim-incoming);
+  --color-sim-outgoing: var(--sim-outgoing);
+  --color-sim-text: var(--sim-text);
+  --color-sim-secondary: var(--sim-secondary);
+  --color-sim-read: var(--sim-read);
+  --color-sim-button: var(--sim-button);
+  --color-sim-date-chip: var(--sim-date-chip);
+  --color-sim-date-text: var(--sim-date-text);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-urdu: var(--font-noto-nastaliq-urdu), "Noto Naskh Arabic", serif;
   --radius-card: var(--card-radius);

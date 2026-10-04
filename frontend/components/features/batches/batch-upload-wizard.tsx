@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Download } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -11,15 +10,15 @@ import { downloadBlob } from "@/components/features/batches/batch-files";
 import {
   ConfirmStep,
   ImportSuccess,
-  InlineBatchError,
   ReviewStep,
   WizardProgress,
   type WizardStep,
 } from "@/components/features/batches/batch-upload-steps";
-import { FileDropzone } from "@/components/shared/file-dropzone";
+import {
+  BatchUploadForm,
+  type BatchUploadFormValues,
+} from "@/components/features/batches/batch-upload-form";
 import { PageHeader } from "@/components/shared/page-header";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   useImportDonorBatch,
   usePreviewDonorBatch,
@@ -28,7 +27,6 @@ import {
   type DonorBatch,
 } from "@/hooks/use-donor-batches";
 
-const uploadMaxBytes = 10 * 1024 * 1024;
 const uploadSchema = z.object({
   name: z
     .string()
@@ -36,7 +34,6 @@ const uploadSchema = z.object({
     .min(1, "Enter a batch name.")
     .max(120, "Use 120 characters or fewer."),
 });
-type UploadFormValues = z.infer<typeof uploadSchema>;
 
 /** Three-step donor-batch validation and import flow. */
 export function BatchUploadWizard(): React.JSX.Element {
@@ -45,7 +42,7 @@ export function BatchUploadWizard(): React.JSX.Element {
   const [preview, setPreview] = useState<BatchPreview | null>(null);
   const [importedBatch, setImportedBatch] = useState<DonorBatch | null>(null);
   const [dropzoneKey, setDropzoneKey] = useState(0);
-  const form = useForm<UploadFormValues>({
+  const form = useForm<BatchUploadFormValues>({
     resolver: zodResolver(uploadSchema),
     defaultValues: { name: "" },
   });
@@ -110,64 +107,18 @@ export function BatchUploadWizard(): React.JSX.Element {
       <WizardProgress currentStep={step} />
 
       {step === "upload" ? (
-        <form className="space-y-6" onSubmit={form.handleSubmit(submitPreview)}>
-          <section className="border-border bg-surface rounded-card space-y-5 border p-6">
-            <div>
-              <label htmlFor="batch-name" className="text-sm font-medium">
-                Batch name
-              </label>
-              <Input
-                id="batch-name"
-                className="mt-2 max-w-xl"
-                maxLength={120}
-                placeholder="October regular donor recall"
-                aria-invalid={Boolean(form.formState.errors.name)}
-                {...form.register("name")}
-              />
-              {form.formState.errors.name ? (
-                <p className="text-danger mt-2 text-sm" role="alert">
-                  {form.formState.errors.name.message}
-                </p>
-              ) : null}
-            </div>
-            <div>
-              <div className="mb-2 flex items-center justify-between gap-4">
-                <span className="text-sm font-medium">Donor file</span>
-                <button
-                  type="button"
-                  className="text-primary focus-visible:outline-ring inline-flex items-center gap-2 rounded text-sm font-medium underline-offset-4 hover:underline focus-visible:outline-2"
-                  disabled={sampleFile.isPending}
-                  onClick={() => void downloadSample()}
-                >
-                  <Download aria-hidden="true" className="size-4" />
-                  {sampleFile.isPending
-                    ? "Downloading"
-                    : "Download sample file"}
-                </button>
-              </div>
-              <FileDropzone
-                key={dropzoneKey}
-                accept=".csv,.xlsx"
-                maxSize={uploadMaxBytes}
-                onFileSelect={setFile}
-                disabled={previewBatch.isPending}
-              />
-            </div>
-            <InlineBatchError
-              error={sampleFile.error}
-              fallback="The sample file could not be downloaded."
-            />
-            <InlineBatchError
-              error={previewBatch.error}
-              fallback="The donor file could not be reviewed."
-            />
-          </section>
-          <div className="flex justify-end">
-            <Button type="submit" disabled={!file || previewBatch.isPending}>
-              {previewBatch.isPending ? "Validating file" : "Review batch"}
-            </Button>
-          </div>
-        </form>
+        <BatchUploadForm
+          form={form}
+          file={file}
+          dropzoneKey={dropzoneKey}
+          previewPending={previewBatch.isPending}
+          previewError={previewBatch.error}
+          samplePending={sampleFile.isPending}
+          sampleError={sampleFile.error}
+          onFileSelect={setFile}
+          onDownloadSample={() => void downloadSample()}
+          onSubmit={() => void submitPreview()}
+        />
       ) : null}
 
       {step === "review" && preview ? (

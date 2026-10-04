@@ -10,6 +10,7 @@ import {
 
 import { apiClient } from "@/lib/api/client";
 import { ApiError } from "@/lib/api/errors";
+import { requireResponseData } from "@/lib/api/response";
 import type { components, operations } from "@/lib/api/schema";
 
 export type BatchPreview = components["schemas"]["BatchPreview"];
@@ -39,13 +40,6 @@ export const donorBatchKeys = {
   validation: (batchId: string) =>
     [...donorBatchKeys.detail(batchId), "validation"] as const,
 };
-
-function requireData<T>(data: T | undefined, description: string): T {
-  if (!data) {
-    throw new Error(`${description} response was empty.`);
-  }
-  return data;
-}
 
 /** Convert documented donor-batch failures into clear staff-facing copy. */
 export function getDonorBatchErrorMessage(
@@ -81,7 +75,7 @@ export function useDonorBatches(
       const { data } = await apiClient.GET("/api/v1/donor-batches", {
         params: { query: parameters },
       });
-      return requireData(data, "Donor batch list");
+      return requireResponseData(data, "Donor batch list");
     },
   });
 }
@@ -101,7 +95,7 @@ export function usePreviewDonorBatch(): UseMutationResult<
           file: file as unknown as string,
         },
       });
-      return requireData(data, "Batch preview");
+      return requireResponseData(data, "Batch preview");
     },
   });
 }
@@ -124,7 +118,7 @@ export function useImportDonorBatch(): UseMutationResult<
       const { data } = await apiClient.POST("/api/v1/donor-batches", {
         body: { name, preview_token: previewToken },
       });
-      return requireData(data, "Batch import");
+      return requireResponseData(data, "Batch import");
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: donorBatchKeys.all });
@@ -139,7 +133,10 @@ export function useSampleBatchFile(): UseMutationResult<Blob, Error, void> {
       const result = await apiClient.GET("/api/v1/donor-batches/sample-file", {
         parseAs: "blob",
       });
-      return requireData(result.data as Blob | undefined, "Sample file");
+      return requireResponseData(
+        result.data as Blob | undefined,
+        "Sample file",
+      );
     },
   });
 }
@@ -154,7 +151,7 @@ export function useDonorBatch(
       const { data } = await apiClient.GET("/api/v1/donor-batches/{batch_id}", {
         params: { path: { batch_id: batchId } },
       });
-      return requireData(data, "Donor batch");
+      return requireResponseData(data, "Donor batch");
     },
   });
 }
@@ -176,7 +173,7 @@ export function useBatchDonors(
           },
         },
       );
-      return requireData(data, "Batch donors");
+      return requireResponseData(data, "Batch donors");
     },
   });
 }
@@ -193,7 +190,7 @@ export function useBatchValidationReport(
         "/api/v1/donor-batches/{batch_id}/validation-report",
         { params: { path: { batch_id: batchId } } },
       );
-      return requireData(data, "Validation report");
+      return requireResponseData(data, "Validation report");
     },
     enabled,
   });
