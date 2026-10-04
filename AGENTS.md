@@ -60,7 +60,8 @@ build. Always check the relevant file before starting a task, and follow it exac
 | `docs/simulator.md` | WhatsApp simulator behavior and visual details | Building the simulator |
 | `docs/agent.md` | LangGraph reply agent: nodes, state, outputs, prompts, fallback | Building the reply agent |
 | `docs/env.md` | All environment variables with descriptions and example values | Adding or reading config |
-| `docs/brand.md` | TIHBC logo usage, colors, fonts, design tokens | Any UI work |
+| `docs/brand.md` | Logo usage, light and dark theme tokens, fonts | Any UI work |
+| `docs/demo-content.md` | Exact message texts (EN/UR), bot replies, buttons, seed settings | Seed data, reply service, series features |
 
 Rules for these documents:
 - If code and a spec disagree, the spec wins. Do not silently diverge.
@@ -100,6 +101,8 @@ part of every task, not optional.
 - Record a decision whenever you choose a library, pattern, structure, or naming approach that is not
   already defined, or when you deviate from a spec.
 - Use the next number (`D-018`, `D-019`, ...). Never renumber or delete entries.
+- Parallel sessions: backend sessions use the next free ID below D-100; frontend sessions use D-100 and up.
+  Always re-read `docs/decisions.md` immediately before appending.
 - Never change an accepted decision silently. Add a new entry with `Supersedes: D-0XX` and mark the old
   entry `Superseded by D-0YY`.
 - Decisions that change scope, UX, or the client-facing flow need human approval: record them as
@@ -178,6 +181,7 @@ tihbc-donor-recall/
 
 ### Frontend
 - Next.js (App Router), React, TypeScript (strict), `pnpm`
+- next-themes for light/dark mode
 - Tailwind CSS, shadcn/ui, lucide-react icons
 - TanStack Query for server state; Zustand only for small client UI state (e.g. simulator open/closed)
 - react-hook-form + zod for forms
@@ -386,7 +390,9 @@ error (message and retry), and success. No blank screens.
 
 The audience is hospital and blood-center staff, not engineers. The UI must be simple, calm, and obvious.
 
-- Clean, professional healthcare look using TIHBC brand colors and logo (assets in `frontend/public/brand/`).
+- Clean, professional healthcare look using the client's red and blue brand colors and logo
+  (`frontend/public/images/`). Exact tokens and logo rules are in `docs/brand.md`.
+- Light mode (default) and dark mode, switchable from the top bar. Every screen must look correct in both.
 - **No emojis anywhere** in the admin UI, seed data, or system messages.
 - **No "AI-style" visuals:** no gradients, glows, sparkles, or "magic" icons.
   AI-generated results are shown as normal data (e.g. "Decline reason: Travelling").
@@ -462,9 +468,10 @@ The audience is hospital and blood-center staff, not engineers. The UI must be s
 cd backend
 uv sync
 uv run alembic upgrade head
-uv run uvicorn app.main:app --reload
+uv run uvicorn app.main:app --reload --reload-dir app
 uv run python -m app.scheduler     # dispatcher worker
 uv run python -m app.seed
+uv run python -m app.export_openapi # write the stable schema to frontend/openapi.json
 uv run ruff check . && uv run ruff format --check . && uv run mypy app && uv run pytest
 
 # Frontend
@@ -477,6 +484,14 @@ pnpm lint && pnpm typecheck && pnpm test
 # Full stack
 docker compose up --build
 ```
+
+Run `uv run python -m app.export_openapi` after every API change and commit the updated
+`frontend/openapi.json` file.
+
+**Codex pytest isolation:** When Codex runs backend tests, it must use
+`uv run pytest --basetemp=.pytest_tmp_codex -o cache_dir=.pytest_tmp_codex/cache` (plus any other
+required pytest arguments). Codex must never create, use, modify, or delete `backend/.pytest_tmp`;
+that path is reserved for human local test runs. Both paths remain Git-ignored.
 
 ---
 

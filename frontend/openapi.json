@@ -1,0 +1,3136 @@
+{
+  "components": {
+    "schemas": {
+      "BatchImportRequest": {
+        "description": "Request to persist the valid rows from one preview.",
+        "properties": {
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "preview_token": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Preview Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "preview_token"
+        ],
+        "title": "BatchImportRequest",
+        "type": "object"
+      },
+      "BatchPreview": {
+        "description": "Upload validation result returned to the review screen.",
+        "properties": {
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationIssue"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "invalid_rows": {
+            "title": "Invalid Rows",
+            "type": "integer"
+          },
+          "language_breakdown": {
+            "items": {
+              "$ref": "#/components/schemas/LanguageBreakdown"
+            },
+            "title": "Language Breakdown",
+            "type": "array"
+          },
+          "original_filename": {
+            "title": "Original Filename",
+            "type": "string"
+          },
+          "preview_token": {
+            "title": "Preview Token",
+            "type": "string"
+          },
+          "sample_valid_rows": {
+            "items": {
+              "$ref": "#/components/schemas/DonorPreviewRow"
+            },
+            "title": "Sample Valid Rows",
+            "type": "array"
+          },
+          "segment_breakdown": {
+            "items": {
+              "$ref": "#/components/schemas/SegmentBreakdown"
+            },
+            "title": "Segment Breakdown",
+            "type": "array"
+          },
+          "total_rows": {
+            "title": "Total Rows",
+            "type": "integer"
+          },
+          "valid_rows": {
+            "title": "Valid Rows",
+            "type": "integer"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/ExistingPhoneWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "preview_token",
+          "original_filename",
+          "total_rows",
+          "valid_rows",
+          "invalid_rows",
+          "segment_breakdown",
+          "language_breakdown",
+          "sample_valid_rows",
+          "errors",
+          "warnings"
+        ],
+        "title": "BatchPreview",
+        "type": "object"
+      },
+      "Body_preview_batch_api_v1_donor_batches_preview_post": {
+        "properties": {
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "description": "CSV or XLSX donor file",
+            "title": "File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_preview_batch_api_v1_donor_batches_preview_post",
+        "type": "object"
+      },
+      "Body_upload_media_api_v1_media_post": {
+        "properties": {
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "description": "JPG, PNG, WebP, or MP4 media",
+            "title": "File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_media_api_v1_media_post",
+        "type": "object"
+      },
+      "ContentSeriesCreate": {
+        "description": "Create one draft content series.",
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/SeriesKind"
+          },
+          "languages": {
+            "items": {
+              "$ref": "#/components/schemas/LanguageCode"
+            },
+            "minItems": 1,
+            "title": "Languages",
+            "type": "array"
+          },
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "response_window_hours": {
+            "default": 48,
+            "exclusiveMinimum": 0.0,
+            "title": "Response Window Hours",
+            "type": "integer"
+          },
+          "tag_names": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tag Names",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "kind",
+          "languages"
+        ],
+        "title": "ContentSeriesCreate",
+        "type": "object"
+      },
+      "ContentSeriesDetail": {
+        "description": "Content series with its ordered steps.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/UploadedBySummary"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/SeriesKind"
+          },
+          "languages": {
+            "items": {
+              "$ref": "#/components/schemas/LanguageCode"
+            },
+            "title": "Languages",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "response_window_hours": {
+            "title": "Response Window Hours",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SeriesStatus"
+          },
+          "step_count": {
+            "title": "Step Count",
+            "type": "integer"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/SeriesStepOut"
+            },
+            "title": "Steps",
+            "type": "array"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "kind",
+          "status",
+          "languages",
+          "response_window_hours",
+          "tags",
+          "step_count",
+          "created_by",
+          "created_at",
+          "updated_at",
+          "steps"
+        ],
+        "title": "ContentSeriesDetail",
+        "type": "object"
+      },
+      "ContentSeriesOut": {
+        "description": "Content-series list representation.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/UploadedBySummary"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/SeriesKind"
+          },
+          "languages": {
+            "items": {
+              "$ref": "#/components/schemas/LanguageCode"
+            },
+            "title": "Languages",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "response_window_hours": {
+            "title": "Response Window Hours",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SeriesStatus"
+          },
+          "step_count": {
+            "title": "Step Count",
+            "type": "integer"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "kind",
+          "status",
+          "languages",
+          "response_window_hours",
+          "tags",
+          "step_count",
+          "created_by",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ContentSeriesOut",
+        "type": "object"
+      },
+      "ContentSeriesPage": {
+        "description": "Paginated content-series summaries.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ContentSeriesOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size"
+        ],
+        "title": "ContentSeriesPage",
+        "type": "object"
+      },
+      "ContentSeriesUpdate": {
+        "description": "Update selected content-series settings.",
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SeriesKind"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "languages": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/LanguageCode"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Languages"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "response_window_hours": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Response Window Hours"
+          },
+          "tag_names": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tag Names"
+          }
+        },
+        "title": "ContentSeriesUpdate",
+        "type": "object"
+      },
+      "DonorBatchDetail": {
+        "description": "Batch summary with segment and language counts.",
+        "properties": {
+          "campaign_count": {
+            "title": "Campaign Count",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "invalid_rows": {
+            "title": "Invalid Rows",
+            "type": "integer"
+          },
+          "language_breakdown": {
+            "items": {
+              "$ref": "#/components/schemas/LanguageBreakdown"
+            },
+            "title": "Language Breakdown",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "original_filename": {
+            "title": "Original Filename",
+            "type": "string"
+          },
+          "segment_breakdown": {
+            "items": {
+              "$ref": "#/components/schemas/SegmentBreakdown"
+            },
+            "title": "Segment Breakdown",
+            "type": "array"
+          },
+          "total_rows": {
+            "title": "Total Rows",
+            "type": "integer"
+          },
+          "uploaded_by": {
+            "$ref": "#/components/schemas/UploadedBySummary"
+          },
+          "valid_rows": {
+            "title": "Valid Rows",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "original_filename",
+          "total_rows",
+          "valid_rows",
+          "invalid_rows",
+          "uploaded_by",
+          "created_at",
+          "campaign_count",
+          "segment_breakdown",
+          "language_breakdown"
+        ],
+        "title": "DonorBatchDetail",
+        "type": "object"
+      },
+      "DonorBatchOut": {
+        "description": "Summary of one imported donor batch.",
+        "properties": {
+          "campaign_count": {
+            "title": "Campaign Count",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "invalid_rows": {
+            "title": "Invalid Rows",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "original_filename": {
+            "title": "Original Filename",
+            "type": "string"
+          },
+          "total_rows": {
+            "title": "Total Rows",
+            "type": "integer"
+          },
+          "uploaded_by": {
+            "$ref": "#/components/schemas/UploadedBySummary"
+          },
+          "valid_rows": {
+            "title": "Valid Rows",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "original_filename",
+          "total_rows",
+          "valid_rows",
+          "invalid_rows",
+          "uploaded_by",
+          "created_at",
+          "campaign_count"
+        ],
+        "title": "DonorBatchOut",
+        "type": "object"
+      },
+      "DonorBatchPage": {
+        "description": "Paginated donor batch summaries.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DonorBatchOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size"
+        ],
+        "title": "DonorBatchPage",
+        "type": "object"
+      },
+      "DonorOut": {
+        "description": "Masked donor row for staff batch browsing.",
+        "properties": {
+          "blood_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blood Group"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "full_name": {
+            "title": "Full Name",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "language": {
+            "$ref": "#/components/schemas/LanguageCode"
+          },
+          "last_donation_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Donation Date"
+          },
+          "phone_e164": {
+            "title": "Phone E164",
+            "type": "string"
+          },
+          "segment": {
+            "title": "Segment",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "full_name",
+          "phone_e164",
+          "segment",
+          "language",
+          "city",
+          "blood_group",
+          "last_donation_date",
+          "created_at"
+        ],
+        "title": "DonorOut",
+        "type": "object"
+      },
+      "DonorPage": {
+        "description": "Paginated donors within one batch.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DonorOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size"
+        ],
+        "title": "DonorPage",
+        "type": "object"
+      },
+      "DonorPreviewRow": {
+        "description": "One normalized valid donor shown during review.",
+        "properties": {
+          "blood_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blood Group"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "language": {
+            "$ref": "#/components/schemas/LanguageCode"
+          },
+          "last_donation_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Donation Date"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "phone": {
+            "title": "Phone",
+            "type": "string"
+          },
+          "row": {
+            "title": "Row",
+            "type": "integer"
+          },
+          "segment": {
+            "title": "Segment",
+            "type": "string"
+          }
+        },
+        "required": [
+          "row",
+          "name",
+          "phone",
+          "segment",
+          "language"
+        ],
+        "title": "DonorPreviewRow",
+        "type": "object"
+      },
+      "ExistingPhoneWarning": {
+        "description": "A valid phone that also appears in an earlier batch.",
+        "properties": {
+          "existing_batch_name": {
+            "title": "Existing Batch Name",
+            "type": "string"
+          },
+          "phone": {
+            "title": "Phone",
+            "type": "string"
+          },
+          "row": {
+            "title": "Row",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "row",
+          "phone",
+          "existing_batch_name"
+        ],
+        "title": "ExistingPhoneWarning",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "LanguageBreakdown": {
+        "description": "Preview or batch count for one donor language.",
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "language": {
+            "$ref": "#/components/schemas/LanguageCode"
+          }
+        },
+        "required": [
+          "language",
+          "count"
+        ],
+        "title": "LanguageBreakdown",
+        "type": "object"
+      },
+      "LanguageCode": {
+        "enum": [
+          "en",
+          "ur"
+        ],
+        "title": "LanguageCode",
+        "type": "string"
+      },
+      "LiveResponse": {
+        "description": "Liveness probe payload.",
+        "properties": {
+          "status": {
+            "const": "ok",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "LiveResponse",
+        "type": "object"
+      },
+      "LoginRequest": {
+        "description": "Credentials submitted to the login endpoint.",
+        "properties": {
+          "email": {
+            "maxLength": 255,
+            "minLength": 3,
+            "title": "Email",
+            "type": "string"
+          },
+          "password": {
+            "format": "password",
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Password",
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "LoginRequest",
+        "type": "object"
+      },
+      "MediaType": {
+        "enum": [
+          "none",
+          "image",
+          "video"
+        ],
+        "title": "MediaType",
+        "type": "string"
+      },
+      "MediaUploadOut": {
+        "description": "Public URL and detected kind of one uploaded media file.",
+        "properties": {
+          "media_type": {
+            "$ref": "#/components/schemas/MediaType"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "media_type"
+        ],
+        "title": "MediaUploadOut",
+        "type": "object"
+      },
+      "MessageCategory": {
+        "enum": [
+          "utility",
+          "marketing"
+        ],
+        "title": "MessageCategory",
+        "type": "string"
+      },
+      "MessageDirection": {
+        "enum": [
+          "outbound",
+          "inbound"
+        ],
+        "title": "MessageDirection",
+        "type": "string"
+      },
+      "MessageKind": {
+        "enum": [
+          "template",
+          "text",
+          "interactive",
+          "button_reply"
+        ],
+        "title": "MessageKind",
+        "type": "string"
+      },
+      "MessageStatus": {
+        "enum": [
+          "queued",
+          "sent",
+          "delivered",
+          "read",
+          "failed"
+        ],
+        "title": "MessageStatus",
+        "type": "string"
+      },
+      "PreviewButtonOut": {
+        "description": "Quick reply localized for simulator preview.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "PreviewButtonOut",
+        "type": "object"
+      },
+      "QuickReplyButtonInput": {
+        "description": "Localized quick-reply definition.",
+        "properties": {
+          "id": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "intent": {
+            "enum": [
+              "confirm",
+              "reschedule",
+              "decline"
+            ],
+            "title": "Intent",
+            "type": "string"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/LanguageCode"
+            },
+            "title": "Labels",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "intent",
+          "labels"
+        ],
+        "title": "QuickReplyButtonInput",
+        "type": "object"
+      },
+      "QuickReplyButtonOut": {
+        "description": "Stored multilingual quick-reply definition.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "intent": {
+            "enum": [
+              "confirm",
+              "reschedule",
+              "decline"
+            ],
+            "title": "Intent",
+            "type": "string"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/LanguageCode"
+            },
+            "title": "Labels",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "intent",
+          "labels"
+        ],
+        "title": "QuickReplyButtonOut",
+        "type": "object"
+      },
+      "ReadyResponse": {
+        "description": "Successful readiness probe payload.",
+        "properties": {
+          "checks": {
+            "additionalProperties": {
+              "const": "ok",
+              "type": "string"
+            },
+            "title": "Checks",
+            "type": "object"
+          },
+          "status": {
+            "const": "ready",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "checks"
+        ],
+        "title": "ReadyResponse",
+        "type": "object"
+      },
+      "SegmentBreakdown": {
+        "description": "Preview or batch count for one segment.",
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "segment": {
+            "title": "Segment",
+            "type": "string"
+          }
+        },
+        "required": [
+          "segment",
+          "count"
+        ],
+        "title": "SegmentBreakdown",
+        "type": "object"
+      },
+      "SeriesKind": {
+        "enum": [
+          "primary",
+          "secondary"
+        ],
+        "title": "SeriesKind",
+        "type": "string"
+      },
+      "SeriesPreviewInput": {
+        "description": "Select a step, language, and optional real donor.",
+        "properties": {
+          "donor_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Donor Id"
+          },
+          "language": {
+            "$ref": "#/components/schemas/LanguageCode"
+          },
+          "step_id": {
+            "format": "uuid",
+            "title": "Step Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "step_id",
+          "language"
+        ],
+        "title": "SeriesPreviewInput",
+        "type": "object"
+      },
+      "SeriesPreviewMessage": {
+        "description": "Non-persistent outbound message rendered for the simulator preview.",
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "button_id": {
+            "title": "Button Id",
+            "type": "null"
+          },
+          "buttons": {
+            "items": {
+              "$ref": "#/components/schemas/PreviewButtonOut"
+            },
+            "title": "Buttons",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "delivered_at": {
+            "title": "Delivered At",
+            "type": "null"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/MessageDirection"
+          },
+          "donor_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Donor Id"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/MessageKind"
+          },
+          "media_type": {
+            "$ref": "#/components/schemas/MediaType"
+          },
+          "media_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Media Url"
+          },
+          "read_at": {
+            "title": "Read At",
+            "type": "null"
+          },
+          "reply_to_message_id": {
+            "title": "Reply To Message Id",
+            "type": "null"
+          },
+          "sent_at": {
+            "title": "Sent At",
+            "type": "null"
+          },
+          "status": {
+            "$ref": "#/components/schemas/MessageStatus"
+          }
+        },
+        "required": [
+          "id",
+          "donor_id",
+          "direction",
+          "kind",
+          "body",
+          "media_type",
+          "media_url",
+          "buttons",
+          "status",
+          "created_at"
+        ],
+        "title": "SeriesPreviewMessage",
+        "type": "object"
+      },
+      "SeriesReorderInput": {
+        "description": "Complete desired ordering for one series.",
+        "properties": {
+          "step_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Step Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "step_ids"
+        ],
+        "title": "SeriesReorderInput",
+        "type": "object"
+      },
+      "SeriesStatus": {
+        "enum": [
+          "draft",
+          "active",
+          "archived"
+        ],
+        "title": "SeriesStatus",
+        "type": "string"
+      },
+      "SeriesStepContentInput": {
+        "description": "Localized body supplied for a series step.",
+        "properties": {
+          "body": {
+            "maxLength": 1024,
+            "title": "Body",
+            "type": "string"
+          },
+          "language": {
+            "$ref": "#/components/schemas/LanguageCode"
+          }
+        },
+        "required": [
+          "language",
+          "body"
+        ],
+        "title": "SeriesStepContentInput",
+        "type": "object"
+      },
+      "SeriesStepContentOut": {
+        "description": "Stored localized step body.",
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "language": {
+            "$ref": "#/components/schemas/LanguageCode"
+          }
+        },
+        "required": [
+          "id",
+          "language",
+          "body"
+        ],
+        "title": "SeriesStepContentOut",
+        "type": "object"
+      },
+      "SeriesStepInput": {
+        "description": "Create one ordered content-series step.",
+        "properties": {
+          "buttons": {
+            "items": {
+              "$ref": "#/components/schemas/QuickReplyButtonInput"
+            },
+            "maxItems": 3,
+            "title": "Buttons",
+            "type": "array"
+          },
+          "category": {
+            "$ref": "#/components/schemas/MessageCategory"
+          },
+          "contents": {
+            "items": {
+              "$ref": "#/components/schemas/SeriesStepContentInput"
+            },
+            "title": "Contents",
+            "type": "array"
+          },
+          "delay_days": {
+            "minimum": 0.0,
+            "title": "Delay Days",
+            "type": "integer"
+          },
+          "media_type": {
+            "$ref": "#/components/schemas/MediaType",
+            "default": "none"
+          },
+          "media_url": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Media Url"
+          }
+        },
+        "required": [
+          "delay_days",
+          "category"
+        ],
+        "title": "SeriesStepInput",
+        "type": "object"
+      },
+      "SeriesStepOut": {
+        "description": "One ordered series step with localized contents.",
+        "properties": {
+          "buttons": {
+            "items": {
+              "$ref": "#/components/schemas/QuickReplyButtonOut"
+            },
+            "title": "Buttons",
+            "type": "array"
+          },
+          "category": {
+            "$ref": "#/components/schemas/MessageCategory"
+          },
+          "contents": {
+            "items": {
+              "$ref": "#/components/schemas/SeriesStepContentOut"
+            },
+            "title": "Contents",
+            "type": "array"
+          },
+          "delay_days": {
+            "title": "Delay Days",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "media_type": {
+            "$ref": "#/components/schemas/MediaType"
+          },
+          "media_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Media Url"
+          },
+          "step_order": {
+            "title": "Step Order",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "step_order",
+          "delay_days",
+          "category",
+          "media_type",
+          "media_url",
+          "contents",
+          "buttons"
+        ],
+        "title": "SeriesStepOut",
+        "type": "object"
+      },
+      "SeriesStepUpdate": {
+        "description": "Replace selected fields on one series step.",
+        "properties": {
+          "buttons": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/QuickReplyButtonInput"
+                },
+                "maxItems": 3,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Buttons"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MessageCategory"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "contents": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/SeriesStepContentInput"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contents"
+          },
+          "delay_days": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delay Days"
+          },
+          "media_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MediaType"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "media_url": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Media Url"
+          }
+        },
+        "title": "SeriesStepUpdate",
+        "type": "object"
+      },
+      "TokenResponse": {
+        "description": "Access token and authenticated user returned after login.",
+        "properties": {
+          "access_token": {
+            "title": "Access Token",
+            "type": "string"
+          },
+          "token_type": {
+            "const": "bearer",
+            "default": "bearer",
+            "title": "Token Type",
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserOut"
+          }
+        },
+        "required": [
+          "access_token",
+          "user"
+        ],
+        "title": "TokenResponse",
+        "type": "object"
+      },
+      "UploadedBySummary": {
+        "description": "Minimal uploader identity displayed with a batch.",
+        "properties": {
+          "full_name": {
+            "title": "Full Name",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "full_name"
+        ],
+        "title": "UploadedBySummary",
+        "type": "object"
+      },
+      "UserOut": {
+        "description": "Public staff-user fields.",
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "full_name": {
+            "title": "Full Name",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "full_name",
+          "role",
+          "is_active"
+        ],
+        "title": "UserOut",
+        "type": "object"
+      },
+      "UserPage": {
+        "description": "Paginated active-user response.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/UserOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size"
+        ],
+        "title": "UserPage",
+        "type": "object"
+      },
+      "UserRole": {
+        "enum": [
+          "admin",
+          "coordinator"
+        ],
+        "title": "UserRole",
+        "type": "string"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "ValidationIssue": {
+        "description": "One row-level upload validation error.",
+        "properties": {
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "row": {
+            "title": "Row",
+            "type": "integer"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "row",
+          "field",
+          "value",
+          "reason"
+        ],
+        "title": "ValidationIssue",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "TIHBC Donor Recall API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/auth/login": {
+      "post": {
+        "description": "Authenticate a staff user and issue an access token.",
+        "operationId": "login_api_v1_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Log in with staff credentials",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "description": "Return the authenticated active user.",
+        "operationId": "get_me_api_v1_auth_me_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get the current staff user",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/v1/content-series": {
+      "get": {
+        "description": "Return filtered content-series summaries.",
+        "operationId": "list_content_series_api_v1_content_series_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/SeriesKind"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/SeriesStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tag",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 40,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tag"
+            }
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/LanguageCode"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Language"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 255,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentSeriesPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List content series",
+        "tags": [
+          "Content Series"
+        ]
+      },
+      "post": {
+        "description": "Create one draft content series.",
+        "operationId": "create_content_series_api_v1_content_series_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentSeriesCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentSeriesDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create a content series",
+        "tags": [
+          "Content Series"
+        ]
+      }
+    },
+    "/api/v1/content-series/{series_id}": {
+      "get": {
+        "description": "Return one series with ordered steps and contents.",
+        "operationId": "get_content_series_api_v1_content_series__series_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "series_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Series Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentSeriesDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get content-series details",
+        "tags": [
+          "Content Series"
+        ]
+      },
+      "patch": {
+        "description": "Update editable series settings.",
+        "operationId": "update_content_series_api_v1_content_series__series_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "series_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Series Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentSeriesUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentSeriesDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update a content series",
+        "tags": [
+          "Content Series"
+        ]
+      }
+    },
+    "/api/v1/content-series/{series_id}/actions/activate": {
+      "post": {
+        "description": "Validate every step and activate the series.",
+        "operationId": "activate_content_series_api_v1_content_series__series_id__actions_activate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "series_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Series Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentSeriesDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Activate a content series",
+        "tags": [
+          "Content Series"
+        ]
+      }
+    },
+    "/api/v1/content-series/{series_id}/actions/archive": {
+      "post": {
+        "description": "Archive a series not used by an active campaign.",
+        "operationId": "archive_content_series_api_v1_content_series__series_id__actions_archive_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "series_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Series Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentSeriesDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Archive a content series",
+        "tags": [
+          "Content Series"
+        ]
+      }
+    },
+    "/api/v1/content-series/{series_id}/actions/duplicate": {
+      "post": {
+        "description": "Deep-copy a series into a new draft.",
+        "operationId": "duplicate_content_series_api_v1_content_series__series_id__actions_duplicate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "series_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Series Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentSeriesDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Duplicate a content series",
+        "tags": [
+          "Content Series"
+        ]
+      }
+    },
+    "/api/v1/content-series/{series_id}/preview": {
+      "post": {
+        "description": "Render one localized simulator message without persisting it.",
+        "operationId": "preview_series_step_api_v1_content_series__series_id__preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "series_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Series Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeriesPreviewInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeriesPreviewMessage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Preview a rendered series step",
+        "tags": [
+          "Content Series"
+        ]
+      }
+    },
+    "/api/v1/content-series/{series_id}/steps": {
+      "post": {
+        "description": "Append a validated step to a series.",
+        "operationId": "create_series_step_api_v1_content_series__series_id__steps_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "series_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Series Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeriesStepInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeriesStepOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Add a content-series step",
+        "tags": [
+          "Content Series"
+        ]
+      }
+    },
+    "/api/v1/content-series/{series_id}/steps/actions/reorder": {
+      "post": {
+        "description": "Replace the complete step order.",
+        "operationId": "reorder_series_steps_api_v1_content_series__series_id__steps_actions_reorder_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "series_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Series Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeriesReorderInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentSeriesDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Reorder content-series steps",
+        "tags": [
+          "Content Series"
+        ]
+      }
+    },
+    "/api/v1/content-series/{series_id}/steps/{step_id}": {
+      "delete": {
+        "description": "Delete a step and return the renumbered series.",
+        "operationId": "delete_series_step_api_v1_content_series__series_id__steps__step_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "series_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Series Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "step_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Step Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentSeriesDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete a content-series step",
+        "tags": [
+          "Content Series"
+        ]
+      },
+      "patch": {
+        "description": "Update one step without changing its order.",
+        "operationId": "update_series_step_api_v1_content_series__series_id__steps__step_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "series_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Series Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "step_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Step Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeriesStepUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeriesStepOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update a content-series step",
+        "tags": [
+          "Content Series"
+        ]
+      }
+    },
+    "/api/v1/donor-batches": {
+      "get": {
+        "description": "Return searchable and sortable donor batch summaries.",
+        "operationId": "list_batches_api_v1_donor_batches_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "search",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 255,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "default": "-created_at",
+              "enum": [
+                "created_at",
+                "-created_at",
+                "name",
+                "-name"
+              ],
+              "title": "Sort",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DonorBatchPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List donor batches",
+        "tags": [
+          "Donor Batches"
+        ]
+      },
+      "post": {
+        "description": "Persist only valid donors from a live preview token.",
+        "operationId": "import_batch_api_v1_donor_batches_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchImportRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DonorBatchOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Import a validated donor batch",
+        "tags": [
+          "Donor Batches"
+        ]
+      }
+    },
+    "/api/v1/donor-batches/preview": {
+      "post": {
+        "description": "Validate an upload without persisting a donor batch.",
+        "operationId": "preview_batch_api_v1_donor_batches_preview_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_preview_batch_api_v1_donor_batches_preview_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchPreview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Preview and validate a donor batch upload",
+        "tags": [
+          "Donor Batches"
+        ]
+      }
+    },
+    "/api/v1/donor-batches/sample-file": {
+      "get": {
+        "description": "Return a generated CSV with valid columns and example rows.",
+        "operationId": "download_sample_file_api_v1_donor_batches_sample_file_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Download a donor batch sample CSV",
+        "tags": [
+          "Donor Batches"
+        ]
+      }
+    },
+    "/api/v1/donor-batches/{batch_id}": {
+      "get": {
+        "description": "Return one donor batch with breakdowns.",
+        "operationId": "get_batch_api_v1_donor_batches__batch_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Batch Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DonorBatchDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get donor batch details",
+        "tags": [
+          "Donor Batches"
+        ]
+      }
+    },
+    "/api/v1/donor-batches/{batch_id}/donors": {
+      "get": {
+        "description": "Return filtered donors with masked phone numbers.",
+        "operationId": "list_batch_donors_api_v1_donor_batches__batch_id__donors_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Batch Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "segment",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 40,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Segment"
+            }
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/LanguageCode"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Language"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 255,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "default": "full_name",
+              "enum": [
+                "created_at",
+                "-created_at",
+                "full_name",
+                "-full_name"
+              ],
+              "title": "Sort",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DonorPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List donors in a batch",
+        "tags": [
+          "Donor Batches"
+        ]
+      }
+    },
+    "/api/v1/donor-batches/{batch_id}/validation-report": {
+      "get": {
+        "description": "Return persisted invalid-row details for a donor batch.",
+        "operationId": "get_validation_report_api_v1_donor_batches__batch_id__validation_report_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Batch Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ValidationIssue"
+                  },
+                  "title": "Response Get Validation Report Api V1 Donor Batches  Batch Id  Validation Report Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get a donor batch validation report",
+        "tags": [
+          "Donor Batches"
+        ]
+      }
+    },
+    "/api/v1/media": {
+      "post": {
+        "description": "Validate media bytes and store the asset under a random filename.",
+        "operationId": "upload_media_api_v1_media_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_media_api_v1_media_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaUploadOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Upload content-series media",
+        "tags": [
+          "Media"
+        ]
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "description": "Return active users, optionally filtered by role.",
+        "operationId": "list_users_api_v1_users_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "role",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/UserRole"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Role"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List active staff users",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/health/live": {
+      "get": {
+        "description": "Return success whenever the API process can answer requests.",
+        "operationId": "live_health_live_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LiveResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Check API process liveness",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "description": "Report whether both required data services are reachable.",
+        "operationId": "ready_health_ready_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "503": {
+            "description": "A required dependency is unavailable"
+          }
+        },
+        "summary": "Check database and Redis readiness",
+        "tags": [
+          "health"
+        ]
+      }
+    }
+  }
+}

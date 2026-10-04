@@ -1,0 +1,6 @@
+.next/
+*.tsbuildinfo
+coverage/
+next-env.d.ts
+playwright-report/
+test-results/
