@@ -14,6 +14,7 @@ from app.core.db import get_db
 from app.core.errors import ForbiddenError, UnauthorizedError
 from app.core.redis import get_redis
 from app.models.enums import UserRole
+from app.repositories.campaign import CampaignRepository
 from app.repositories.content_series import ContentSeriesRepository
 from app.repositories.donor import DonorRepository, SegmentRepository
 from app.repositories.donor_batch import DonorBatchRepository
@@ -23,6 +24,8 @@ from app.services.auth_service import INVALID_TOKEN_MESSAGE, AuthService
 from app.services.batch_upload.preview_store import PreviewCache, PreviewStore
 from app.services.batch_upload.query_service import DonorBatchQueryService
 from app.services.batch_upload.service import BatchUploadService
+from app.services.campaigns.query_service import CampaignQueryService
+from app.services.campaigns.service import CampaignService
 from app.services.content_series.access import ContentSeriesAccess
 from app.services.content_series.query_service import ContentSeriesQueryService
 from app.services.content_series.service import ContentSeriesService
@@ -106,6 +109,21 @@ def get_content_series_query_service(
         current_clock,
         settings.timezone_display,
     )
+
+
+def get_campaign_service(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_clock: Annotated[Clock, Depends(get_clock)],
+) -> CampaignService:
+    """Build the request-scoped campaign mutation service."""
+    return CampaignService(db, CampaignRepository(db), current_clock)
+
+
+def get_campaign_query_service(
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> CampaignQueryService:
+    """Build the request-scoped campaign query service."""
+    return CampaignQueryService(CampaignRepository(db))
 
 
 def get_media_service(

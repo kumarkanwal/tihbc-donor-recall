@@ -1,23 +1,74 @@
-# MVP Progress
+# Progress Tracker
 
-| Task | Status | Notes |
-|---|---|---|
-| 1.1 Backend skeleton | Done | Automated checks pass. User verification confirmed Docker Compose services healthy, `/health/ready` returned 200, and the complete test suite passed. Pytest artifacts are isolated under `backend/.pytest_tmp`, and Uvicorn reload watches only `backend/app`. |
-| 1.2 Database models and migrations | Done | Implemented all specified models, constraints, relationships, generic repository operations, cached persistent demo clock, and migrations through `0002_reference_data`. Upgrade/downgrade and schema-parity checks pass; all 60 tests pass against PostgreSQL, and integration writes are rollback-isolated. |
-| 1.3 Authentication and role access | Done | Added Argon2 password hashing, clock-aware HS256 access tokens, active-user and role enforcement, auth/user APIs, and idempotent demo-user seeding. All 80 tests pass against PostgreSQL; seed reruns retain user IDs; admin login and `/auth/me` were verified through OpenAPI docs. |
-| 1.4 Docker compose for the backend | Done | Added a non-root multi-stage backend image, shared PostgreSQL-waiting entrypoint, API-owned migrations, healthy API/worker Compose services, persistent media storage, graceful placeholder worker heartbeats, and local/Docker documentation. User-run Docker build, health, migration, seed, log, restart, and shutdown checks passed. |
-| 2.1 Donor batch upload | Done | CSV/XLSX preview, first-occurrence duplicate handling, cross-batch warnings, Redis preview storage, non-empty transactional import, protected batch/donor APIs, campaign-free list/detail behavior, and PostgreSQL HTTP coverage are complete. User `/docs` verification passed for sample upload, preview, import, list, and detail. |
-| 2.2 Content series, steps, and media upload | Done | Bilingual series lifecycle, ordered steps, previews, media validation/storage, role guards, and isolated PostgreSQL coverage are complete. Manual `/docs` acceptance and all 170 automated tests pass. |
-| 3.1 Frontend setup, design tokens, and API client | Done | Next.js foundation, exact light/dark tokens, fonts, theme and query providers, validated environment, generated typed API client, global auth/error handling, tooling, temporary visual page, and required folder structure are complete. API generation, lint, typecheck, 2 tests, production build, and light/dark visual checks pass. |
-| 3.2 App shell | Done | Added auth/dashboard route groups, persistent 240/64 px responsive navigation, active-route styling, page context and role-gated top-bar controls, light/dark theme access, placeholder routes, and a navigation-persistent donor phone panel. Lint, typecheck, 5 tests, production build, and responsive light/dark visual checks pass. |
-| 3.3 Login and session | Done | Added the validated staff login, safe return paths, typed login plus `/auth/me` confirmation, demo-only memory/localStorage session persistence, protected-route and login redirects without content flash, current-user query, shared role visibility, cache-clearing logout, and global 401 reset. Lint, typecheck, 12 tests, production build, protected-route redirect, login layout, and inline validation checks pass. |
-| 3.4 Shared components | Done | Added typed PageHeader, server-side DataTable, complete StatusBadge coverage, KpiCard, EmptyState, ErrorState, ConfirmDialog, FileDropzone, MaskedPhone, DateTime, ChartCard, LanguageTabs, and structural PhonePreview. All use design tokens, required view states, accessible controls, and responsive layouts. Lint, typecheck, 18 tests, and production build pass. |
-| 3.5 Donor Batches pages | Done | Added the searchable/sortable batch list, role-gated three-step CSV/XLSX upload and import wizard, warning/error review, expired-preview recovery, authenticated downloads, batch detail metrics, filtered donor browsing, and validation reports. API generation, lint, strict typecheck, 24 tests, and the production build pass. |
+Status values: Not started | In progress | Done | Blocked
+Update after every task. Add a note for Blocked items.
 
-## Phase status
+## Phase 0: Preparation (human)
+| # | Task | Status | Notes |
+|---|---|---|---|
+| 0.1 | TIHBC logo and brand colors → update brand.md | Not started | |
+| 0.2 | Repo with AGENTS.md and docs/ | Done | |
+| 0.3 | VPS: Docker, Nginx, subdomains, SSL | Not started | |
+| 0.4 | LLM and LangSmith API keys | Not started | |
+| 0.5 | Demo content: 3 series (EN/UR), 1 sample video | Not started | |
 
-**Phase 1 — Backend foundation (Tasks 1.1–1.4): Done.**
+## Phase 1: Backend foundation
+| # | Task | Status | Notes |
+|---|---|---|---|
+| 1.1 | Skeleton: config, logging, clock, errors | Not started | |
+| 1.2 | Models and Alembic migrations | Not started | |
+| 1.3 | Auth: login, JWT, role guards | Not started | |
+| 1.4 | Docker compose: API, Postgres, Redis | Not started | |
 
-**Phase 2 — Donor and content management: Task 2.1 complete.**
+## Phase 2: Backend features
+| # | Task | Status | Notes |
+|---|---|---|---|
+| 2.1 | Batch upload: preview, validation, import | Not started | |
+| 2.2 | Content series, steps, media upload | Done | Bilingual series lifecycle, ordered steps, previews, media validation/storage, role guards, and isolated PostgreSQL coverage are complete. Manual `/docs` acceptance and all 170 automated tests pass. |
+| 2.3 | Campaigns: create, launch, pause, resume | In progress | Backend campaign lifecycle and enrollment APIs are being implemented. |
+| 2.4 | Messaging provider (simulator) | Not started | |
+| 2.5 | Scheduler: dispatcher and escalation | Not started | |
+| 2.6 | WebSockets and Redis events | Not started | |
+| 2.7 | Simulator API | Not started | |
+| 2.8 | Reply service flows | Not started | |
+| 2.9 | LangGraph agent, fallback, LangSmith | Not started | |
+| 2.10 | Follow-up inbox API | Not started | |
+| 2.11 | Metrics and reports API | Not started | |
+| 2.12 | Settings and demo clock API | Not started | |
+| 2.13 | Seed data | Not started | |
+| 2.14 | Backend tests | Not started | |
 
-**Phase 3 — Frontend application: Tasks 3.1–3.5 complete.**
+## Phase 3: Frontend
+| # | Task | Status | Notes |
+|---|---|---|---|
+| 3.1 | Setup, tokens, generated API client | Not started | |
+| 3.2 | App shell and skip-time control | Not started | |
+| 3.3 | Login | Not started | |
+| 3.4 | Shared components | Not started | |
+| 3.5 | Donor batches | Not started | |
+| 3.6 | Content series library and editor | Done | Added the searchable/filterable table and grid library, administrator lifecycle actions, bilingual settings and step editor, accessible reordering, media upload, server-rendered simulator preview, activation problem groups, and coordinator/archived read-only states. API generation, lint, strict typecheck, 29 tests, and the production build pass. |
+| 3.7 | Campaigns | Not started | |
+| 3.8 | WhatsApp simulator | Not started | |
+| 3.9 | Follow-up inbox | Not started | |
+| 3.10 | Dashboard | Not started | |
+| 3.11 | Reports | Not started | |
+| 3.12 | Settings | Not started | |
+| 3.13 | WebSocket live updates | Not started | |
+
+## Phase 4: Integration and deployment
+| # | Task | Status | Notes |
+|---|---|---|---|
+| 4.1 | End-to-end Playwright flow | Not started | |
+| 4.2 | Agent test with real LLM (EN, UR, Roman Urdu) | Not started | |
+| 4.3 | Deploy to VPS | Not started | |
+| 4.4 | Bug fixes and polish | Not started | |
+
+## Phase 5: Demo preparation (human)
+| # | Task | Status | Notes |
+|---|---|---|---|
+| 5.1 | Demo script | Not started | |
+| 5.2 | Two full rehearsals | Not started | |
+| 5.3 | Reset demo data before meeting | Not started | |
+| 5.4 | Backup screen recording | Not started | |
+
+DNS A record tihbc.kanwalkumar.com → 2.25.189.195 added. Deploy in 4.3.
