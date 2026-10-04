@@ -11,6 +11,10 @@ interface MaskedPhoneProps {
 }
 
 function formatPakistaniPhone(value: string, masked: boolean): string {
+  if (value.includes("*")) {
+    return value;
+  }
+
   const digits = value.replace(/\D/g, "");
   if (digits.length === 12 && digits.startsWith("92")) {
     const prefix = `+${digits.slice(0, 2)} ${digits.slice(2, 5)}`;

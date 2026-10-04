@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added complete Donor Batches screens for searchable batch browsing, role-gated CSV/XLSX validation and import, warning/error review, expired-preview recovery, donor filtering, and validation reports.
 - Added the reusable table, state, KPI, dialog, upload, phone, date/time, chart, bilingual, and phone-preview component library for upcoming frontend screens.
 - Added validated staff sign-in, persisted demo sessions, protected routes, role-aware current-user data, and complete logout and expired-session handling.
 - Added the responsive application shell with persistent navigation, role-aware top-bar controls, light/dark theme access, placeholder pages, and the donor phone panel entry point.
