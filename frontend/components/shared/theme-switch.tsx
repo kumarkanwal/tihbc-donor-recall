@@ -2,7 +2,6 @@
 
 import { Laptop, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useSyncExternalStore } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,22 +11,13 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useHasMounted } from "@/hooks/use-has-mounted";
 
 const themes = [
   { label: "Light", value: "light", icon: Sun },
   { label: "Dark", value: "dark", icon: Moon },
   { label: "System", value: "system", icon: Laptop },
 ] as const;
-
-const subscribeToHydration = (): (() => void) => () => undefined;
-
-function useHasMounted(): boolean {
-  return useSyncExternalStore(
-    subscribeToHydration,
-    () => true,
-    () => false,
-  );
-}
 
 /** Select and persist the application color theme. */
 export function ThemeSwitch(): React.JSX.Element {

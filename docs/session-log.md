@@ -111,3 +111,10 @@
 - **Verification:** `pnpm lint`, strict typecheck, 5 Vitest tests, and the Next.js production build pass. The shell, active navigation, light and dark themes, 240 px desktop sidebar, 64 px tablet sidebar, and 400 px donor panel were visually checked at `http://localhost:3000`.
 - **Next:** Implement Task 3.3 login, session persistence, current-user query, route protection, logout, and global 401 behavior.
 - **Blockers:** None.
+
+## S-018 — 2026-10-04 — [FE] Login and session
+
+- **Done:** Added the centered TIHBC login with React Hook Form and Zod validation, pending and inline error states, generic 401 messaging, typed login and `/auth/me` confirmation, safe requested-page redirects, Zustand memory plus localStorage session persistence, protected-route and logged-in login redirects without protected-content flash, the TanStack Query current-user hook, current-user-driven role visibility and top-bar identity, cache-clearing logout, and global 401 reset. Corrected the generated-client base so versioned OpenAPI paths are not duplicated.
+- **Verification:** `pnpm lint`, strict typecheck, 12 Vitest tests, and the Next.js production build pass. Browser checks confirmed `/` redirects to `/login?next=%2F`, the light-theme login layout, 96 px logo, required copy, and inline empty-field validation. The local backend was not running, so credential acceptance was covered with the generated API contract and component-level 401 test rather than a live browser round-trip.
+- **Next:** Implement Task 3.4 shared components from `docs/screens.md` section 10.
+- **Blockers:** None for implementation; live API acceptance remains environment-dependent.

@@ -1,7 +1,7 @@
 "use client";
 
 import { Bell, ChevronDown, Clock3, LogOut } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 import { RequireRole } from "@/components/shared/require-role";
 import { ThemeSwitch } from "@/components/shared/theme-switch";
@@ -12,25 +12,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { clearSession } from "@/lib/api/session";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { useLogout } from "@/hooks/use-logout";
 import { getNavigationItem } from "@/lib/navigation";
-import type { UserRole } from "@/lib/auth/roles";
-
-const demoUser = {
-  name: "Demo Admin",
-  role: "admin" as UserRole,
-};
 
 /** Current page context and application-level controls. */
 export function TopBar(): React.JSX.Element {
   const pathname = usePathname();
-  const router = useRouter();
+  const { data: user } = useCurrentUser();
+  const logout = useLogout();
   const currentItem = getNavigationItem(pathname);
-
-  function handleLogout(): void {
-    clearSession();
-    router.push("/login");
-  }
 
   return (
     <header className="border-border bg-surface sticky top-0 z-30 flex min-h-20 items-center justify-between gap-4 border-b px-4 py-3 sm:px-6">
@@ -42,7 +33,7 @@ export function TopBar(): React.JSX.Element {
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
-        <RequireRole currentRole={demoUser.role} allowed={["admin"]}>
+        <RequireRole allowed={["admin"]}>
           <Button
             type="button"
             variant="secondary"
@@ -72,10 +63,10 @@ export function TopBar(): React.JSX.Element {
             <Button type="button" variant="secondary">
               <span className="hidden text-left sm:block">
                 <span className="block text-xs font-medium">
-                  {demoUser.name}
+                  {user?.full_name ?? "Staff user"}
                 </span>
                 <span className="text-muted-foreground block text-xs capitalize">
-                  {demoUser.role}
+                  {user?.role ?? "coordinator"}
                 </span>
               </span>
               <ChevronDown aria-hidden="true" strokeWidth={1.75} />
@@ -83,7 +74,7 @@ export function TopBar(): React.JSX.Element {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onSelect={handleLogout}>
+            <DropdownMenuItem onSelect={logout}>
               <LogOut aria-hidden="true" strokeWidth={1.75} />
               Logout
             </DropdownMenuItem>

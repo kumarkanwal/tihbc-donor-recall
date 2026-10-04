@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added validated staff sign-in, persisted demo sessions, protected routes, role-aware current-user data, and complete logout and expired-session handling.
 - Added the responsive application shell with persistent navigation, role-aware top-bar controls, light/dark theme access, placeholder pages, and the donor phone panel entry point.
 - Added the frontend application foundation, light and dark brand themes, Urdu typography, typed API client, shared status styling, and temporary visual verification page.
 - Added secure staff login, role-based API access, current-user lookup, active-user listing, and idempotent admin/coordinator demo-user seeding.

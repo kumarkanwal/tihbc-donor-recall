@@ -3,6 +3,7 @@ import createClient, { type Middleware } from "openapi-fetch";
 import { env } from "@/lib/env";
 import type { paths } from "@/lib/api/schema";
 
+import { getGeneratedClientBaseUrl } from "./base-url";
 import { parseApiErrorPayload } from "./errors";
 import { clearSessionAndRedirect, getAccessToken } from "./session";
 
@@ -50,7 +51,7 @@ const apiMiddleware: Middleware = {
 
 /** Generated-contract HTTP client with shared authentication and error behavior. */
 export const apiClient = createClient<paths>({
-  baseUrl: env.NEXT_PUBLIC_API_URL,
+  baseUrl: getGeneratedClientBaseUrl(env.NEXT_PUBLIC_API_URL),
 });
 
 apiClient.use(apiMiddleware);

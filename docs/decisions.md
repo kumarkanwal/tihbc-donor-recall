@@ -235,3 +235,11 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Status:** Accepted
 - **Decision:** Use pnpm 12.4.2, Next.js 16.3.8, React 19.3.0, Tailwind CSS 4.3.3, and TypeScript 5.9.3 for the frontend foundation. Generate and commit API types from `frontend/openapi.json` with openapi-typescript 7.13.0, and call them through openapi-fetch 0.17.0. TypeScript 5.9.3 is the newest stable release compatible with openapi-typescript and the approved ESLint TypeScript tooling.
 - **Reason:** Pinning the verified current-compatible foundation makes local and CI behavior reproducible while keeping the API contract generated rather than duplicated by hand.
+
+## D-100 — Demo browser session persistence
+
+- **Date:** 2026-10-04
+- **Status:** Accepted
+- **Decision:** Store the access token and confirmed current user in a Zustand session store backed by browser `localStorage`. Keep all access behind the shared session module and clear the store, persisted value, and TanStack Query cache on logout. A 401 performs an intentional full navigation to clear in-memory authenticated state globally.
+- **Reason:** The MVP needs sessions to survive navigation and reloads without adding an unavailable server-side cookie flow. Centralizing access keeps the demo-only persistence replaceable when production authentication is designed.
+- **Consequences:** Browser storage is acceptable only for this demo and must not be treated as the production security model.
