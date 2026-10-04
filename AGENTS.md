@@ -473,6 +473,7 @@ uv run python -m app.scheduler     # dispatcher worker
 uv run python -m app.seed
 uv run python -m app.export_openapi # write the stable schema to frontend/openapi.json
 uv run ruff check . && uv run ruff format --check . && uv run mypy app && uv run pytest
+uv run pytest --run-postgres         # isolated TEST_DATABASE_URL; creates and migrates it if needed
 
 # Frontend
 cd frontend
@@ -489,9 +490,14 @@ Run `uv run python -m app.export_openapi` after every API change and commit the 
 `frontend/openapi.json` file.
 
 **Codex pytest isolation:** When Codex runs backend tests, it must use
-`uv run pytest --basetemp=.pytest_tmp_codex -o cache_dir=.pytest_tmp_codex/cache` (plus any other
-required pytest arguments). Codex must never create, use, modify, or delete `backend/.pytest_tmp`;
-that path is reserved for human local test runs. Both paths remain Git-ignored.
+`uv run pytest --basetemp=.pytest_tmp_codex` (plus any other required pytest arguments). The pytest
+cache provider is disabled project-wide. Codex must never create, use, modify, or delete
+`backend/.pytest_tmp`; normal human runs use pytest's operating-system temporary directory instead.
+Both repository paths remain Git-ignored for compatibility and isolation.
+
+PostgreSQL tests must use `TEST_DATABASE_URL`, which defaults to a database named `tihbc_test` on the
+same server as `DATABASE_URL`. The test session must refuse the development database, create the test
+database if missing, and migrate it automatically before tests run.
 
 ---
 

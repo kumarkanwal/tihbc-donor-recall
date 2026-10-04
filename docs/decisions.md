@@ -251,3 +251,17 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Decision:** Build the server-driven `DataTable` on TanStack React Table 9.2.4 and use the shadcn-compatible Radix Alert Dialog and Tabs primitives for confirmation and bilingual content. Keep application styling and state presentation in repository-owned shared components.
 - **Reason:** These approved headless foundations provide typed table state and accessible interaction behavior without imposing visual styles that conflict with the TIHBC tokens.
 - **Consequences:** Feature pages supply server pagination, sorting, filters, and data while the shared components remain free of domain business logic.
+
+## D-040 — Automatically provisioned isolated PostgreSQL tests
+
+- **Date:** 2026-10-04
+- **Status:** Accepted
+- **Decision:** PostgreSQL tests replace the application database URL with `TEST_DATABASE_URL`. When it is unset, derive a `tihbc_test` database on the `DATABASE_URL` server. Refuse an identical development target, create the test database when absent, migrate it to Alembic head at session start, and keep each test rollback-isolated. Tests identify only records they create. Normal local pytest runs use the operating-system temporary directory; Codex alone uses `.pytest_tmp_codex`, and the cache provider stays disabled.
+- **Reason:** Automated tests must never observe or mutate development data, must remain repeatable when a test database contains prior records, and must not create cross-user Windows permission conflicts in repository-owned temp/cache directories.
+
+## D-041 — Redacted framework validation details
+
+- **Date:** 2026-10-04
+- **Status:** Accepted
+- **Decision:** Framework request-validation responses expose only `loc`, `msg`, and `type` for each error. The original submitted `input` value is removed globally before serialization.
+- **Reason:** Validation metadata remains actionable without reflecting donor names, phone numbers, or other personal data in API responses.

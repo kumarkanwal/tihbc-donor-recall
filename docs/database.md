@@ -209,6 +209,9 @@ Only one open item per enrollment: partial unique index on `enrollment_id` where
 
 ### 2.16 `demo_clock`
 Single-row table (`id` = 1). `offset_seconds` bigint default 0. Read by `core/clock.py`.
+The singleton row is inserted by migration. Application startup loads its value into the process-local
+clock cache so `clock.now()` performs no database I/O. Advancing or resetting the clock persists the
+row transactionally before updating the cache.
 
 ---
 

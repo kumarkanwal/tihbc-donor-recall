@@ -13,7 +13,9 @@ All variables are read only through `backend/app/core/config.py` (pydantic-setti
 | `API_BASE_PATH` | no | `/api/v1` | |
 | `CORS_ORIGINS` | yes | `https://demo.example.com` | Comma-separated |
 | `DATABASE_URL` | yes | `postgresql+asyncpg://tihbc:secret@db:5432/tihbc` | |
+| `TEST_DATABASE_URL` | no | `postgresql+asyncpg://tihbc:secret@localhost:5433/tihbc_test` | PostgreSQL integration-test database. When omitted, tests use `tihbc_test` on the `DATABASE_URL` server. Must not identify the development database. |
 | `REDIS_URL` | yes | `redis://redis:6379/0` | |
+| `RUN_MIGRATIONS` | no | `false` | Container startup migration owner; Compose overrides this to `true` only for the API |
 | `JWT_SECRET` | yes | `change-me` | Long random string |
 | `JWT_EXPIRES_MINUTES` | no | `720` | |
 | `LOG_LEVEL` | no | `INFO` | |
@@ -30,10 +32,24 @@ All variables are read only through `backend/app/core/config.py` (pydantic-setti
 | `SIM_AUTO_READ_DELAY_SECONDS` | no | `10` | |
 | `SIM_TYPING_SECONDS` | no | `1.5` | Typing indicator before automatic replies |
 | `LLM_ENABLED` | no | `true` | `false` uses keyword fallback |
-| `LLM_PROVIDER` | if LLM on | `openai` | `openai` or `anthropic` |
-| `LLM_MODEL` | if LLM on | `gpt-4o-mini` | |
-| `LLM_API_KEY` | if LLM on | `sk-...` | |
-| `LLM_TIMEOUT_SECONDS` | no | `8` | |
+| `LLM_PROVIDER_ORDER` | if LLM on | `groq,cerebras,gemini,mistral,together,openrouter` | Try order; providers without a key are skipped |
+| `LLM_TIMEOUT_SECONDS` | no | `4` | Per-provider timeout before moving to the next |
+| `LLM_MAX_RETRIES_PER_PROVIDER` | no | `0` | Retries on the same provider before falling back |
+| `LLM_TOTAL_BUDGET_SECONDS` | no | `12` | Max total time across all providers, then fallback to `unknown` |
+| `LLM_CIRCUIT_FAILURES` | no | `3` | Consecutive failures before a provider is skipped |
+| `LLM_CIRCUIT_COOLDOWN_SECONDS` | no | `120` | How long a tripped provider is skipped |
+| `GROQ_API_KEY` | optional | `gsk_...` | |
+| `GROQ_MODEL` | no | `<model id>` | Overrides the default model in `agents/llm/providers.py` |
+| `CEREBRAS_API_KEY` | optional | `csk-...` | |
+| `CEREBRAS_MODEL` | no | `<model id>` | Overrides the default model in `agents/llm/providers.py` |
+| `GEMINI_API_KEY` | optional | `AIza...` | |
+| `GEMINI_MODEL` | no | `<model id>` | Overrides the default model in `agents/llm/providers.py` |
+| `MISTRAL_API_KEY` | optional | `...` | |
+| `MISTRAL_MODEL` | no | `<model id>` | Overrides the default model in `agents/llm/providers.py` |
+| `TOGETHER_API_KEY` | optional | `...` | |
+| `TOGETHER_MODEL` | no | `<model id>` | Overrides the default model in `agents/llm/providers.py` |
+| `OPENROUTER_API_KEY` | optional | `sk-or-...` | |
+| `OPENROUTER_MODEL` | no | `<model id>` | Overrides the default model in `agents/llm/providers.py` |
 | `AGENT_CONFIDENCE_THRESHOLD` | no | `0.7` | |
 | `LANGSMITH_TRACING` | no | `true` | |
 | `LANGSMITH_API_KEY` | if tracing | `lsv2_...` | |
@@ -55,5 +71,8 @@ All variables are read only through `backend/app/core/config.py` (pydantic-setti
 
 ## 3. Rules
 - Never commit `.env`. Secrets only in the VPS environment or Docker secrets.
+- PostgreSQL tests replace `DATABASE_URL` with the isolated `TEST_DATABASE_URL`, create that database
+  if it is missing, and migrate it to Alembic head before test collection. The configured database user
+  therefore needs `CREATEDB` only for the first run when `tihbc_test` does not exist.
 - `NEXT_PUBLIC_*` values are visible in the browser: never put secrets there.
 - Adding a variable requires updating this file, `.env.example`, and the config module in the same change.

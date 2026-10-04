@@ -132,3 +132,10 @@
 - **Verification:** `pnpm gen:api`, ESLint, strict typecheck, all 24 Vitest tests, and the Next.js production build pass. Five new page-flow tests cover wizard completion, zero-valid blocking, `PREVIEW_EXPIRED`, warnings, and coordinator visibility; a shared regression covers API-masked phone rendering. The local API returned HTTP 200 from `/health/live`; the desktop browser surface failed to attach to localhost after two attempts, so the live upload walkthrough remains a short manual acceptance check rather than an observed automated browser run.
 - **Next:** Log in as the demo admin, download and upload the sample CSV, then upload the locally supplied `bad-donors.csv` to visually confirm review/import/detail behavior in the running stack.
 - **Blockers:** None in the implementation. `bad-donors.csv` is not stored in the repository, and the desktop browser surface was unavailable for the final interactive check.
+
+## S-021 — 2026-10-04 — [BE] Task 2.2 closure
+
+- **Done:** Closed Content Series Task 2.2 after the full manual `/docs` flow passed. Added a dedicated `TEST_DATABASE_URL` that defaults to `tihbc_test` on the development PostgreSQL server, refuses the development database itself, creates the test database when missing, and migrates it automatically at pytest session start. Made integration assertions select only records created by each test, removed repository-wide pytest temp/cache defaults that caused Windows ownership collisions, and globally removed submitted `input` values from framework validation-error details. Regenerated the deterministic OpenAPI contract.
+- **Verification:** User-run isolated PostgreSQL suite passed all 170 tests with only KI-002. Codex-run Ruff lint and format checks pass, strict mypy passes across 120 source files, and the non-PostgreSQL suite reports 158 passed and 12 skipped with only KI-002. OpenAPI SHA-256 remains `0A6A5D8604688BF516CFD91CE652B8483571D478B7A478A11738301F4A595302`.
+- **Next:** Proceed to Task 2.3, Campaigns: create, launch, pause, and resume.
+- **Blockers:** None. Task 2.2 is complete.

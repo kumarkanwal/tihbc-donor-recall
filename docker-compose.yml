@@ -1,0 +1,88 @@
+x-backend-environment: &backend-environment
+  DATABASE_URL: postgresql+asyncpg://tihbc:secret@db:5432/tihbc
+  REDIS_URL: redis://redis:6379/0
+  MEDIA_STORAGE_DIR: /data/media
+
+x-backend-service: &backend-service
+  image: tihbc-donor-recall-backend
+  env_file:
+    - .env
+  volumes:
+    - media_data:/data/media
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: tihbc
+      POSTGRES_USER: tihbc
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tihbc -d tihbc"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  redis:
+    image: redis:7
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  api:
+    <<: *backend-service
+    environment:
+      <<: *backend-environment
+      RUN_MIGRATIONS: "true"
+    build:
+      context: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=3)
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  worker:
+    <<: *backend-service
+    environment:
+      <<: *backend-environment
+      RUN_MIGRATIONS: "false"
+    command: ["python", "-m", "app.scheduler"]
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os; os.kill(1, 0)"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  media_data:
+  postgres_data:
+  redis_data:

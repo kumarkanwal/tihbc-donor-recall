@@ -20,6 +20,9 @@ Query params for lists: `page`, `page_size` (max 100), `search`, `sort` (e.g. `-
 { "error": { "code": "VALIDATION_ERROR", "message": "Human readable", "details": {} } }
 ```
 
+Framework request-validation details contain only `loc`, `msg`, and `type`. They never echo the
+submitted `input` value.
+
 | Code | HTTP |
 |---|---|
 | `VALIDATION_ERROR` | 422 |
@@ -59,7 +62,7 @@ Query params for lists: `page`, `page_size` (max 100), `search`, `sort` (e.g. `-
 |---|---|---|---|
 | GET | `/donor-batches/sample-file` | A | Download sample CSV with correct columns |
 | POST | `/donor-batches/preview` | A | Multipart `file` (CSV/XLSX). Validates, returns `BatchPreview`. Nothing saved to DB |
-| POST | `/donor-batches` | A | Body `{name, preview_token}` → imports valid rows, returns `DonorBatch` |
+| POST | `/donor-batches` | A | Body `{name, preview_token}` → imports valid rows, returns `DonorBatch`. `name` is trimmed and must contain 1–120 characters |
 | GET | `/donor-batches` | C | Paginated `DonorBatch` list |
 | GET | `/donor-batches/{id}` | C | `DonorBatchDetail` (includes segment and language breakdown) |
 | GET | `/donor-batches/{id}/donors` | C | Paginated donors. Filters `segment`, `language`, `search` |
@@ -74,12 +77,20 @@ Query params for lists: `page`, `page_size` (max 100), `search`, `sort` (e.g. `-
   "segment_breakdown": [{"segment": "regular", "count": 120}],
   "language_breakdown": [{"language": "ur", "count": 140}],
   "sample_valid_rows": [ /* first 10 normalized rows */ ],
-  "errors": [{"row": 12, "field": "phone", "value": "0300-12", "reason": "Invalid Pakistani mobile number"}]
+  "errors": [{"row": 12, "field": "phone", "value": "0300-12", "reason": "Invalid Pakistani mobile number"}],
+  "warnings": [{"row": 18, "phone": "+92300*****67", "existing_batch_name": "January Recall"}]
 }
 ```
 Validation rules: required columns present; phone normalized to `+923XXXXXXXXX`; segment matches a
-`segments.key`; language in `en`/`ur` (also accept `English`/`Urdu`, case-insensitive); no duplicate phone
-in file; optional blood group in allowed list; `last_donation_date` parseable and not in the future.
+`segments.key`; language in `en`/`ur` (also accept `English`/`Urdu`, case-insensitive); optional blood
+group in allowed list; `last_donation_date` parseable and not in the future. For duplicate normalized
+phones within one file, the first occurrence remains valid and every later occurrence is invalid with
+reason `Duplicate of row N`, where `N` is the first occurrence's source row.
+Phones already present in another batch remain valid and are returned as masked `warnings` with the
+existing batch name.
+
+Import requires at least one valid donor in the referenced preview. A preview with `valid_rows: 0`
+cannot be imported and returns `VALIDATION_ERROR` with message `No valid donors to import`.
 
 `DonorBatch`: `{id, name, original_filename, total_rows, valid_rows, invalid_rows, uploaded_by, created_at, campaign_count}`
 
@@ -87,7 +98,7 @@ in file; optional blood group in allowed list; `last_donation_date` parseable an
 
 | Method | Path | Role | Description |
 |---|---|---|---|
-| GET | `/content-series` | C | Paginated. Filters `kind`, `status`, `tag`, `language` |
+| GET | `/content-series` | C | Paginated. Filters `kind`, `status`, `tag`, `language`, `search` |
 | POST | `/content-series` | A | Create `{name, description, kind, languages, response_window_hours, tag_names}` |
 | GET | `/content-series/{id}` | C | `SeriesDetail` with steps and contents |
 | PATCH | `/content-series/{id}` | A | Update fields. Blocked if used by a running campaign |
@@ -110,6 +121,28 @@ in file; optional blood group in allowed list; `last_donation_date` parseable an
   "buttons": [{"id": "btn_confirm", "intent": "confirm", "labels": {"en": "Confirm", "ur": "تصدیق"}}]
 }
 ```
+
+Series names and tag names are trimmed. Tag matching is case-insensitive and new tags are created on
+demand using a normalized lowercase name. Series languages, tag names, localized contents, and button
+ids must be unique in their respective inputs. Step bodies are limited to 1024 characters and may use
+only `{{donor_name}}`, `{{center_name}}`, and `{{appointment_date}}`. Buttons are limited to three;
+their intent must be `confirm`, `reschedule`, or `decline`, and every series language requires a label
+of at most 20 characters.
+
+Activation returns every problem together in `error.details.problems`, with each problem shaped as
+`{step, language, field, reason}`. A series requires at least one step, content for every configured
+language on every step, and a `media_url` whenever `media_type` is not `none`. Archived series cannot
+be edited or activated. Mutations are blocked with `CONFLICT` while a scheduled, running, or paused
+campaign references the series. An edit to an otherwise-unused active series must preserve activation
+validity.
+
+Preview uses the requested donor name when `donor_id` is supplied; otherwise it uses `Ahmed Raza`.
+The sample center is `Korangi Campus Blood Center`, and the appointment is two demo-clock days ahead at
+10:00 AM in `TIMEZONE_DISPLAY`. Dates and quick-reply labels are localized for the requested language.
+
+Media type is detected from file content rather than filename or request MIME type. Allowed types are
+JPG, PNG, WebP (up to 5 MB) and MP4 (up to 16 MB). Files are stored under `MEDIA_STORAGE_DIR` with random
+names, returned beneath `MEDIA_PUBLIC_URL`, and served from `/media`.
 
 ## 6. Campaigns
 

@@ -11,3 +11,4 @@
 - Added production backend containers for the API and scheduler worker, automatic API-owned database migrations, dependency health checks, and persistent media storage.
 - Added donor batch sample download, CSV/XLSX validation previews, first-occurrence duplicate handling, cross-batch warnings, transactional imports that reject empty batches, and searchable batch/donor browsing. Newly imported batches remain visible before campaign assignment.
 - Added the bilingual content-series library API, ordered step operations, aggregate activation validation, localized simulator previews, duplication and archiving, and validated image/video uploads with static media serving.
+- Prevented request-validation responses from echoing submitted personal data while retaining actionable field, message, and error-type details.
