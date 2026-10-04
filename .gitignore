@@ -11,16 +11,11 @@ __pycache__/
 .venv/
 venv/
 .pytest_cache/
-.pytest_tmp/
-.pytest_tmp_codex/
 .mypy_cache/
 .ruff_cache/
-.uv-cache/
 .coverage
 htmlcov/
-backend/data/
 
 # Node / Next.js
 node_modules/
-
-.pnpm-store/
+*.patch
