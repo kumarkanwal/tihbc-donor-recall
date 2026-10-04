@@ -104,3 +104,10 @@
 - **Verification:** Decision IDs D-001 through D-039 are represented exactly once and remain in order, including the combined skipped entry for D-023/D-024. Task 3.1 retains passing API generation, lint, strict typecheck, 2 Vitest tests, production build, and light/dark visual checks.
 - **Next:** Implement Task 3.2 app shell, followed by Task 3.3 login/session and Task 3.4 shared components.
 - **Blockers:** None for Task 3.1.
+
+## S-017 — 2026-10-03 — [FE] App shell
+
+- **Done:** Replaced the temporary setup page with auth and dashboard route groups; added the shared dashboard layout, seven required navigation destinations, persistent 240/64 px sidebar, tablet collapse, active accent styling, page title and breadcrumb context, role-gated disabled demo-clock control, notification and user-menu placeholders, theme control, reusable page-header and empty states, and the navigation-persistent donor phone panel.
+- **Verification:** `pnpm lint`, strict typecheck, 5 Vitest tests, and the Next.js production build pass. The shell, active navigation, light and dark themes, 240 px desktop sidebar, 64 px tablet sidebar, and 400 px donor panel were visually checked at `http://localhost:3000`.
+- **Next:** Implement Task 3.3 login, session persistence, current-user query, route protection, logout, and global 401 behavior.
+- **Blockers:** None.

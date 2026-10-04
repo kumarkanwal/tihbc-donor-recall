@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added the responsive application shell with persistent navigation, role-aware top-bar controls, light/dark theme access, placeholder pages, and the donor phone panel entry point.
 - Added the frontend application foundation, light and dark brand themes, Urdu typography, typed API client, shared status styling, and temporary visual verification page.
 - Added secure staff login, role-based API access, current-user lookup, active-user listing, and idempotent admin/coordinator demo-user seeding.
 - Added production backend containers for the API and scheduler worker, automatic API-owned database migrations, dependency health checks, and persistent media storage.

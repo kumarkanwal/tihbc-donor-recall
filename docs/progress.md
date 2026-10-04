@@ -9,6 +9,7 @@
 | 2.1 Donor batch upload | Done | CSV/XLSX preview, first-occurrence duplicate handling, cross-batch warnings, Redis preview storage, non-empty transactional import, protected batch/donor APIs, campaign-free list/detail behavior, and PostgreSQL HTTP coverage are complete. User `/docs` verification passed for sample upload, preview, import, list, and detail. |
 | 2.2 Content series, steps, and media upload | In progress | Renderer, validated media storage/static serving, full content-series lifecycle, ordered step management, preview rendering, role guards, PostgreSQL HTTP coverage, and deterministic committed OpenAPI export are implemented. All automated checks pass; awaiting the requested user-run Docker `/docs` acceptance flow. |
 | 3.1 Frontend setup, design tokens, and API client | Done | Next.js foundation, exact light/dark tokens, fonts, theme and query providers, validated environment, generated typed API client, global auth/error handling, tooling, temporary visual page, and required folder structure are complete. API generation, lint, typecheck, 2 tests, production build, and light/dark visual checks pass. |
+| 3.2 App shell | Done | Added auth/dashboard route groups, persistent 240/64 px responsive navigation, active-route styling, page context and role-gated top-bar controls, light/dark theme access, placeholder routes, and a navigation-persistent donor phone panel. Lint, typecheck, 5 tests, production build, and responsive light/dark visual checks pass. |
 
 ## Phase status
 
