@@ -146,3 +146,10 @@
 - **Verification:** `pnpm gen:api`, ESLint, strict TypeScript, all 29 Vitest tests, and the Next.js production build pass. Focused tests cover activation problem grouping, variable insertion, the three-button limit, archived read-only controls, and the coordinator editor view. The original batch flow tests continue to pass after the component split.
 - **Next:** Manually verify the admin and coordinator flows against a running seeded API, then proceed to Task 3.7.
 - **Blockers:** None.
+
+## S-024 — 2026-10-04 — [BE] Campaign lifecycle and enrollments
+
+- **Done:** Completed Task 2.3 with paginated campaign creation, draft updates, detail and status filtering; centralized launch, scheduled-start, pause, resume, and completion transitions; aggregate launch validation; transactional donor enrollment creation without messages; grouped enrollment-status counts; filtered enrollment list/detail views; coordinator read-only access; real donor-batch campaign counts; and end-to-end content-series edit protection. Split campaign and enrollment persistence into focused repositories, removed deprecated SQLAlchemy result conversions, and regenerated the deterministic OpenAPI contract.
+- **Verification:** User-run isolated PostgreSQL suite passed all 203 tests; the 13 campaign-query deprecation warnings it exposed were removed afterward, leaving only KI-002 in the Codex-run suite. User `/docs` verification passed archived-series validation, draft repair, launch with three pending enrollments, complete zero-filled counts, masked list/full detail phones, empty timeline/follow-up/appointment, pause/resume, live-series edit blocking, same-batch double-launch blocking, and coordinator read/write roles. Ruff lint and format checks pass, strict mypy passes across 81 application files, and the non-PostgreSQL suite reports 189 passed and 14 skipped with only KI-002. OpenAPI SHA-256 is `FCE04042DE12801B0C183F745ADB03AFE84A38675E17C68FD56FE6C5CF1AFAE0`.
+- **Next:** Proceed to Task 2.4, the simulator messaging provider.
+- **Blockers:** None. Task 2.3 is complete.

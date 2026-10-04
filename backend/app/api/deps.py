@@ -18,6 +18,7 @@ from app.repositories.campaign import CampaignRepository
 from app.repositories.content_series import ContentSeriesRepository
 from app.repositories.donor import DonorRepository, SegmentRepository
 from app.repositories.donor_batch import DonorBatchRepository
+from app.repositories.enrollment import EnrollmentRepository
 from app.repositories.user import UserRepository
 from app.schemas.user import UserOut
 from app.services.auth_service import INVALID_TOKEN_MESSAGE, AuthService
@@ -116,14 +117,19 @@ def get_campaign_service(
     current_clock: Annotated[Clock, Depends(get_clock)],
 ) -> CampaignService:
     """Build the request-scoped campaign mutation service."""
-    return CampaignService(db, CampaignRepository(db), current_clock)
+    return CampaignService(
+        db,
+        CampaignRepository(db),
+        EnrollmentRepository(db),
+        current_clock,
+    )
 
 
 def get_campaign_query_service(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> CampaignQueryService:
     """Build the request-scoped campaign query service."""
-    return CampaignQueryService(CampaignRepository(db))
+    return CampaignQueryService(CampaignRepository(db), EnrollmentRepository(db))
 
 
 def get_media_service(

@@ -3,7 +3,8 @@
 from app.core.logging import mask_phone_number
 from app.models.campaign import Enrollment
 from app.models.enums import EnrollmentStatus, FollowUpStatus
-from app.repositories.campaign import CampaignRecord, EnrollmentRecord
+from app.repositories.campaign import CampaignRecord
+from app.repositories.enrollment import EnrollmentRecord
 from app.schemas.campaign import (
     AppointmentSlotSummary,
     CampaignDetail,

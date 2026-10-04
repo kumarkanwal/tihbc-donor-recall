@@ -273,3 +273,10 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Decision:** Keep simulator-only visual tokens in the shared theme token file and implement the phone frame and message bubble under `components/simulator/` for reuse by series previews and Task 3.8. Series steps use native pointer drag behavior plus explicit Move up/Move down buttons for keyboard operation, without adding a drag-and-drop dependency.
 - **Reason:** The series preview and future simulator must remain visually identical, while explicit movement controls make ordering reliable and accessible without expanding the dependency surface.
 - **Consequences:** Future simulator work should extend the shared simulator primitives instead of creating separate bubble styles, and step order changes continue to submit the complete backend-defined ID sequence.
+
+## D-042 — One live campaign per donor batch
+
+- **Date:** 2026-10-04
+- **Status:** Accepted
+- **Decision:** On launch, lock the donor batch and reject the campaign when another campaign for that batch is `scheduled`, `running`, or `paused`. Draft and completed campaigns do not block launch.
+- **Reason:** A donor batch represents one messaging audience; allowing two live campaigns to enroll it would double-message the same donors. The batch lock also prevents concurrent launches from bypassing the check.

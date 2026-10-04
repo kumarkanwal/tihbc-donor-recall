@@ -9,6 +9,7 @@ from app.core.errors import InvalidStateTransitionError, NotFoundError, Validati
 from app.models.campaign import Campaign, Enrollment
 from app.models.enums import CampaignStatus, EnrollmentStatus, SeriesKind
 from app.repositories.campaign import CampaignRepository
+from app.repositories.enrollment import EnrollmentRepository
 from app.schemas.campaign import CampaignCreate, CampaignDetail, CampaignUpdate
 from app.schemas.user import UserOut
 from app.services.campaigns.mappers import campaign_detail
@@ -26,11 +27,13 @@ class CampaignService:
     def __init__(
         self,
         session: AsyncSession,
-        repository: CampaignRepository,
+        campaign_repository: CampaignRepository,
+        enrollment_repository: EnrollmentRepository,
         current_clock: Clock,
     ) -> None:
         self._session = session
-        self._repository = repository
+        self._campaigns = campaign_repository
+        self._enrollments = enrollment_repository
         self._clock = current_clock
 
     async def create(self, request: CampaignCreate, created_by: UserOut) -> CampaignDetail:
@@ -49,7 +52,7 @@ class CampaignService:
             start_at=request.start_at,
             created_by_id=created_by.id,
         )
-        await self._repository.add(campaign)
+        await self._campaigns.add(campaign)
         await self._commit()
         return await self._detail(campaign.id)
 
@@ -89,9 +92,9 @@ class CampaignService:
         now = self._clock.now()
         target = CampaignStatus.SCHEDULED if campaign.start_at > now else CampaignStatus.RUNNING
         validate_campaign_transition(campaign.status, target)
-        await self._repository.lock_batch(campaign.batch_id)
-        donor_language_counts = await self._repository.donor_language_counts(campaign.batch_id)
-        batch_has_live_campaign = await self._repository.has_live_campaign_for_batch(
+        await self._campaigns.lock_batch(campaign.batch_id)
+        donor_language_counts = await self._campaigns.donor_language_counts(campaign.batch_id)
+        batch_has_live_campaign = await self._campaigns.has_live_campaign_for_batch(
             campaign.batch_id,
             excluding_campaign_id=campaign.id,
         )
@@ -105,19 +108,20 @@ class CampaignService:
                 "Campaign cannot be launched",
                 {"problems": [problem.model_dump(mode="json") for problem in problems]},
             )
-        donors = await self._repository.donors_for_batch(campaign.batch_id)
+        donors = await self._campaigns.donors_for_batch(campaign.batch_id)
         enrollments = [self._new_enrollment(campaign, donor.id) for donor in donors]
         transition_campaign(campaign, target)
         campaign.launched_at = now
-        await self._repository.add_enrollments(enrollments)
+        await self._enrollments.add_many(enrollments)
         await self._commit()
         return await self._detail(campaign.id)
 
     async def start_scheduled(self, campaign_id: UUID) -> CampaignDetail:
         """Start a scheduled campaign once its configured time is reached."""
         campaign = await self._required_locked(campaign_id)
+        require_campaign_status(campaign, CampaignStatus.SCHEDULED, "start")
         now = self._clock.now()
-        if campaign.status == CampaignStatus.SCHEDULED and campaign.start_at > now:
+        if campaign.start_at > now:
             raise InvalidStateTransitionError(
                 "Scheduled campaign start time has not been reached",
                 {"start_at": campaign.start_at.isoformat(), "now": now.isoformat()},
@@ -149,7 +153,7 @@ class CampaignService:
         return await self._detail(campaign.id)
 
     async def _required_locked(self, campaign_id: UUID) -> Campaign:
-        campaign = await self._repository.get_full_for_update(campaign_id)
+        campaign = await self._campaigns.get_full_for_update(campaign_id)
         if campaign is None:
             raise NotFoundError("Campaign not found")
         return campaign
@@ -160,18 +164,18 @@ class CampaignService:
         primary_series_id: UUID,
         secondary_series_id: UUID,
     ) -> None:
-        if await self._repository.get_batch(batch_id) is None:
+        if await self._campaigns.get_batch(batch_id) is None:
             raise NotFoundError("Donor batch not found")
-        if await self._repository.get_series(primary_series_id) is None:
+        if await self._campaigns.get_series(primary_series_id) is None:
             raise NotFoundError("Primary content series not found")
-        if await self._repository.get_series(secondary_series_id) is None:
+        if await self._campaigns.get_series(secondary_series_id) is None:
             raise NotFoundError("Secondary content series not found")
 
     async def _detail(self, campaign_id: UUID) -> CampaignDetail:
-        record = await self._repository.get_summary(campaign_id)
+        record = await self._campaigns.get_summary(campaign_id)
         if record is None:
             raise RuntimeError("Persisted campaign could not be reloaded")
-        counts = await self._repository.enrollment_counts(campaign_id)
+        counts = await self._enrollments.counts_by_status(campaign_id)
         return campaign_detail(record, counts)
 
     async def _commit(self) -> None:

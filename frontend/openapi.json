@@ -1,6 +1,32 @@
 {
   "components": {
     "schemas": {
+      "AppointmentSlotSummary": {
+        "description": "Booked appointment associated with an enrollment.",
+        "properties": {
+          "center_name": {
+            "title": "Center Name",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "starts_at": {
+            "format": "date-time",
+            "title": "Starts At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "center_name",
+          "starts_at"
+        ],
+        "title": "AppointmentSlotSummary",
+        "type": "object"
+      },
       "BatchImportRequest": {
         "description": "Request to persist the valid rows from one preview.",
         "properties": {
@@ -126,6 +152,366 @@
           "file"
         ],
         "title": "Body_upload_media_api_v1_media_post",
+        "type": "object"
+      },
+      "CampaignCreate": {
+        "description": "Create one draft campaign.",
+        "properties": {
+          "batch_id": {
+            "format": "uuid",
+            "title": "Batch Id",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "primary_series_id": {
+            "format": "uuid",
+            "title": "Primary Series Id",
+            "type": "string"
+          },
+          "secondary_series_id": {
+            "format": "uuid",
+            "title": "Secondary Series Id",
+            "type": "string"
+          },
+          "start_at": {
+            "format": "date-time",
+            "title": "Start At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "batch_id",
+          "primary_series_id",
+          "secondary_series_id",
+          "start_at"
+        ],
+        "title": "CampaignCreate",
+        "type": "object"
+      },
+      "CampaignDetail": {
+        "description": "Campaign summary with every enrollment-status count.",
+        "properties": {
+          "batch": {
+            "$ref": "#/components/schemas/NamedResourceSummary"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/UploadedBySummary"
+          },
+          "enrollment_count": {
+            "title": "Enrollment Count",
+            "type": "integer"
+          },
+          "enrollment_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/EnrollmentStatus"
+            },
+            "title": "Enrollment Counts",
+            "type": "object"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "launched_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Launched At"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "primary_series": {
+            "$ref": "#/components/schemas/NamedResourceSummary"
+          },
+          "responded_count": {
+            "title": "Responded Count",
+            "type": "integer"
+          },
+          "response_rate": {
+            "title": "Response Rate",
+            "type": "number"
+          },
+          "secondary_series": {
+            "$ref": "#/components/schemas/NamedResourceSummary"
+          },
+          "start_at": {
+            "format": "date-time",
+            "title": "Start At",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CampaignStatus"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "batch",
+          "primary_series",
+          "secondary_series",
+          "status",
+          "start_at",
+          "launched_at",
+          "completed_at",
+          "enrollment_count",
+          "responded_count",
+          "response_rate",
+          "created_by",
+          "created_at",
+          "updated_at",
+          "enrollment_counts"
+        ],
+        "title": "CampaignDetail",
+        "type": "object"
+      },
+      "CampaignOut": {
+        "description": "Campaign list representation.",
+        "properties": {
+          "batch": {
+            "$ref": "#/components/schemas/NamedResourceSummary"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/UploadedBySummary"
+          },
+          "enrollment_count": {
+            "title": "Enrollment Count",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "launched_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Launched At"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "primary_series": {
+            "$ref": "#/components/schemas/NamedResourceSummary"
+          },
+          "responded_count": {
+            "title": "Responded Count",
+            "type": "integer"
+          },
+          "response_rate": {
+            "title": "Response Rate",
+            "type": "number"
+          },
+          "secondary_series": {
+            "$ref": "#/components/schemas/NamedResourceSummary"
+          },
+          "start_at": {
+            "format": "date-time",
+            "title": "Start At",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CampaignStatus"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "batch",
+          "primary_series",
+          "secondary_series",
+          "status",
+          "start_at",
+          "launched_at",
+          "completed_at",
+          "enrollment_count",
+          "responded_count",
+          "response_rate",
+          "created_by",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "CampaignOut",
+        "type": "object"
+      },
+      "CampaignPage": {
+        "description": "Paginated campaign summaries.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CampaignOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size"
+        ],
+        "title": "CampaignPage",
+        "type": "object"
+      },
+      "CampaignStatus": {
+        "enum": [
+          "draft",
+          "scheduled",
+          "running",
+          "paused",
+          "completed"
+        ],
+        "title": "CampaignStatus",
+        "type": "string"
+      },
+      "CampaignUpdate": {
+        "description": "Update selected draft campaign settings.",
+        "properties": {
+          "batch_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Batch Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "primary_series_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Series Id"
+          },
+          "secondary_series_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secondary Series Id"
+          },
+          "start_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start At"
+          }
+        },
+        "title": "CampaignUpdate",
         "type": "object"
       },
       "ContentSeriesCreate": {
@@ -467,6 +853,17 @@
         "title": "ContentSeriesUpdate",
         "type": "object"
       },
+      "DeclineReason": {
+        "enum": [
+          "travelling",
+          "health",
+          "recently_donated",
+          "not_interested",
+          "other"
+        ],
+        "title": "DeclineReason",
+        "type": "string"
+      },
       "DonorBatchDetail": {
         "description": "Batch summary with segment and language counts.",
         "properties": {
@@ -801,6 +1198,411 @@
         "title": "DonorPreviewRow",
         "type": "object"
       },
+      "EnrollmentDetail": {
+        "description": "Enrollment with full donor data and related activity.",
+        "properties": {
+          "appointment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AppointmentSlotSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "campaign": {
+            "$ref": "#/components/schemas/NamedResourceSummary"
+          },
+          "campaign_id": {
+            "format": "uuid",
+            "title": "Campaign Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "current_series_kind": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SeriesKind"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "current_step_order": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Step Order"
+          },
+          "decline_reason": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeclineReason"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "donor": {
+            "$ref": "#/components/schemas/EnrollmentDonorOut"
+          },
+          "follow_up": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FollowUpSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "next_action_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action At"
+          },
+          "responded_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Responded At"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EnrollmentStatus"
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/EnrollmentTimelineItem"
+            },
+            "title": "Timeline",
+            "type": "array"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "campaign_id",
+          "donor",
+          "status",
+          "current_series_kind",
+          "current_step_order",
+          "next_action_at",
+          "responded_at",
+          "decline_reason",
+          "created_at",
+          "updated_at",
+          "campaign",
+          "timeline",
+          "follow_up",
+          "appointment"
+        ],
+        "title": "EnrollmentDetail",
+        "type": "object"
+      },
+      "EnrollmentDonorOut": {
+        "description": "Donor information returned with an enrollment.",
+        "properties": {
+          "blood_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blood Group"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "full_name": {
+            "title": "Full Name",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "language": {
+            "$ref": "#/components/schemas/LanguageCode"
+          },
+          "last_donation_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Donation Date"
+          },
+          "phone_e164": {
+            "title": "Phone E164",
+            "type": "string"
+          },
+          "segment": {
+            "title": "Segment",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "full_name",
+          "phone_e164",
+          "segment",
+          "language",
+          "city",
+          "blood_group",
+          "last_donation_date"
+        ],
+        "title": "EnrollmentDonorOut",
+        "type": "object"
+      },
+      "EnrollmentOut": {
+        "description": "Enrollment list representation.",
+        "properties": {
+          "campaign_id": {
+            "format": "uuid",
+            "title": "Campaign Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "current_series_kind": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SeriesKind"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "current_step_order": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Step Order"
+          },
+          "decline_reason": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeclineReason"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "donor": {
+            "$ref": "#/components/schemas/EnrollmentDonorOut"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "next_action_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action At"
+          },
+          "responded_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Responded At"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EnrollmentStatus"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "campaign_id",
+          "donor",
+          "status",
+          "current_series_kind",
+          "current_step_order",
+          "next_action_at",
+          "responded_at",
+          "decline_reason",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "EnrollmentOut",
+        "type": "object"
+      },
+      "EnrollmentPage": {
+        "description": "Paginated campaign enrollments.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/EnrollmentOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size"
+        ],
+        "title": "EnrollmentPage",
+        "type": "object"
+      },
+      "EnrollmentStatus": {
+        "enum": [
+          "pending",
+          "in_primary",
+          "in_secondary",
+          "escalated",
+          "confirmed",
+          "reschedule_requested",
+          "rescheduled",
+          "declined",
+          "invalid_number",
+          "undeliverable"
+        ],
+        "title": "EnrollmentStatus",
+        "type": "string"
+      },
+      "EnrollmentTimelineItem": {
+        "description": "Chronological message or response event.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MessageTimelineEntry"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "response": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResponseTimelineEntry"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": {
+            "enum": [
+              "message",
+              "response"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "created_at"
+        ],
+        "title": "EnrollmentTimelineItem",
+        "type": "object"
+      },
       "ExistingPhoneWarning": {
         "description": "A valid phone that also appears in an earlier batch.",
         "properties": {
@@ -824,6 +1626,85 @@
         ],
         "title": "ExistingPhoneWarning",
         "type": "object"
+      },
+      "FollowUpPriority": {
+        "enum": [
+          "normal",
+          "high"
+        ],
+        "title": "FollowUpPriority",
+        "type": "string"
+      },
+      "FollowUpStatus": {
+        "enum": [
+          "open",
+          "in_progress",
+          "done"
+        ],
+        "title": "FollowUpStatus",
+        "type": "string"
+      },
+      "FollowUpSummary": {
+        "description": "Current or most recent coordinator follow-up.",
+        "properties": {
+          "assigned_to_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigned To Id"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/FollowUpPriority"
+          },
+          "status": {
+            "$ref": "#/components/schemas/FollowUpStatus"
+          },
+          "type": {
+            "$ref": "#/components/schemas/FollowUpType"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "status",
+          "priority",
+          "assigned_to_id",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "FollowUpSummary",
+        "type": "object"
+      },
+      "FollowUpType": {
+        "enum": [
+          "confirmed",
+          "reschedule",
+          "declined",
+          "needs_call"
+        ],
+        "title": "FollowUpType",
+        "type": "string"
       },
       "HTTPValidationError": {
         "properties": {
@@ -968,6 +1849,113 @@
         "title": "MessageStatus",
         "type": "string"
       },
+      "MessageTimelineEntry": {
+        "description": "Message data embedded in an enrollment timeline.",
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "delivered_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delivered At"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/MessageDirection"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/MessageKind"
+          },
+          "media_type": {
+            "$ref": "#/components/schemas/MediaType"
+          },
+          "media_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Media Url"
+          },
+          "read_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read At"
+          },
+          "scheduled_at": {
+            "format": "date-time",
+            "title": "Scheduled At",
+            "type": "string"
+          },
+          "sent_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sent At"
+          },
+          "status": {
+            "$ref": "#/components/schemas/MessageStatus"
+          }
+        },
+        "required": [
+          "direction",
+          "kind",
+          "body",
+          "media_type",
+          "media_url",
+          "status",
+          "scheduled_at",
+          "sent_at",
+          "delivered_at",
+          "read_at"
+        ],
+        "title": "MessageTimelineEntry",
+        "type": "object"
+      },
+      "NamedResourceSummary": {
+        "description": "Identifier and display name for a related resource.",
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "NamedResourceSummary",
+        "type": "object"
+      },
       "PreviewButtonOut": {
         "description": "Quick reply localized for simulator preview.",
         "properties": {
@@ -1081,6 +2069,77 @@
           "checks"
         ],
         "title": "ReadyResponse",
+        "type": "object"
+      },
+      "ResponseIntent": {
+        "enum": [
+          "confirm",
+          "reschedule",
+          "decline",
+          "question",
+          "unknown"
+        ],
+        "title": "ResponseIntent",
+        "type": "string"
+      },
+      "ResponseSource": {
+        "enum": [
+          "button",
+          "agent"
+        ],
+        "title": "ResponseSource",
+        "type": "string"
+      },
+      "ResponseTimelineEntry": {
+        "description": "Classified response data embedded in an enrollment timeline.",
+        "properties": {
+          "confidence": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Confidence",
+            "type": "string"
+          },
+          "decline_reason": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeclineReason"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "detected_language": {
+            "title": "Detected Language",
+            "type": "string"
+          },
+          "intent": {
+            "$ref": "#/components/schemas/ResponseIntent"
+          },
+          "requested_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requested Date"
+          },
+          "source": {
+            "$ref": "#/components/schemas/ResponseSource"
+          }
+        },
+        "required": [
+          "intent",
+          "source",
+          "detected_language",
+          "requested_date",
+          "decline_reason",
+          "confidence"
+        ],
+        "title": "ResponseTimelineEntry",
         "type": "object"
       },
       "SegmentBreakdown": {
@@ -1765,6 +2824,487 @@
         "summary": "Get the current staff user",
         "tags": [
           "Authentication"
+        ]
+      }
+    },
+    "/api/v1/campaigns": {
+      "get": {
+        "description": "Return a status-filtered campaign page.",
+        "operationId": "list_campaigns_api_v1_campaigns_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/CampaignStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List campaigns",
+        "tags": [
+          "Campaigns"
+        ]
+      },
+      "post": {
+        "description": "Create one draft campaign.",
+        "operationId": "create_campaign_api_v1_campaigns_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CampaignCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create a campaign",
+        "tags": [
+          "Campaigns"
+        ]
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}": {
+      "get": {
+        "description": "Return one campaign with enrollment-status counts.",
+        "operationId": "get_campaign_api_v1_campaigns__campaign_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "campaign_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Campaign Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get campaign details",
+        "tags": [
+          "Campaigns"
+        ]
+      },
+      "patch": {
+        "description": "Update selected fields on a draft campaign.",
+        "operationId": "update_campaign_api_v1_campaigns__campaign_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "campaign_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Campaign Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CampaignUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update a draft campaign",
+        "tags": [
+          "Campaigns"
+        ]
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}/actions/launch": {
+      "post": {
+        "description": "Validate a draft and create its donor enrollments.",
+        "operationId": "launch_campaign_api_v1_campaigns__campaign_id__actions_launch_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "campaign_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Campaign Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Launch a campaign",
+        "tags": [
+          "Campaigns"
+        ]
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}/actions/pause": {
+      "post": {
+        "description": "Pause a running campaign.",
+        "operationId": "pause_campaign_api_v1_campaigns__campaign_id__actions_pause_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "campaign_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Campaign Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Pause a campaign",
+        "tags": [
+          "Campaigns"
+        ]
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}/actions/resume": {
+      "post": {
+        "description": "Resume a paused campaign.",
+        "operationId": "resume_campaign_api_v1_campaigns__campaign_id__actions_resume_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "campaign_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Campaign Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Resume a campaign",
+        "tags": [
+          "Campaigns"
+        ]
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}/enrollments": {
+      "get": {
+        "description": "Return filtered enrollments with masked list phone values.",
+        "operationId": "list_campaign_enrollments_api_v1_campaigns__campaign_id__enrollments_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "campaign_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Campaign Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EnrollmentStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 255,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrollmentPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List campaign enrollments",
+        "tags": [
+          "Campaigns"
         ]
       }
     },
@@ -2957,6 +4497,55 @@
         "summary": "Get a donor batch validation report",
         "tags": [
           "Donor Batches"
+        ]
+      }
+    },
+    "/api/v1/enrollments/{enrollment_id}": {
+      "get": {
+        "description": "Return a full donor enrollment timeline and follow-up.",
+        "operationId": "get_enrollment_api_v1_enrollments__enrollment_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enrollment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Enrollment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrollmentDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get enrollment details",
+        "tags": [
+          "Enrollments"
         ]
       }
     },

@@ -15,6 +15,7 @@ from app.core.errors import InvalidStateTransitionError
 from app.main import app
 from app.models.enums import CampaignStatus, EnrollmentStatus
 from app.repositories.campaign import CampaignRepository
+from app.repositories.enrollment import EnrollmentRepository
 from app.schemas.user import UserOut
 from app.services.campaigns.service import CampaignService
 from tests.integration.campaign_fixtures import CampaignFixture, add_campaign_fixture
@@ -127,16 +128,25 @@ async def test_scheduled_campaign_starts_only_when_due(
                 )
                 campaign_id = UUID(created.json()["id"])
                 launched = await client.post(f"/api/v1/campaigns/{campaign_id}/actions/launch")
+                draft = await client.post(
+                    "/api/v1/campaigns",
+                    json=_campaign_payload(fixture, start_at),
+                )
+                draft_id = UUID(draft.json()["id"])
             early_service = CampaignService(
                 session,
                 CampaignRepository(session),
+                EnrollmentRepository(session),
                 FixedClock(start_at - timedelta(seconds=1)),
             )
             with pytest.raises(InvalidStateTransitionError, match="not been reached"):
                 await early_service.start_scheduled(campaign_id)
+            with pytest.raises(InvalidStateTransitionError, match="must be scheduled"):
+                await early_service.start_scheduled(draft_id)
             due_service = CampaignService(
                 session,
                 CampaignRepository(session),
+                EnrollmentRepository(session),
                 FixedClock(start_at),
             )
             started = await due_service.start_scheduled(campaign_id)
