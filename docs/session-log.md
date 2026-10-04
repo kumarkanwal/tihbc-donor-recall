@@ -147,6 +147,13 @@
 - **Next:** Manually verify the admin and coordinator flows against a running seeded API, then proceed to Task 3.7.
 - **Blockers:** None.
 
+## S-023 — 2026-10-04 — [FE] WhatsApp simulator UI
+
+- **Done:** Confirmed Task 3.6 was committed and already closed in progress/session memory; enabled Vitest worker reuse with explicit per-test DOM cleanup; replaced the empty donor-phone panel with a persistent slide-in simulator; added a source-agnostic mock/API data boundary, documented WebSocket subscription, and direct-open helper; seeded four English/Urdu donor conversations including an unreachable number; and implemented search/campaign filtering, masked chat rows, localized bubbles and quick replies, reply lockout, media lightbox, formatting, grouping tails, status ticks, typing, text input, auto-scroll, new-message affordance, secure-business notice, Urdu typography, and mock automatic confirm/reschedule/decline/free-text flows.
+- **Verification:** `pnpm lint`, strict TypeScript, all 35 Vitest tests, and the Next.js production build pass. The full pre-change suite passed twice with `isolate: false`, and the final suite passes with explicit cleanup. Focused coverage verifies formatting, sent/delivered/read ticks, disabled replied buttons, typing start/clear and confirm auto-reply timing, Urdu rendering, and unreachable-donor presentation. All simulator components remain below 125 lines and every authored source module remains below 300 lines.
+- **Next:** Manually open Donor Phone, select Aisha Khan, tap Confirm, send a free-text reply, and switch to فاطمہ علی to verify the presentation; after backend Task 2.7, export OpenAPI, regenerate the client, remove the KI-005 compatibility bridge, and test `NEXT_PUBLIC_SIMULATOR_SOURCE=api`.
+- **Blockers:** None for Task 3.8 mock mode. API-backed mode intentionally awaits backend Task 2.7.
+
 ## S-024 — 2026-10-04 — [BE] Campaign lifecycle and enrollments
 
 - **Done:** Completed Task 2.3 with paginated campaign creation, draft updates, detail and status filtering; centralized launch, scheduled-start, pause, resume, and completion transitions; aggregate launch validation; transactional donor enrollment creation without messages; grouped enrollment-status counts; filtered enrollment list/detail views; coordinator read-only access; real donor-batch campaign counts; and end-to-end content-series edit protection. Split campaign and enrollment persistence into focused repositories, removed deprecated SQLAlchemy result conversions, and regenerated the deterministic OpenAPI contract.

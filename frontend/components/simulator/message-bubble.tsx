@@ -1,47 +1,40 @@
-import Image from "next/image";
-
+import type { SimulatorButton, SimulatorMessageStatus } from "@/lib/simulator";
 import { cn } from "@/lib/utils/class-names";
+import { parseWhatsAppFormat } from "@/lib/utils/whatsapp-format";
+
+import { MediaHeader } from "./media-header";
+import { MessageTicks } from "./message-ticks";
+import { QuickReplyButtons } from "./quick-reply-buttons";
 
 interface SimulatorMessageBubbleProps {
   body: string;
-  buttons?: { id: string; label: string }[];
+  buttons?: SimulatorButton[];
   mediaType?: "none" | "image" | "video";
   mediaUrl?: string | null;
   direction?: "incoming" | "outgoing";
   language?: "en" | "ur";
   timestamp?: string;
+  status?: SimulatorMessageStatus;
+  showTail?: boolean;
+  buttonsDisabled?: boolean;
+  onButtonReply?: (button: SimulatorButton) => void;
 }
 
-function MessageMedia({
-  mediaType,
-  mediaUrl,
-}: Pick<
-  SimulatorMessageBubbleProps,
-  "mediaType" | "mediaUrl"
->): React.JSX.Element | null {
-  if (!mediaUrl || mediaType === "none") return null;
-  if (mediaType === "video") {
-    return (
-      <video
-        src={mediaUrl}
-        controls
-        className="mb-2 aspect-video w-full rounded object-cover"
-      />
-    );
-  }
+function FormattedBody({ body }: { body: string }): React.JSX.Element {
   return (
-    <Image
-      src={mediaUrl}
-      alt="Message attachment"
-      width={320}
-      height={180}
-      unoptimized
-      className="mb-2 aspect-video w-full rounded object-cover"
-    />
+    <p className="whitespace-pre-wrap">
+      {parseWhatsAppFormat(body).map((token, index) => {
+        const key = `${token.kind}-${index}`;
+        if (token.kind === "bold")
+          return <strong key={key}>{token.value}</strong>;
+        if (token.kind === "italic") return <em key={key}>{token.value}</em>;
+        return <span key={key}>{token.value}</span>;
+      })}
+    </p>
   );
 }
 
-/** WhatsApp-styled message bubble shared by preview and future live chats. */
+/** WhatsApp-styled bubble shared by series previews and live donor chats. */
 export function SimulatorMessageBubble({
   body,
   buttons = [],
@@ -50,43 +43,41 @@ export function SimulatorMessageBubble({
   direction = "incoming",
   language = "en",
   timestamp = "10:30 AM",
+  status = "delivered",
+  showTail = false,
+  buttonsDisabled = false,
+  onButtonReply,
 }: SimulatorMessageBubbleProps): React.JSX.Element {
+  const outgoing = direction === "outgoing";
   return (
-    <div
-      className={cn(
-        "flex",
-        direction === "outgoing" ? "justify-end" : "justify-start",
-      )}
-    >
+    <div className={cn("flex", outgoing ? "justify-end" : "justify-start")}>
       <article
         className={cn(
-          "text-sim-text max-w-[80%] overflow-hidden rounded-[7.5px] text-[14.2px] shadow-sm",
-          direction === "outgoing" ? "bg-sim-outgoing" : "bg-sim-incoming",
+          "text-sim-text relative max-w-[80%] rounded-[7.5px] text-[14.2px] shadow-sm",
+          outgoing ? "bg-sim-outgoing" : "bg-sim-incoming",
+          showTail &&
+            (outgoing
+              ? "before:bg-sim-outgoing before:absolute before:top-1 before:-right-1 before:size-2 before:rotate-45"
+              : "before:bg-sim-incoming before:absolute before:top-1 before:-left-1 before:size-2 before:rotate-45"),
         )}
       >
         <div
-          className="p-2 pb-1"
+          className={cn("relative p-2 pb-1", language === "ur" && "font-urdu")}
           lang={language}
-          dir={language === "ur" ? "rtl" : "ltr"}
+          dir="auto"
         >
-          <MessageMedia mediaType={mediaType} mediaUrl={mediaUrl} />
-          <p className="whitespace-pre-wrap">{body}</p>
-          <p className="text-sim-secondary mt-1 text-right font-sans text-[0.62rem] leading-none tabular-nums">
+          <MediaHeader mediaType={mediaType} mediaUrl={mediaUrl} />
+          <FormattedBody body={body} />
+          <span className="text-sim-secondary mt-1 flex items-center justify-end gap-0.5 font-sans text-[0.62rem] leading-none tabular-nums">
             {timestamp}
-          </p>
+            {outgoing ? <MessageTicks status={status} /> : null}
+          </span>
         </div>
-        {buttons.length > 0 ? (
-          <div className="border-sim-secondary/20 border-t">
-            {buttons.map((button) => (
-              <div
-                key={button.id}
-                className="text-sim-button border-sim-secondary/20 border-b px-3 py-2 text-center text-xs font-medium last:border-b-0"
-              >
-                {button.label}
-              </div>
-            ))}
-          </div>
-        ) : null}
+        <QuickReplyButtons
+          buttons={buttons}
+          disabled={buttonsDisabled}
+          onReply={onButtonReply}
+        />
       </article>
     </div>
   );

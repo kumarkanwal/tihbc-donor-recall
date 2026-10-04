@@ -274,6 +274,22 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Reason:** The series preview and future simulator must remain visually identical, while explicit movement controls make ordering reliable and accessible without expanding the dependency surface.
 - **Consequences:** Future simulator work should extend the shared simulator primitives instead of creating separate bubble styles, and step order changes continue to submit the complete backend-defined ID sequence.
 
+## D-103 — Source-agnostic simulator boundary
+
+- **Date:** 2026-10-04
+- **Status:** Accepted
+- **Decision:** Put all donor conversation reads, opens, replies, and live-event subscriptions behind one `SimulatorDataSource` interface selected by `NEXT_PUBLIC_SIMULATOR_SOURCE=mock|api`, defaulting to the in-memory mock. Keep the UI and TanStack Query hooks unaware of the selected source. Until backend Task 2.7 exports the documented simulator routes, the API adapter uses a narrow compatibility type bridge around the shared authenticated generated client and the documented WebSocket envelope.
+- **Reason:** The complete demo interaction can be built and tested against deterministic mock data now, while the same UI can switch to REST and WebSocket delivery without component changes when the generated contract lands.
+- **Consequences:** Task 2.7 must export the section-7 routes, after which the compatibility bridge is removed and the adapter compiles directly against generated path types; KI-005 tracks this handoff.
+
+## D-104 — Reused Vitest worker with explicit DOM cleanup
+
+- **Date:** 2026-10-04
+- **Status:** Accepted
+- **Decision:** Run the frontend Vitest suite with one reused thread (`isolate: false`, `maxWorkers: 1`) and perform Testing Library cleanup explicitly after every test.
+- **Reason:** Reusing the worker substantially reduces repeated jsdom startup cost while explicit cleanup preserves deterministic component isolation. The complete suite passed repeatedly before and after the change.
+- **Consequences:** Tests must reset other module-level mutable state they introduce; DOM state is cleared centrally in `test/setup.ts`.
+
 ## D-042 — One live campaign per donor batch
 
 - **Date:** 2026-10-04

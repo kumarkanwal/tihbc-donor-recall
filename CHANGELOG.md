@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Added campaign creation and lifecycle controls with aggregate launch checks, transactional donor enrollments, status counts, enrollment detail, and coordinator read access.
+- Added the persistent WhatsApp-style donor phone simulator with searchable mock conversations, bilingual replies, realistic typing and delivery ticks, media previews, unreachable-number states, and a switchable API/WebSocket source boundary.
 - Added the bilingual Content Series library and editor with table/grid browsing, filters, lifecycle actions, ordered message steps, media and quick replies, activation guidance, and live simulator-styled previews.
 - Added complete Donor Batches screens for searchable batch browsing, role-gated CSV/XLSX validation and import, warning/error review, expired-preview recovery, donor filtering, and validation reports.
 - Added the reusable table, state, KPI, dialog, upload, phone, date/time, chart, bilingual, and phone-preview component library for upcoming frontend screens.
