@@ -243,3 +243,11 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Decision:** Store the access token and confirmed current user in a Zustand session store backed by browser `localStorage`. Keep all access behind the shared session module and clear the store, persisted value, and TanStack Query cache on logout. A 401 performs an intentional full navigation to clear in-memory authenticated state globally.
 - **Reason:** The MVP needs sessions to survive navigation and reloads without adding an unavailable server-side cookie flow. Centralizing access keeps the demo-only persistence replaceable when production authentication is designed.
 - **Consequences:** Browser storage is acceptable only for this demo and must not be treated as the production security model.
+
+## D-101 — Headless shared-component foundations
+
+- **Date:** 2026-10-04
+- **Status:** Accepted
+- **Decision:** Build the server-driven `DataTable` on TanStack React Table 9.2.4 and use the shadcn-compatible Radix Alert Dialog and Tabs primitives for confirmation and bilingual content. Keep application styling and state presentation in repository-owned shared components.
+- **Reason:** These approved headless foundations provide typed table state and accessible interaction behavior without imposing visual styles that conflict with the TIHBC tokens.
+- **Consequences:** Feature pages supply server pagination, sorting, filters, and data while the shared components remain free of domain business logic.

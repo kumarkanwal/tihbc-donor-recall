@@ -118,3 +118,10 @@
 - **Verification:** `pnpm lint`, strict typecheck, 12 Vitest tests, and the Next.js production build pass. Browser checks confirmed `/` redirects to `/login?next=%2F`, the light-theme login layout, 96 px logo, required copy, and inline empty-field validation. The local backend was not running, so credential acceptance was covered with the generated API contract and component-level 401 test rather than a live browser round-trip.
 - **Next:** Implement Task 3.4 shared components from `docs/screens.md` section 10.
 - **Blockers:** None for implementation; live API acceptance remains environment-dependent.
+
+## S-019 — 2026-10-04 — [FE] Shared components
+
+- **Done:** Completed the section-10 shared component set: PageHeader; TanStack Table v9 DataTable with server pagination and sorting, debounced search, filter slot, accessible row activation, responsive scrolling, and loading/empty/error/success states; every documented database enum in StatusBadge with muted unknown fallback; KpiCard; configurable EmptyState and ErrorState; accessible ConfirmDialog; validated keyboard and drag/drop FileDropzone; permission-aware MaskedPhone; absolute and relative Asia/Karachi DateTime; state-aware ChartCard; English/Urdu LanguageTabs; and a structural PhonePreview for later simulator bubble reuse. Added the destructive button variant required by ConfirmDialog.
+- **Verification:** `pnpm lint`, strict typecheck, 18 Vitest tests, and the Next.js production build pass. Date/time formatting, every documented enum value, unknown status fallback, DataTable data/pagination/empty rendering, login errors, API errors, role visibility, safe redirects, and generated-client URL handling have automated coverage. All shared component files are at or below 196 lines and application components contain no raw hex colors.
+- **Next:** Proceed to the next explicitly requested frontend task.
+- **Blockers:** None.

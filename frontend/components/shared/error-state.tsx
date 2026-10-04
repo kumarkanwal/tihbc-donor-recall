@@ -1,11 +1,13 @@
 import { CircleAlert } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils/class-names";
 
 interface ErrorStateProps {
   title?: string;
   description: string;
   onRetry?: () => void;
+  className?: string;
 }
 
 /** Recoverable error message with an optional retry action. */
@@ -13,9 +15,15 @@ export function ErrorState({
   title = "Something went wrong",
   description,
   onRetry,
+  className,
 }: ErrorStateProps): React.JSX.Element {
   return (
-    <section className="rounded-card border-border bg-surface flex min-h-64 flex-col items-center justify-center border p-8 text-center">
+    <section
+      className={cn(
+        "rounded-card border-border bg-surface flex min-h-64 flex-col items-center justify-center border p-8 text-center",
+        className,
+      )}
+    >
       <span className="bg-accent-soft text-danger flex size-12 items-center justify-center rounded-full">
         <CircleAlert aria-hidden="true" className="size-5" strokeWidth={1.75} />
       </span>
