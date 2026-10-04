@@ -7,12 +7,12 @@ error, and success states. Dates display in `Asia/Karachi` as `03 Oct 2026, 10:3
 
 ## 1. App Shell
 
-**Sidebar (left, collapsible):** TIHBC logo at top, then:
+**Sidebar (left, collapsible):** client logo at top (on a white tile in dark mode), then:
 Dashboard, Donor Batches, Content Series, Campaigns, Follow-up Inbox, Reports, Settings.
 Coordinators do not see admin-only actions (buttons are hidden, not disabled).
 
 **Top bar:** page title and breadcrumb (left); demo clock and "Skip time" control (admin only),
-notifications for new follow-ups, user menu with role and logout (right).
+notifications for new follow-ups, theme switch (Light / Dark / System), user menu with role and logout (right).
 
 **Skip time control:** shows current demo date and time. Dropdown with "+1 hour", "+1 day", "+3 days",
 "+7 days", and "Reset clock". Shows a confirmation toast with the new time.
@@ -23,7 +23,7 @@ notifications for new follow-ups, user menu with role and logout (right).
 ---
 
 ## 2. Login `/login`
-Centered card: logo, email, password, "Sign in" button. Inline error on invalid credentials.
+Centered card: logo (96 px), product name "Donor Recall", email, password, "Sign in" button. Inline error on invalid credentials.
 Redirect to Dashboard after login.
 
 ---

@@ -104,21 +104,41 @@ class AgentResult(BaseModel):
     trace_id: str | None
 ```
 
-### 3.4 LLM Usage
+### 3.4 LLM Usage and Provider Routing
 - Every LLM call uses structured output bound to a Pydantic model. No regex parsing of LLM text.
-- Model, temperature (0), and timeout come from config (`docs/env.md`).
-- Prompts are files in `agents/prompts/`: `classify_intent.md`, `extract_date.md`, `extract_decline_reason.md`,
-  `detect_language.md`. Prompts include few-shot examples in English, Urdu, and Roman Urdu.
+- Temperature 0. Prompts are files in `agents/prompts/`: `classify_intent.md`, `extract_date.md`,
+  `extract_decline_reason.md`, `detect_language.md`, with few-shot examples in English, Urdu, and Roman Urdu.
+
+**Routing (`agents/llm/`)**
+- `providers.py`: one registry entry per provider (name, base URL, key setting, client type, and a
+  **default free model** that supports structured output). `<PROVIDER>_MODEL` in env overrides the default.
+  Only the API key is required to enable a provider.
+- Startup check: list each enabled provider's models; if the configured model is missing, log a warning
+  and skip that provider (never crash).
+  Groq, Cerebras, Together, and OpenRouter use the OpenAI-compatible chat client with their base URL;
+  Gemini and Mistral use their LangChain integrations. Adding a provider means adding one registry entry.
+- `router.py`: builds the chain in `LLM_PROVIDER_ORDER`, skipping providers without a key. Implemented with
+  LangChain `with_fallbacks`, plus:
+  - per-provider timeout (`LLM_TIMEOUT_SECONDS`) and total budget (`LLM_TOTAL_BUDGET_SECONDS`);
+  - fall back on timeout, rate limit (429), server errors (5xx), connection errors, and invalid
+    structured output;
+  - do not fall back on authentication errors (401/403): log an error and mark the provider unavailable;
+  - circuit breaker in Redis: after `LLM_CIRCUIT_FAILURES` consecutive failures a provider is skipped for
+    `LLM_CIRCUIT_COOLDOWN_SECONDS` (shared across workers).
+- Nodes call only `get_structured_llm(schema)` from the router; they never know which provider answered.
+- Each result records the provider and model used (saved in LangSmith metadata and logs).
+- Startup logs which providers are active (names only, never keys).
 
 ### 3.5 Fallback
-- If confidence < `AGENT_CONFIDENCE_THRESHOLD` (default 0.7), the LLM errors, or it times out
-  → return intent `unknown`. The flow in 2.4 applies. The demo never breaks because of the LLM.
+- If confidence < `AGENT_CONFIDENCE_THRESHOLD` (default 0.7), or **all** providers fail or the total
+  budget runs out → return intent `unknown`. The flow in 2.4 applies. The demo never breaks because of the LLM.
 - If `LLM_ENABLED=false`, a keyword classifier is used (`agents/fallback.py`) with a small keyword list
   per intent in English and Roman Urdu.
 
 ## 4. Observability (LangSmith)
 - Tracing enabled via env. Run name: `donor_reply`.
-- Metadata on every run: `campaign_id`, `enrollment_id`, `donor_language`, `awaiting`, `environment`.
+- Metadata on every run: `campaign_id`, `enrollment_id`, `donor_language`, `awaiting`, `environment`,
+  `llm_provider`, `llm_model`, `fallback_count`.
 - Tags: `intent:<value>`, `source:agent`, `fallback:true|false`.
 - The run id is saved as `donor_responses.trace_id`.
 - Phone numbers and names are never sent to the LLM or LangSmith; only the message text and context.
