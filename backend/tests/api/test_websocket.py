@@ -16,7 +16,6 @@ from app.core.security import InvalidAccessTokenError, create_access_token, veri
 from app.main import create_app
 from app.models.enums import UserRole
 from app.ws.manager import ConnectionManager
-from tests.integration.messaging_fixtures import FixedClock
 
 
 @pytest.mark.parametrize("token", [None, "invalid", "expired"])
@@ -27,18 +26,21 @@ def test_missing_invalid_and_expired_tokens_are_rejected(
     settings = get_settings()
     settings = settings.model_copy(update={"jwt_secret": SecretStr("test-secret-" * 4)})
     if token == "expired":
-        token = create_access_token(
-            user_id=uuid4(),
-            role=UserRole.ADMIN,
-            secret=settings.jwt_secret,
-            expires_minutes=1,
-            current_clock=FixedClock(clock.now() - timedelta(hours=1)),
-        )
+        with monkeypatch.context() as patch:
+            patch.setattr(
+                "app.core.security.wall_clock_now", lambda: clock.now() - timedelta(hours=1)
+            )
+            token = create_access_token(
+                user_id=uuid4(),
+                role=UserRole.ADMIN,
+                secret=settings.jwt_secret,
+                expires_minutes=1,
+            )
 
     async def authenticate(socket: object, value: str) -> None:
         del socket
         try:
-            verify_access_token(value, secret=settings.jwt_secret, current_clock=clock)
+            verify_access_token(value, secret=settings.jwt_secret)
         except InvalidAccessTokenError:
             raise UnauthorizedError() from None
 

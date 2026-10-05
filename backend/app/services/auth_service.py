@@ -3,7 +3,6 @@
 import structlog
 from pydantic import SecretStr
 
-from app.core.clock import Clock
 from app.core.errors import UnauthorizedError
 from app.core.logging import mask_email_address
 from app.core.security import (
@@ -31,12 +30,10 @@ class AuthService:
         *,
         jwt_secret: SecretStr,
         jwt_expires_minutes: int,
-        current_clock: Clock,
     ) -> None:
         self._users = user_repository
         self._jwt_secret = jwt_secret
         self._jwt_expires_minutes = jwt_expires_minutes
-        self._clock = current_clock
 
     async def authenticate(self, request: LoginRequest) -> TokenResponse:
         """Authenticate credentials and return a bearer token."""
@@ -54,7 +51,6 @@ class AuthService:
             role=user.role,
             secret=self._jwt_secret,
             expires_minutes=self._jwt_expires_minutes,
-            current_clock=self._clock,
         )
         logger.info("login_succeeded", user_id=str(user.id), role=user.role.value)
         return TokenResponse(access_token=token, user=UserOut.model_validate(user))
@@ -65,7 +61,6 @@ class AuthService:
             claims = verify_access_token(
                 token,
                 secret=self._jwt_secret,
-                current_clock=self._clock,
             )
         except InvalidAccessTokenError:
             raise UnauthorizedError(INVALID_TOKEN_MESSAGE) from None

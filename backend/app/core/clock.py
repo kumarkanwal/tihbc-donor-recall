@@ -5,6 +5,11 @@ from threading import Lock
 from typing import Protocol
 
 
+def wall_clock_now() -> datetime:
+    """Return real UTC time without the configurable demo offset."""
+    return datetime.now(UTC)
+
+
 class ClockPersistence(Protocol):
     """Persistence operations required by the demo clock."""
 
@@ -37,7 +42,7 @@ class Clock:
         """Return the timezone-aware current demo time in UTC."""
         with self._lock:
             offset = self._offset
-        return datetime.now(UTC) + offset
+        return wall_clock_now() + offset
 
     @property
     def offset(self) -> timedelta:

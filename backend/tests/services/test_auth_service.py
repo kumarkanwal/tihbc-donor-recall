@@ -6,7 +6,6 @@ from uuid import uuid4
 import pytest
 from pydantic import SecretStr
 
-from app.core.clock import Clock
 from app.core.errors import UnauthorizedError
 from app.core.security import hash_password
 from app.models.enums import UserRole
@@ -35,7 +34,6 @@ def _service(repository: UserRepository) -> AuthService:
         repository,
         jwt_secret=JWT_TEST_SECRET,
         jwt_expires_minutes=30,
-        current_clock=Clock(),
     )
 
 

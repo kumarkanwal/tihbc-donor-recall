@@ -9,7 +9,7 @@ from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError, VerifyMismatchError
 from pydantic import SecretStr
 
-from app.core.clock import Clock
+from app.core.clock import wall_clock_now
 from app.models.enums import UserRole
 
 JWT_ALGORITHM = "HS256"
@@ -52,10 +52,9 @@ def create_access_token(
     role: UserRole,
     secret: SecretStr,
     expires_minutes: int,
-    current_clock: Clock,
 ) -> str:
-    """Create an HS256 access token using application-clock timestamps."""
-    issued_at = current_clock.now()
+    """Create an HS256 access token using real UTC timestamps."""
+    issued_at = wall_clock_now()
     expires_at = issued_at + timedelta(minutes=expires_minutes)
     payload = {
         "sub": str(user_id),
@@ -70,9 +69,8 @@ def verify_access_token(
     token: str,
     *,
     secret: SecretStr,
-    current_clock: Clock,
 ) -> AccessTokenClaims:
-    """Verify signature, required claims, role, subject, and clock-based expiry."""
+    """Verify signature, required claims, role, subject, and wall-clock expiry."""
     try:
         payload: dict[str, object] = jwt.decode(
             token,
@@ -98,7 +96,7 @@ def verify_access_token(
     ) as error:
         raise InvalidAccessTokenError from error
 
-    current_time = current_clock.now()
+    current_time = wall_clock_now()
     if issued_at > current_time or expires_at <= issued_at or expires_at <= current_time:
         raise InvalidAccessTokenError
     return AccessTokenClaims(

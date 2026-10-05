@@ -7,7 +7,7 @@ from typing import Protocol
 
 import structlog
 
-from app.core.clock import clock
+from app.core.clock import wall_clock_now
 from app.ws.events import EventEnvelope
 
 SEND_TIMEOUT_SECONDS = 5.0
@@ -55,7 +55,7 @@ class ConnectionManager:
         )
 
     async def _send(self, connection: Connection, data: str) -> None:
-        if connection.expires_at is not None and clock.now() >= connection.expires_at:
+        if connection.expires_at is not None and wall_clock_now() >= connection.expires_at:
             self.remove(connection.socket)
             await self._close(connection.socket, code=1008)
             return

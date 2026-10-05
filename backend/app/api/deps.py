@@ -53,14 +53,12 @@ def get_event_publisher(
 def get_auth_service(
     db: Annotated[AsyncSession, Depends(get_db)],
     settings: Annotated[Settings, Depends(get_settings)],
-    current_clock: Annotated[Clock, Depends(get_clock)],
 ) -> AuthService:
     """Build the request-scoped authentication service."""
     return AuthService(
         UserRepository(db),
         jwt_secret=settings.jwt_secret,
         jwt_expires_minutes=settings.jwt_expires_minutes,
-        current_clock=current_clock,
     )
 
 

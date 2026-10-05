@@ -142,6 +142,21 @@ async def test_expired_connection_never_receives_an_event() -> None:
 
 
 @pytest.mark.asyncio
+async def test_demo_clock_advance_does_not_close_valid_connection(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manager, socket = ConnectionManager(), Socket()
+    manager.add(socket, expires_at=clock.now() + timedelta(hours=1))
+    demo_now = clock.now()
+    monkeypatch.setattr(clock, "now", lambda: demo_now + timedelta(days=7))
+
+    await manager.broadcast(clock_event())
+
+    assert len(socket.frames) == 1
+    assert not socket.closed
+
+
+@pytest.mark.asyncio
 async def test_shutdown_flushes_pending_metrics_and_closes_tasks() -> None:
     manager, socket = ConnectionManager(), Socket()
     manager.add(socket)

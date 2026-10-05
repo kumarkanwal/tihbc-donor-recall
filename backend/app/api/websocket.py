@@ -8,7 +8,6 @@ from uuid import uuid4
 import structlog
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
-from app.core.clock import clock
 from app.core.config import Settings
 from app.core.db import DatabaseResources
 from app.core.errors import UnauthorizedError
@@ -25,7 +24,7 @@ async def authenticate_socket(socket: WebSocket, token: str) -> datetime:
     """Resolve the active user and token expiry in a short session."""
     settings = cast(Settings, socket.app.state.settings)
     try:
-        claims = verify_access_token(token, secret=settings.jwt_secret, current_clock=clock)
+        claims = verify_access_token(token, secret=settings.jwt_secret)
     except InvalidAccessTokenError:
         raise UnauthorizedError() from None
     resources = cast(DatabaseResources, socket.app.state.database)
@@ -34,7 +33,6 @@ async def authenticate_socket(socket: WebSocket, token: str) -> datetime:
             UserRepository(session),
             jwt_secret=settings.jwt_secret,
             jwt_expires_minutes=settings.jwt_expires_minutes,
-            current_clock=clock,
         )
         await service.get_current_user(token)
         return claims.expires_at

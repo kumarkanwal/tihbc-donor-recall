@@ -1,6 +1,6 @@
 """Tests for password and access-token security primitives."""
 
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 import pytest
@@ -47,7 +47,7 @@ def test_password_hashing_and_verification() -> None:
 
 
 @pytest.mark.asyncio
-async def test_token_create_verify_and_clock_expiry() -> None:
+async def test_demo_clock_advance_does_not_expire_token() -> None:
     test_clock = Clock()
     await test_clock.initialize(FakeClockPersistence())
     user_id = uuid4()
@@ -57,34 +57,46 @@ async def test_token_create_verify_and_clock_expiry() -> None:
         role=UserRole.ADMIN,
         secret=secret,
         expires_minutes=5,
-        current_clock=test_clock,
     )
 
-    claims = verify_access_token(token, secret=secret, current_clock=test_clock)
+    claims = verify_access_token(token, secret=secret)
 
     assert claims.user_id == user_id
     assert claims.role == UserRole.ADMIN
     assert claims.expires_at - claims.issued_at == timedelta(minutes=5)
 
-    await test_clock.advance(timedelta(minutes=6))
+    await test_clock.advance(timedelta(days=7))
+
+    assert verify_access_token(token, secret=secret).user_id == user_id
+
+
+def test_token_expires_against_wall_clock(monkeypatch: pytest.MonkeyPatch) -> None:
+    issued_at = datetime(2026, 10, 5, 12, tzinfo=UTC)
+    monkeypatch.setattr("app.core.security.wall_clock_now", lambda: issued_at)
+    token = create_access_token(
+        user_id=uuid4(),
+        role=UserRole.ADMIN,
+        secret=JWT_TEST_SECRET,
+        expires_minutes=5,
+    )
+    monkeypatch.setattr(
+        "app.core.security.wall_clock_now", lambda: issued_at + timedelta(minutes=6)
+    )
 
     with pytest.raises(InvalidAccessTokenError):
-        verify_access_token(token, secret=secret, current_clock=test_clock)
+        verify_access_token(token, secret=JWT_TEST_SECRET)
 
 
 def test_token_rejects_invalid_signature() -> None:
-    test_clock = Clock()
     token = create_access_token(
         user_id=uuid4(),
         role=UserRole.COORDINATOR,
         secret=SecretStr("correct-test-secret-with-32-byte-minimum"),
         expires_minutes=5,
-        current_clock=test_clock,
     )
 
     with pytest.raises(InvalidAccessTokenError):
         verify_access_token(
             token,
             secret=SecretStr("wrong-test-secret-with-32-byte-minimum"),
-            current_clock=test_clock,
         )
