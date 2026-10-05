@@ -183,6 +183,25 @@ batch has at least one valid donor.
 Buttons are returned already localized to the donor's language. Buttons on a message become disabled
 in the UI once the donor has replied to that message.
 
+Conversation lists use standard `page`/`page_size` pagination. The nested donor contains `id`, `name`,
+masked `phone`, `language`, `sim_reachable`, `read_receipts`, and nullable `campaign_id` and
+`campaign_name` from the latest matching message. Failed messages remain available as conversation
+previews for unreachable donors, but are excluded from chat history.
+
+Message history returns `{items, next_before, limit}`. `before` is an exclusive message UUID cursor
+belonging to that donor; `limit` defaults to 50 (maximum 100). Each page is chronological, with the
+latest page returned first; pass `next_before` to retrieve older messages. Equal creation timestamps
+are ordered by UUID. Opening returns `{read_count}` and changes only delivered outbound messages
+when read receipts are enabled; repeating it returns zero if no additional messages qualify.
+
+Replies return HTTP 201 and the inbound message. Text is trimmed, nonempty, and at most 4096 characters.
+Button replies must reference that donor's sent outbound message and one of its localized buttons;
+invalid references/buttons return 422, and repeated button replies return 409. Unreachable donors
+cannot reply (409). Text replies link to the latest sent outbound message. Both reply forms suspend
+the enrollment's next scheduled action and record its first response time. In Task 2.7 the enrollment
+status is unchanged, inbound messages are `delivered`, and no intent, acknowledgement, or follow-up
+is created; reply handling belongs to Task 2.8. Read/delivery events apply only to outbound messages.
+
 ## 8. Follow-up Inbox
 
 | Method | Path | Role | Description |

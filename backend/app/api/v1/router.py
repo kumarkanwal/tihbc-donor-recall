@@ -8,6 +8,7 @@ from app.api.v1.content_series import router as content_series_router
 from app.api.v1.demo import router as demo_router
 from app.api.v1.donor_batches import router as donor_batches_router
 from app.api.v1.media import router as media_router
+from app.api.v1.simulator import router as simulator_router
 from app.api.v1.users import router as users_router
 
 router = APIRouter()
@@ -18,4 +19,5 @@ router.include_router(demo_router)
 router.include_router(donor_batches_router)
 router.include_router(media_router)
 router.include_router(users_router)
+router.include_router(simulator_router)
 router.include_router(enrollment_router)

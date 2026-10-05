@@ -29,7 +29,7 @@ Update after every task. Add a note for Blocked items.
 | 2.4 | Messaging provider (simulator) | Done | Added provider-injected bilingual step sending, capacity-safe appointment booking with a non-blocking localized fallback, deterministic simulated delivery/read progression, post-commit events, demo CLI tools, and idempotency. All 221 PostgreSQL tests and the live CLI/API acceptance flow pass. |
 | 2.5 | Scheduler: dispatcher and escalation | Done (pending user verification) | Added the idempotent worker tick, primary-to-secondary escalation, needs-call follow-ups, campaign completion, and admin demo-clock API. Automated PostgreSQL and manual lifecycle verification remain tracked in KI-007. |
 | 2.6 | WebSockets and Redis events | Done (pending user verification) | Authenticated WebSockets, Redis cross-process event delivery, public payload filtering, metrics coalescing, worker/CLI integration, and local tests are complete. Live acceptance remains pending under KI-010. |
-| 2.7 | Simulator API | Not started | |
+| 2.7 | Simulator API | Done (pending user verification) | Added conversation browsing, chronological UUID-cursor message pages, read receipts, and transactional inbound replies that stop scheduled outreach without intent handling. PostgreSQL/manual acceptance remains tracked in KI-011. |
 | 2.8 | Reply service flows | Not started | |
 | 2.9 | LangGraph agent, fallback, LangSmith | Not started | |
 | 2.10 | Follow-up inbox API | Not started | |

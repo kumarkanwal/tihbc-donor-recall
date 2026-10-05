@@ -9,7 +9,7 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.sql.elements import ColumnElement
 
 from app.models.donor import Donor
-from app.models.enums import MessageStatus
+from app.models.enums import MessageDirection, MessageStatus
 from app.models.message import Message
 from app.repositories.base import BaseRepository
 
@@ -53,7 +53,7 @@ class MessageRepository(BaseRepository[Message]):
         statement = (
             select(Message)
             .join(Donor, Message.donor_id == Donor.id)
-            .where(*filters)
+            .where(*filters, Message.direction == MessageDirection.OUTBOUND)
             .order_by(Message.created_at, Message.id)
             .with_for_update(of=Message, skip_locked=True)
             .options(selectinload(Message.donor), selectinload(Message.enrollment))

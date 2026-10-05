@@ -154,6 +154,35 @@
         "title": "Body_upload_media_api_v1_media_post",
         "type": "object"
       },
+      "ButtonReply": {
+        "additionalProperties": false,
+        "description": "Reply to one of a particular outbound message's localized buttons.",
+        "properties": {
+          "button_id": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Button Id",
+            "type": "string"
+          },
+          "reply_to_message_id": {
+            "format": "uuid",
+            "title": "Reply To Message Id",
+            "type": "string"
+          },
+          "type": {
+            "const": "button",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "button_id",
+          "reply_to_message_id"
+        ],
+        "title": "ButtonReply",
+        "type": "object"
+      },
       "CampaignCreate": {
         "description": "Create one draft campaign.",
         "properties": {
@@ -851,6 +880,38 @@
           }
         },
         "title": "ContentSeriesUpdate",
+        "type": "object"
+      },
+      "ConversationPage": {
+        "description": "Paginated donor threads.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SimulatorConversation"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size"
+        ],
+        "title": "ConversationPage",
         "type": "object"
       },
       "DeclineReason": {
@@ -1851,6 +1912,25 @@
         "title": "MediaUploadOut",
         "type": "object"
       },
+      "MessageButton": {
+        "description": "A localized public button.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "MessageButton",
+        "type": "object"
+      },
       "MessageCategory": {
         "enum": [
           "utility",
@@ -1876,6 +1956,41 @@
         ],
         "title": "MessageKind",
         "type": "string"
+      },
+      "MessagePage": {
+        "description": "Latest message slice in chronological order, with an older-page cursor.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SimulatorMessage"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "next_before": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Before"
+          }
+        },
+        "required": [
+          "items",
+          "next_before",
+          "limit"
+        ],
+        "title": "MessagePage",
+        "type": "object"
       },
       "MessageStatus": {
         "enum": [
@@ -1993,6 +2108,20 @@
           "name"
         ],
         "title": "NamedResourceSummary",
+        "type": "object"
+      },
+      "OpenConversationResult": {
+        "description": "Number of delivered outbound messages marked read.",
+        "properties": {
+          "read_count": {
+            "title": "Read Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "read_count"
+        ],
+        "title": "OpenConversationResult",
         "type": "object"
       },
       "PreviewButtonOut": {
@@ -2594,6 +2723,254 @@
           }
         },
         "title": "SeriesStepUpdate",
+        "type": "object"
+      },
+      "SimulatorConversation": {
+        "description": "Donor thread preview.",
+        "properties": {
+          "donor": {
+            "$ref": "#/components/schemas/SimulatorDonor"
+          },
+          "last_message": {
+            "$ref": "#/components/schemas/SimulatorMessage"
+          },
+          "unread_count": {
+            "title": "Unread Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "donor",
+          "last_message",
+          "unread_count"
+        ],
+        "title": "SimulatorConversation",
+        "type": "object"
+      },
+      "SimulatorDonor": {
+        "description": "Masked donor-picker row with its latest matching campaign.",
+        "properties": {
+          "campaign_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Campaign Id"
+          },
+          "campaign_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Campaign Name"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "language": {
+            "$ref": "#/components/schemas/LanguageCode"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "phone": {
+            "title": "Phone",
+            "type": "string"
+          },
+          "read_receipts": {
+            "title": "Read Receipts",
+            "type": "boolean"
+          },
+          "sim_reachable": {
+            "title": "Sim Reachable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "phone",
+          "language",
+          "sim_reachable",
+          "read_receipts",
+          "campaign_id",
+          "campaign_name"
+        ],
+        "title": "SimulatorDonor",
+        "type": "object"
+      },
+      "SimulatorMessage": {
+        "description": "The same public message shape used by realtime events.",
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "button_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Button Id"
+          },
+          "buttons": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/MessageButton"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Buttons"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "delivered_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delivered At"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/MessageDirection"
+          },
+          "donor_id": {
+            "format": "uuid",
+            "title": "Donor Id",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/MessageKind"
+          },
+          "media_type": {
+            "$ref": "#/components/schemas/MediaType"
+          },
+          "media_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Media Url"
+          },
+          "read_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read At"
+          },
+          "reply_to_message_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reply To Message Id"
+          },
+          "sent_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sent At"
+          },
+          "status": {
+            "$ref": "#/components/schemas/MessageStatus"
+          }
+        },
+        "required": [
+          "id",
+          "donor_id",
+          "direction",
+          "kind",
+          "body",
+          "media_type",
+          "media_url",
+          "buttons",
+          "button_id",
+          "reply_to_message_id",
+          "status",
+          "created_at",
+          "sent_at",
+          "delivered_at",
+          "read_at"
+        ],
+        "title": "SimulatorMessage",
+        "type": "object"
+      },
+      "TextReply": {
+        "additionalProperties": false,
+        "description": "Unclassified donor free-text reply.",
+        "properties": {
+          "text": {
+            "maxLength": 4096,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "type": {
+            "const": "text",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "text"
+        ],
+        "title": "TextReply",
         "type": "object"
       },
       "TokenResponse": {
@@ -4733,6 +5110,303 @@
         "summary": "Upload content-series media",
         "tags": [
           "Media"
+        ]
+      }
+    },
+    "/api/v1/simulator/conversations": {
+      "get": {
+        "description": "Return masked donor-picker previews and unread counts.",
+        "operationId": "conversations_api_v1_simulator_conversations_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "campaign_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Campaign Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 120,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List simulator conversations",
+        "tags": [
+          "Simulator"
+        ]
+      }
+    },
+    "/api/v1/simulator/conversations/{donor_id}/actions/open": {
+      "post": {
+        "description": "Mark delivered outreach read if the donor supports read receipts.",
+        "operationId": "open_conversation_api_v1_simulator_conversations__donor_id__actions_open_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "donor_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Donor Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenConversationResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Open simulator conversation",
+        "tags": [
+          "Simulator"
+        ]
+      }
+    },
+    "/api/v1/simulator/conversations/{donor_id}/messages": {
+      "get": {
+        "description": "Return a stable chronological slice, with a cursor to older messages.",
+        "operationId": "messages_api_v1_simulator_conversations__donor_id__messages_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "donor_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Donor Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "before",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Before"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagePage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List simulator messages",
+        "tags": [
+          "Simulator"
+        ]
+      }
+    },
+    "/api/v1/simulator/conversations/{donor_id}/replies": {
+      "post": {
+        "description": "Store an inbound message and suspend further steps without classifying intent.",
+        "operationId": "reply_api_v1_simulator_conversations__donor_id__replies_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "donor_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Donor Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "discriminator": {
+                  "mapping": {
+                    "button": "#/components/schemas/ButtonReply",
+                    "text": "#/components/schemas/TextReply"
+                  },
+                  "propertyName": "type"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/TextReply"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ButtonReply"
+                  }
+                ],
+                "title": "Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulatorMessage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Store simulator donor reply",
+        "tags": [
+          "Simulator"
         ]
       }
     },

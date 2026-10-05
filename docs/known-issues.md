@@ -6,11 +6,11 @@
 - **Affects:** Backend test output
 - **Details:** FastAPI's current `TestClient` import emits a Starlette warning that its HTTPX-based implementation is deprecated in favor of `httpx2`. The required test stack still passes; dependency substitution is outside task 1.1 and requires review before changing the approved stack.
 
-## KI-005 — Simulator routes absent from generated frontend contract
+## KI-005 — Simulator frontend contract regeneration pending
 
 - **Status:** Open
 - **Affects:** Frontend API-backed simulator source only; mock mode is complete
-- **Details:** Backend Task 2.7 has not yet exported the documented `/simulator` routes into `frontend/openapi.json`. The API adapter therefore uses a narrow compatibility type bridge around the authenticated generated client. After Task 2.7, regenerate the client, remove the bridge, and verify the final cursor-pagination response directly against the generated types.
+- **Details:** Backend Task 2.7 now exports the documented `/simulator` routes into `frontend/openapi.json`. The frontend API adapter still uses its compatibility type bridge. In a frontend session, run `pnpm gen:api`, remove the bridge, and verify the chronological `{items, next_before, limit}` cursor response directly against generated types. This backend session deliberately leaves other frontend files unchanged.
 
 ## KI-006 — Frontend realtime connection intentionally disabled
 
@@ -41,3 +41,9 @@
 - **Status:** Open
 - **Affects:** Redis worker-to-browser fan-out and authenticated WebSocket acceptance
 - **Details:** The real Redis integration test, PostgreSQL suite, and manual `ws_listen` plus clock-advance check are deferred for combined user verification with Task 2.5. Local auth, broadcast, failure isolation, payload filtering, expiry, and metrics debounce tests pass. Run `uv run pytest --run-postgres --run-redis`; Redis tests use unique channels and never flush Redis. KI-006 remains open until browser realtime is enabled and verified.
+
+## KI-011 — Task 2.7 simulator acceptance pending
+
+- **Status:** Open
+- **Affects:** PostgreSQL simulator queries, read receipts, reply persistence, and live events
+- **Details:** User verification of the PostgreSQL suite and manual conversation/open/reply walkthrough is deferred together with Tasks 2.5/2.6. Local service and API tests pass; new PostgreSQL tests cover HTTP replies, scheduling suspension, no intent records, outbound-only delivery progression, and stable cursor pagination. Intent handling and automatic acknowledgements are intentionally reserved for Task 2.8.

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added staff simulator conversation browsing, chronological message history, read receipts, and bilingual button/text reply capture that suspends further scheduled outreach.
 - Added authenticated staff live events with Redis delivery across API and scheduler processes, isolated WebSocket broadcasts, automatic heartbeats, and coalesced metrics notifications.
 - Added Settings views for mocked WhatsApp integration status, template approvals, active staff users, and administrator-only demo clock and data-reset controls.
 - Added delivery, response, and inactive-number Reports with shared filters, theme-aware charts, detailed tables, summary cards, pagination, and CSV exports.
