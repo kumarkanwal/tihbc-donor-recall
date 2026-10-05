@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added the coordinator Follow-up Inbox with filtered work queues, donor-response details, assignment and resolution workflows, notes, chat access, and CSV export.
 - Added the administrator demo clock and Skip time control plus shared realtime cache-update infrastructure with reconnect handling and follow-up notifications.
 - Added campaign management screens with status browsing, draft configuration, audience and schedule previews, lifecycle controls, enrollment monitoring, donor details, and direct chat access.
 - Added provider-backed bilingual campaign messaging with capacity-safe appointment booking, deterministic simulated delivery and read states, unreachable-number handling, post-commit live events, and demo CLI controls.

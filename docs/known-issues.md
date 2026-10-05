@@ -17,3 +17,9 @@
 - **Status:** Open
 - **Affects:** Live cache updates from server WebSocket events
 - **Details:** `NEXT_PUBLIC_REALTIME` defaults to `off` until backend Task 2.6 provides the authenticated `/ws` endpoint. The shared client, reconnect policy, event router, and API-simulator handoff are complete and tested. Enable it with `NEXT_PUBLIC_REALTIME=on` after Task 2.6 and close this issue after live verification.
+
+## KI-008 — Follow-up and metrics frontend contracts pending generation
+
+- **Status:** Open
+- **Affects:** Frontend Tasks 3.9, 3.10, and 3.11
+- **Details:** Backend Tasks 2.10/2.11 are not implemented, so the documented follow-up, metrics, and reports shapes temporarily live in `frontend/lib/api/pending-contracts.ts`. These pages show “Available after backend update” for HTTP 404. Regenerate OpenAPI and remove the pending contract boundary when those backend APIs land.

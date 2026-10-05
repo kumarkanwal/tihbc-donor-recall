@@ -1,10 +1,5 @@
-import { PlaceholderPage } from "@/components/features/app-shell/placeholder-page";
+import { InboxScreen } from "@/components/features/inbox/inbox-screen";
 
 export default function InboxPage(): React.JSX.Element {
-  return (
-    <PlaceholderPage
-      title="Follow-up Inbox"
-      description="Review donor responses that need coordinator attention."
-    />
-  );
+  return <InboxScreen />;
 }

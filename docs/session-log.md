@@ -182,3 +182,10 @@
 - **Requests for backend:** Complete Task 2.6 and expose authenticated `/ws` before enabling `NEXT_PUBLIC_REALTIME=on`. Commit and export the Task 2.5 demo-clock routes currently present in the shared working copy; then regenerate the client and remove the narrow clock compatibility bridge.
 - **Next:** Complete the remaining Task 3.13 live-update integration after the WebSocket and outstanding feature APIs are committed, then enable and verify realtime against the running stack.
 - **Blockers:** None for part 1; live WebSocket acceptance intentionally waits for backend Task 2.6.
+
+## S-029 — 2026-10-04 — [FE] Follow-up inbox
+
+- **Done:** Completed Task 3.9 with Needs call/Reschedule/Declined/Confirmed/All count tabs; status, assigned-to-me, campaign, and donor/reply filters; paginated queue cards; donor, response, appointment, and activity detail; copy number, assign, start, resolve outcome/note, add note, and View chat actions; and filtered CSV export. Query keys align with the Task 3.13 `followup.*` invalidation route so new and updated items refresh live once realtime is enabled. Added the single documented pending-contract boundary and the explicit HTTP 404 “Available after backend update” state.
+- **Verification:** ESLint, strict TypeScript, all 52 Vitest tests, and the Next.js production build pass. Focused tests cover missing-backend presentation, type-tab filtering, and the shared donor-chat helper.
+- **Next:** Build Task 3.10 Dashboard against the same pending contract boundary.
+- **Blockers:** None; live data awaits backend Task 2.10 and is tracked in KI-008.

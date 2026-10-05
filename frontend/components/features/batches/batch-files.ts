@@ -1,18 +1,9 @@
 import type { ValidationIssue } from "@/hooks/use-donor-batches";
+import { downloadBlob } from "@/lib/utils/download";
 
 function escapeCsvCell(value: string | number): string {
   const text = String(value);
   return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
-}
-
-/** Start a browser download for a generated or API-provided file. */
-export function downloadBlob(blob: Blob, filename: string): void {
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = filename;
-  anchor.click();
-  URL.revokeObjectURL(url);
 }
 
 /** Generate the review error report without sending donor data elsewhere. */

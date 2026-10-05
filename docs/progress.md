@@ -49,7 +49,7 @@ Update after every task. Add a note for Blocked items.
 | 3.6 | Content series library and editor | Done | Added the searchable/filterable table and grid library, administrator lifecycle actions, bilingual settings and step editor, accessible reordering, media upload, server-rendered simulator preview, activation problem groups, and coordinator/archived read-only states. API generation, lint, strict typecheck, 29 tests, and the production build pass. |
 | 3.7 | Campaigns | Done | Added the searchable, sortable campaign library; role-aware draft creation and editing; launch, pause, and resume controls; audience and schedule summaries; enrollment counters, filtering, detail drawer, and donor-chat entry points. API generation, lint, strict typecheck, 41 tests, and the production build pass. |
 | 3.8 | WhatsApp simulator | Done | Added the persistent slide-in donor phone, searchable mock conversation picker, localized live chats, reply flows, typing, ticks, media, formatting, RTL support, direct-open helper, and mock/API source boundary. Lint, strict typecheck, 35 tests, and the production build pass. |
-| 3.9 | Follow-up inbox | Not started | |
+| 3.9 | Follow-up inbox | Done | Added the filtered coordinator queue, count tabs, detail workflow, assignment/start/resolve/note actions, CSV export, chat entry point, realtime-compatible query keys, and backend-update empty state. Lint, strict typecheck, 52 tests, and production build pass. |
 | 3.10 | Dashboard | Not started | |
 | 3.11 | Reports | Not started | |
 | 3.12 | Settings | Not started | |

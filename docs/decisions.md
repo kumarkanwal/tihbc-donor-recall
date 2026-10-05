@@ -320,3 +320,11 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Decision:** Own one authenticated WebSocket client at the application-provider boundary per browser tab, and route every documented event through one cache-mapping module. API-backed simulator subscriptions share this client. Gate the connection with `NEXT_PUBLIC_REALTIME=on|off`, defaulting to `off` until the backend WebSocket task is complete.
 - **Reason:** A single connection prevents duplicate events and reconnect loops, while centralized cache effects keep feature components independent of transport details and make reconnect-wide active-query refresh reliable.
 - **Consequences:** New event types must be added to the typed event union and central router; they must not introduce component-level WebSocket connections or event handlers.
+
+## D-107 — Single pending frontend contract boundary
+
+- **Date:** 2026-10-04
+- **Status:** Accepted
+- **Decision:** Define every temporary request and response type for the unimplemented follow-up, metrics, and reports endpoints in `frontend/lib/api/pending-contracts.ts`, alongside one narrow compatibility view of the normal authenticated API client. Feature hooks consume this boundary and expose a specific backend-update state for HTTP 404.
+- **Reason:** Tasks 3.9–3.11 must implement the documented UI before backend Tasks 2.10/2.11 export OpenAPI types, while keeping temporary contracts easy to find, review, and delete without introducing component-level requests.
+- **Consequences:** After backend Tasks 2.10/2.11, regenerate the API client, replace all pending-contract imports with generated types, remove the compatibility file, and close KI-008.

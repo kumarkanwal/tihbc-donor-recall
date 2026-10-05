@@ -6,7 +6,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { downloadBlob } from "@/components/features/batches/batch-files";
 import {
   ConfirmStep,
   ImportSuccess,
@@ -19,6 +18,7 @@ import {
   type BatchUploadFormValues,
 } from "@/components/features/batches/batch-upload-form";
 import { PageHeader } from "@/components/shared/page-header";
+import { downloadBlob } from "@/lib/utils/download";
 import {
   useImportDonorBatch,
   usePreviewDonorBatch,
