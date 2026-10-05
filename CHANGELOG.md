@@ -2,7 +2,9 @@
 
 ## Unreleased
 
+- Connected the donor-phone simulator to the live generated API with real campaign filters, older-message pagination, read receipts, optimistic replies, and polling when realtime is disabled; offline mock demos remain available.
 - Added deterministic bilingual donor reply flows for confirmation, capacity-safe rescheduling, decline reasons, questions, and coordinator escalation, with live typing and status updates.
+- Corrected skipped-time message timestamps and automatically replaced past appointments before later campaign steps are rendered.
 - Fixed authentication and WebSocket sessions so demo time skips no longer expire real-time access tokens.
 - Added staff simulator conversation browsing, chronological message history, read receipts, and bilingual button/text reply capture that suspends further scheduled outreach.
 - Added authenticated staff live events with Redis delivery across API and scheduler processes, isolated WebSocket broadcasts, automatic heartbeats, and coalesced metrics notifications.

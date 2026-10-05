@@ -9,6 +9,7 @@ import type {
   SimulatorMessage,
   SimulatorMessageStatus,
   SimulatorReply,
+  SimulatorMessagePage,
 } from "./types";
 
 const AUTO_REPLY_DELAY_MS = 1_500;
@@ -64,6 +65,19 @@ export class MockSimulatorSource implements SimulatorDataSource {
     }
   }
 
+  async listMessagePage(
+    donorId: string,
+    before?: string,
+  ): Promise<SimulatorMessagePage> {
+    const messages = await this.listMessages(donorId);
+    const end = before
+      ? messages.findIndex(({ id }) => id === before)
+      : messages.length;
+    const start = Math.max(0, end - 50);
+    const items = messages.slice(start, end);
+    return { items, limit: 50, next_before: start > 0 ? items[0].id : null };
+  }
+
   async sendReply(
     donorId: string,
     reply: SimulatorReply,
@@ -104,7 +118,7 @@ export class MockSimulatorSource implements SimulatorDataSource {
     const label =
       reply.type === "text"
         ? reply.text
-        : (original?.buttons.find(({ id }) => id === reply.button_id)?.label ??
+        : (original?.buttons?.find(({ id }) => id === reply.button_id)?.label ??
           reply.button_id);
     return this.createMessage(donor.id, "inbound", label, {
       buttonId: reply.type === "button" ? reply.button_id : null,

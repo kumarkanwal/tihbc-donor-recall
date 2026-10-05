@@ -108,7 +108,10 @@ export function createMockSeed(): {
   return {
     conversations: donors.map((donor) => ({
       donor: { ...donor },
-      last_message: messages.get(donor.id)?.at(-1) ?? null,
+      last_message: messages.get(donor.id)?.at(-1) ?? {
+        ...initialMessage(donor, "Number not on WhatsApp"),
+        status: "failed",
+      },
       unread_count: donor.sim_reachable ? 1 : 0,
     })),
     messages,

@@ -1,51 +1,15 @@
-export type SimulatorLanguage = "en" | "ur";
-export type SimulatorMessageStatus =
-  "queued" | "sent" | "delivered" | "read" | "failed";
+import type { components, operations } from "@/lib/api/schema";
 
-export interface SimulatorButton {
-  id: string;
-  label: string;
-}
-
-/** Message shape defined by docs/api.md section 7. */
-export interface SimulatorMessage {
-  id: string;
-  donor_id: string;
-  direction: "outbound" | "inbound";
-  kind: "template" | "text" | "interactive" | "button_reply";
-  body: string;
-  media_type: "none" | "image" | "video";
-  media_url: string | null;
-  buttons: SimulatorButton[];
-  button_id: string | null;
-  reply_to_message_id: string | null;
-  status: SimulatorMessageStatus;
-  created_at: string;
-  sent_at: string | null;
-  delivered_at: string | null;
-  read_at: string | null;
-}
-
-export interface SimulatorDonor {
-  id: string;
-  name: string;
-  phone: string;
-  language: SimulatorLanguage;
-  sim_reachable: boolean;
-  read_receipts: boolean;
-  campaign_id: string;
-  campaign_name: string;
-}
-
-export interface SimulatorConversation {
-  donor: SimulatorDonor;
-  last_message: SimulatorMessage | null;
-  unread_count: number;
-}
-
+export type SimulatorLanguage = components["schemas"]["LanguageCode"];
+export type SimulatorMessageStatus = components["schemas"]["MessageStatus"];
+export type SimulatorButton = components["schemas"]["MessageButton"];
+export type SimulatorMessage = components["schemas"]["SimulatorMessage"];
+export type SimulatorDonor = components["schemas"]["SimulatorDonor"];
+export type SimulatorConversation =
+  components["schemas"]["SimulatorConversation"];
+export type SimulatorMessagePage = components["schemas"]["MessagePage"];
 export type SimulatorReply =
-  | { type: "button"; button_id: string; reply_to_message_id: string }
-  | { type: "text"; text: string };
+  components["schemas"]["ButtonReply"] | components["schemas"]["TextReply"];
 
 export type SimulatorEvent =
   | { type: "message.created"; payload: SimulatorMessage }
@@ -65,10 +29,9 @@ export type SimulatorEvent =
       payload: { donor_id: string; is_typing: boolean };
     };
 
-export interface ConversationFilters {
-  campaign_id?: string;
-  search?: string;
-}
+export type ConversationFilters = NonNullable<
+  operations["conversations_api_v1_simulator_conversations_get"]["parameters"]["query"]
+>;
 
 /** Interchangeable mock/API boundary consumed by simulator hooks. */
 export interface SimulatorDataSource {
@@ -76,6 +39,10 @@ export interface SimulatorDataSource {
     filters?: ConversationFilters,
   ): Promise<SimulatorConversation[]>;
   listMessages(donorId: string): Promise<SimulatorMessage[]>;
+  listMessagePage(
+    donorId: string,
+    before?: string,
+  ): Promise<SimulatorMessagePage>;
   openConversation(donorId: string): Promise<void>;
   sendReply(donorId: string, reply: SimulatorReply): Promise<SimulatorMessage>;
   subscribe(listener: (event: SimulatorEvent) => void): () => void;

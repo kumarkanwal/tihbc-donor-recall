@@ -1,5 +1,10 @@
 # TIHBC Donor Recall Demo
 
+The donor-phone simulator defaults to `NEXT_PUBLIC_SIMULATOR_SOURCE=api`. For offline demos,
+set `NEXT_PUBLIC_SIMULATOR_SOURCE=mock` in the frontend environment and restart `pnpm dev`.
+With `NEXT_PUBLIC_REALTIME=off`, the open phone polls messages every 3 seconds and conversations
+every 10 seconds. Set it to `on` to use the shared authenticated WebSocket instead (no polling).
+
 Backend-first MVP for TIHBC's donor recall and rescheduling workflow. The backend supports local `uv`
 development and a Docker Compose stack using the same root environment file.
 

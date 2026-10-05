@@ -277,7 +277,7 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 ## D-103 — Source-agnostic simulator boundary
 
 - **Date:** 2026-10-04
-- **Status:** Accepted
+- **Status:** Superseded by D-109
 - **Decision:** Put all donor conversation reads, opens, replies, and live-event subscriptions behind one `SimulatorDataSource` interface selected by `NEXT_PUBLIC_SIMULATOR_SOURCE=mock|api`, defaulting to the in-memory mock. Keep the UI and TanStack Query hooks unaware of the selected source. Until backend Task 2.7 exports the documented simulator routes, the API adapter uses a narrow compatibility type bridge around the shared authenticated generated client and the documented WebSocket envelope.
 - **Reason:** The complete demo interaction can be built and tested against deterministic mock data now, while the same UI can switch to REST and WebSocket delivery without component changes when the generated contract lands.
 - **Consequences:** Task 2.7 must export the section-7 routes, after which the compatibility bridge is removed and the adapter compiles directly against generated path types; KI-005 tracks this handoff.
@@ -370,3 +370,12 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Decision:** Route simulator replies through `services/reply_service.py`. Infer the pending deterministic context from the latest outbound message's internal button definitions: `slot_<uuid>` identifies offered appointment rows and the documented reason IDs identify decline-reason capture. Store free-text fallback classifications with the existing `agent` response source because the database contract intentionally exposes only `button` and `agent`; Task 2.9 can replace the classifier without changing persistence. Keep exact automatic reply text in language-specific modules under `services/replies/` and publish typing followed by both committed messages, enrollment, follow-up, and metrics events.
 - **Reason:** Persisting conversation state in a second table is unnecessary for the bounded slot/reason flows because the sent message already records the offered choices. Stable internal IDs keep selection capacity-safe, preserve the documented public button shape, and leave the Task 2.9 agent as a drop-in classification replacement.
 - **Consequences:** Button IDs are part of deterministic reply context and must remain stable after send. Repeated final-status intents add a system note to the open follow-up; changed intents use the enrollment reply state machine. D-046's temporary no-classification behavior no longer applies.
+
+## D-109 — Generated simulator contract with exclusive refresh modes
+
+- **Date:** 2026-10-05
+- **Status:** Accepted
+- **Supersedes:** D-103's default-source and temporary compatibility choices; its source-agnostic boundary remains.
+- **Decision:** Default the simulator to `api`, alias its REST types directly from generated OpenAPI, and keep the offline `mock` source. Aggregate paginated conversation rows for the donor picker and derive campaign options from real rows. Use TanStack infinite message pages with exclusive `next_before` cursors and chronological presentation. While the phone is open, poll API messages every three seconds and conversations every ten seconds only when realtime is off; realtime uses the existing shared tab connection and event router without polling. Reconcile optimistic donor bubbles with server messages and never fabricate automatic replies in API mode.
+- **Reason:** The backend simulator contract is now available, and the user explicitly requested live API mode with an offline fallback. Exclusive refresh modes avoid duplicate transport activity, while generated types catch nullable fields and pagination drift.
+- **Consequences:** Restart the frontend after changing public source/realtime environment values. Closed phones and mock mode do not poll. KI-005 is resolved; browser/PostgreSQL/Redis acceptance remains tracked separately under KI-006/KI-010/KI-011.

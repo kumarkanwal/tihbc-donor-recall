@@ -8,7 +8,7 @@ const publicEnvironmentSchema = z.object({
     .enum(["true", "false"])
     .default("true")
     .transform((value) => value === "true"),
-  NEXT_PUBLIC_SIMULATOR_SOURCE: z.enum(["mock", "api"]).default("mock"),
+  NEXT_PUBLIC_SIMULATOR_SOURCE: z.enum(["mock", "api"]).default("api"),
   NEXT_PUBLIC_REALTIME: z
     .enum(["on", "off"])
     .default("off")

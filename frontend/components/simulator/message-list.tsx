@@ -88,7 +88,7 @@ export function MessageList({
             <SimulatorMessageBubble
               key={message.id}
               body={message.body}
-              buttons={message.buttons}
+              buttons={message.buttons ?? []}
               mediaType={message.media_type}
               mediaUrl={message.media_url}
               direction={

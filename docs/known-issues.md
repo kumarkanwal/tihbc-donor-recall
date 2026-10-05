@@ -6,12 +6,6 @@
 - **Affects:** Backend test output
 - **Details:** FastAPI's current `TestClient` import emits a Starlette warning that its HTTPX-based implementation is deprecated in favor of `httpx2`. The required test stack still passes; dependency substitution is outside task 1.1 and requires review before changing the approved stack.
 
-## KI-005 — Simulator frontend contract regeneration pending
-
-- **Status:** Open
-- **Affects:** Frontend API-backed simulator source only; mock mode is complete
-- **Details:** Backend Task 2.7 now exports the documented `/simulator` routes into `frontend/openapi.json`. The frontend API adapter still uses its compatibility type bridge. In a frontend session, run `pnpm gen:api`, remove the bridge, and verify the chronological `{items, next_before, limit}` cursor response directly against generated types. This backend session deliberately leaves other frontend files unchanged.
-
 ## KI-006 — Frontend realtime connection intentionally disabled
 
 - **Status:** Open
@@ -22,7 +16,7 @@
 
 - **Status:** Open
 - **Affects:** Scheduler dispatch, escalation, campaign completion, and demo-clock acceptance
-- **Details:** Task 2.5 PostgreSQL suite (234 tests) and manual scheduler lifecycle have not yet been verified by the user. Codex verification passed Ruff, format, strict mypy, and 204 non-PostgreSQL tests with only KI-002.
+- **Details:** The combined PostgreSQL/Redis suite now passes after correcting demo-clock message timestamps and stale appointment rebooking. Manual scheduler lifecycle re-verification remains pending so the user can confirm skipped steps show the advanced demo time and a future appointment (or the documented fallback).
 
 ## KI-008 — Follow-up and metrics frontend contracts pending generation
 
@@ -40,10 +34,10 @@
 
 - **Status:** Open
 - **Affects:** Redis worker-to-browser fan-out and authenticated WebSocket acceptance
-- **Details:** The real Redis integration test, PostgreSQL suite, and manual `ws_listen` plus clock-advance check are deferred for combined user verification with Task 2.5. Local auth, broadcast, failure isolation, payload filtering, expiry, and metrics debounce tests pass. Run `uv run pytest --run-postgres --run-redis`; Redis tests use unique channels and never flush Redis. KI-006 remains open until browser realtime is enabled and verified.
+- **Details:** The real Redis and PostgreSQL suite passes, and regression coverage proves a seven-day demo-clock advance does not expire HTTP or WebSocket tokens. A final manual `ws_listen` plus clock-advance check remains pending. Redis tests use unique channels and never flush Redis. KI-006 remains open until browser realtime is enabled and verified.
 
 ## KI-011 — Tasks 2.7/2.8 simulator acceptance pending
 
 - **Status:** Open
 - **Affects:** PostgreSQL simulator queries, read receipts, deterministic reply flows, appointment booking, follow-ups, and live events
-- **Details:** User verification of the PostgreSQL suite and manual conversation/open/reply walkthrough is deferred together with Tasks 2.5/2.6. Local service and API tests pass; PostgreSQL coverage includes HTTP replies, scheduling suspension, outbound-only delivery progression, stable cursor pagination, and selected-slot capacity protection. Task 2.8 adds classified responses, bilingual acknowledgements, follow-up creation/update, and ordered typing/message/status events; verify these against the running API, worker, PostgreSQL, and Redis before closing this issue.
+- **Details:** The complete PostgreSQL/Redis suite passes, including HTTP replies, scheduling suspension, outbound-only delivery progression, stable cursor pagination, capacity-safe slot booking, classified responses, bilingual acknowledgements, follow-up create/update payload snapshots, and ordered typing/message/status events. The Donor Phone walkthrough remains pending before closing this issue.

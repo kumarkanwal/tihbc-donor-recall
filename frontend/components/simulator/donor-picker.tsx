@@ -4,7 +4,6 @@ import { Search } from "lucide-react";
 import { useState } from "react";
 
 import { useSimulatorConversations } from "@/hooks/use-simulator";
-import { MOCK_CAMPAIGNS } from "@/lib/simulator/mock-data";
 
 import { ChatListItem } from "./chat-list-item";
 
@@ -20,6 +19,12 @@ export function DonorPicker({
     search: search || undefined,
     campaign_id: campaignId || undefined,
   });
+  const catalog = useSimulatorConversations({});
+  const campaigns = new Map<string, string>();
+  for (const { donor } of catalog.data ?? []) {
+    if (donor.campaign_id && donor.campaign_name)
+      campaigns.set(donor.campaign_id, donor.campaign_name);
+  }
 
   return (
     <div className="bg-sim-incoming flex min-h-0 flex-1 flex-col">
@@ -42,9 +47,9 @@ export function DonorPicker({
             className="border-sim-secondary/30 bg-sim-incoming text-sim-text w-full rounded border px-2 py-1.5 text-xs"
           >
             <option value="">All campaigns</option>
-            {MOCK_CAMPAIGNS.map((campaign) => (
-              <option key={campaign.id} value={campaign.id}>
-                {campaign.name}
+            {[...campaigns].map(([id, name]) => (
+              <option key={id} value={id}>
+                {name}
               </option>
             ))}
           </select>

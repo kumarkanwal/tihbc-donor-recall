@@ -364,6 +364,66 @@ export interface paths {
         patch: operations["update_series_step_api_v1_content_series__series_id__steps__step_id__patch"];
         trace?: never;
     };
+    "/api/v1/demo/clock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the demo clock
+         * @description Return the current demo time and offset.
+         */
+        get: operations["get_demo_clock_api_v1_demo_clock_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/demo/clock/actions/advance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Advance the demo clock
+         * @description Advance the demo clock and immediately run one scheduler tick.
+         */
+        post: operations["advance_demo_clock_api_v1_demo_clock_actions_advance_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/demo/clock/actions/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reset the demo clock
+         * @description Reset the demo clock offset to zero.
+         */
+        post: operations["reset_demo_clock_api_v1_demo_clock_actions_reset_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/donor-batches": {
         parameters: {
             query?: never;
@@ -528,6 +588,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/simulator/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List simulator conversations
+         * @description Return masked donor-picker previews and unread counts.
+         */
+        get: operations["conversations_api_v1_simulator_conversations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/simulator/conversations/{donor_id}/actions/open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Open simulator conversation
+         * @description Mark delivered outreach read if the donor supports read receipts.
+         */
+        post: operations["open_conversation_api_v1_simulator_conversations__donor_id__actions_open_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/simulator/conversations/{donor_id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List simulator messages
+         * @description Return a stable chronological slice, with a cursor to older messages.
+         */
+        get: operations["messages_api_v1_simulator_conversations__donor_id__messages_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/simulator/conversations/{donor_id}/replies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Store simulator donor reply
+         * @description Store, classify, and apply one deterministic donor reply.
+         */
+        post: operations["reply_api_v1_simulator_conversations__donor_id__replies_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users": {
         parameters: {
             query?: never;
@@ -661,6 +801,24 @@ export interface components {
              * @description JPG, PNG, WebP, or MP4 media
              */
             file: string;
+        };
+        /**
+         * ButtonReply
+         * @description Reply to one of a particular outbound message's localized buttons.
+         */
+        ButtonReply: {
+            /** Button Id */
+            button_id: string;
+            /**
+             * Reply To Message Id
+             * Format: uuid
+             */
+            reply_to_message_id: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "button";
         };
         /**
          * CampaignCreate
@@ -941,10 +1099,53 @@ export interface components {
             tag_names?: string[] | null;
         };
         /**
+         * ConversationPage
+         * @description Paginated donor threads.
+         */
+        ConversationPage: {
+            /** Items */
+            items: components["schemas"]["SimulatorConversation"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /**
          * DeclineReason
          * @enum {string}
          */
         DeclineReason: "travelling" | "health" | "recently_donated" | "not_interested" | "other";
+        /**
+         * DemoClockAdvance
+         * @description Non-negative whole-hour demo-clock advance.
+         */
+        DemoClockAdvance: {
+            /**
+             * Days
+             * @default 0
+             */
+            days: number;
+            /**
+             * Hours
+             * @default 0
+             */
+            hours: number;
+        };
+        /**
+         * DemoClockOut
+         * @description Current demo time and durable offset.
+         */
+        DemoClockOut: {
+            /**
+             * Now
+             * Format: date-time
+             */
+            now: string;
+            /** Offset Seconds */
+            offset_seconds: number;
+        };
         /**
          * DonorBatchDetail
          * @description Batch summary with segment and language counts.
@@ -1339,6 +1540,16 @@ export interface components {
             url: string;
         };
         /**
+         * MessageButton
+         * @description A localized public button.
+         */
+        MessageButton: {
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+        };
+        /**
          * MessageCategory
          * @enum {string}
          */
@@ -1353,6 +1564,18 @@ export interface components {
          * @enum {string}
          */
         MessageKind: "template" | "text" | "interactive" | "button_reply";
+        /**
+         * MessagePage
+         * @description Latest message slice in chronological order, with an older-page cursor.
+         */
+        MessagePage: {
+            /** Items */
+            items: components["schemas"]["SimulatorMessage"][];
+            /** Limit */
+            limit: number;
+            /** Next Before */
+            next_before: string | null;
+        };
         /**
          * MessageStatus
          * @enum {string}
@@ -1395,6 +1618,14 @@ export interface components {
             id: string;
             /** Name */
             name: string;
+        };
+        /**
+         * OpenConversationResult
+         * @description Number of delivered outbound messages marked read.
+         */
+        OpenConversationResult: {
+            /** Read Count */
+            read_count: number;
         };
         /**
          * PreviewButtonOut
@@ -1638,6 +1869,94 @@ export interface components {
             media_type?: components["schemas"]["MediaType"] | null;
             /** Media Url */
             media_url?: string | null;
+        };
+        /**
+         * SimulatorConversation
+         * @description Donor thread preview.
+         */
+        SimulatorConversation: {
+            donor: components["schemas"]["SimulatorDonor"];
+            last_message: components["schemas"]["SimulatorMessage"];
+            /** Unread Count */
+            unread_count: number;
+        };
+        /**
+         * SimulatorDonor
+         * @description Masked donor-picker row with its latest matching campaign.
+         */
+        SimulatorDonor: {
+            /** Campaign Id */
+            campaign_id: string | null;
+            /** Campaign Name */
+            campaign_name: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            language: components["schemas"]["LanguageCode"];
+            /** Name */
+            name: string;
+            /** Phone */
+            phone: string;
+            /** Read Receipts */
+            read_receipts: boolean;
+            /** Sim Reachable */
+            sim_reachable: boolean;
+        };
+        /**
+         * SimulatorMessage
+         * @description The same public message shape used by realtime events.
+         */
+        SimulatorMessage: {
+            /** Body */
+            body: string;
+            /** Button Id */
+            button_id: string | null;
+            /** Buttons */
+            buttons: components["schemas"]["MessageButton"][] | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Delivered At */
+            delivered_at: string | null;
+            direction: components["schemas"]["MessageDirection"];
+            /**
+             * Donor Id
+             * Format: uuid
+             */
+            donor_id: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            kind: components["schemas"]["MessageKind"];
+            media_type: components["schemas"]["MediaType"];
+            /** Media Url */
+            media_url: string | null;
+            /** Read At */
+            read_at: string | null;
+            /** Reply To Message Id */
+            reply_to_message_id: string | null;
+            /** Sent At */
+            sent_at: string | null;
+            status: components["schemas"]["MessageStatus"];
+        };
+        /**
+         * TextReply
+         * @description Unclassified donor free-text reply.
+         */
+        TextReply: {
+            /** Text */
+            text: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "text";
         };
         /**
          * TokenResponse
@@ -2456,6 +2775,79 @@ export interface operations {
             };
         };
     };
+    get_demo_clock_api_v1_demo_clock_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoClockOut"];
+                };
+            };
+        };
+    };
+    advance_demo_clock_api_v1_demo_clock_actions_advance_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DemoClockAdvance"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoClockOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reset_demo_clock_api_v1_demo_clock_actions_reset_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoClockOut"];
+                };
+            };
+        };
+    };
     list_batches_api_v1_donor_batches_get: {
         parameters: {
             query?: {
@@ -2725,6 +3117,140 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MediaUploadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    conversations_api_v1_simulator_conversations_get: {
+        parameters: {
+            query?: {
+                campaign_id?: string | null;
+                search?: string | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversationPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    open_conversation_api_v1_simulator_conversations__donor_id__actions_open_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                donor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpenConversationResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    messages_api_v1_simulator_conversations__donor_id__messages_get: {
+        parameters: {
+            query?: {
+                before?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                donor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessagePage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reply_api_v1_simulator_conversations__donor_id__replies_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                donor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TextReply"] | components["schemas"]["ButtonReply"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimulatorMessage"];
                 };
             };
             /** @description Validation Error */

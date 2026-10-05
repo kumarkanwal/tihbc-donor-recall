@@ -72,12 +72,29 @@ export function ConversationScreen({
         </div>
       ) : null}
       {messages.data ? (
-        <MessageList
-          messages={messages.data}
-          language={donor.language}
-          isTyping={messages.isTyping}
-          onButtonReply={sendButton}
-        />
+        <>
+          {messages.hasNextPage ? (
+            <button
+              type="button"
+              className="bg-sim-wallpaper text-sim-button py-2 text-xs"
+              disabled={messages.isFetchingNextPage}
+              onClick={() => void messages.fetchNextPage()}
+            >
+              Load older messages
+            </button>
+          ) : null}
+          <MessageList
+            messages={messages.data}
+            language={donor.language}
+            isTyping={messages.isTyping}
+            onButtonReply={sendButton}
+          />
+        </>
+      ) : null}
+      {openConversation.error ? (
+        <p role="alert" className="text-danger px-3 text-xs">
+          {openConversation.error.message}
+        </p>
       ) : null}
       {sendReply.error ? (
         <p

@@ -70,6 +70,8 @@ All variables are read only through `backend/app/core/config.py` (pydantic-setti
 | `NEXT_PUBLIC_WS_URL` | yes | `wss://api.example.com/ws` | |
 | `NEXT_PUBLIC_APP_NAME` | no | `TIHBC Donor Recall` | |
 | `NEXT_PUBLIC_DEMO_MODE` | no | `true` | Shows demo controls |
+| `NEXT_PUBLIC_SIMULATOR_SOURCE` | no | `api` | Default: live generated REST contract. Set `mock` for offline donor-phone demos; restart frontend after changing. |
+| `NEXT_PUBLIC_REALTIME` | no | `off` | With `off`, API simulator polls the open chat every 3 seconds and donor list every 10 seconds. With `on`, shared WebSocket events replace polling. |
 
 ## 3. Rules
 - Never commit `.env`. Secrets only in the VPS environment or Docker secrets.
