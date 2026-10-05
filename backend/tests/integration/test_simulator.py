@@ -108,6 +108,13 @@ async def test_simulator_http_reply_applies_deterministic_flow(
                     f"{path}/replies", json={"type": "text", "text": "Please call me"}
                 )
                 assert text.status_code == 201
+                updated_events = [
+                    payload
+                    for event_type, payload in publisher.events
+                    if event_type == "followup.updated"
+                ]
+                assert len(updated_events) == 1
+                assert updated_events[0]["updated_at"]
                 history = await client.get(f"{path}/messages")
                 assert len(history.json()["items"]) == 5
         finally:

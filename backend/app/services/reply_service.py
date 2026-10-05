@@ -38,6 +38,10 @@ class ReplyEventPayloads:
     outbound: dict[str, object]
     enrollment: dict[str, object]
     follow_up: dict[str, object]
+    enrollment_id: str
+    donor_id: str
+    campaign_id: str
+    follow_up_created: bool
 
 
 class ReplyService:
@@ -101,11 +105,11 @@ class ReplyService:
         payloads = await self._event_payloads(enrollment, inbound, outbound, outcome)
         result = SimulatorMessage.model_validate(payloads.inbound)
         await self._commit()
-        await self._publish(enrollment, outcome, payloads)
+        await self._publish(payloads)
         logger.info(
             "donor_reply_applied",
-            enrollment_id=str(enrollment.id),
-            campaign_id=str(enrollment.campaign_id),
+            enrollment_id=payloads.enrollment_id,
+            campaign_id=payloads.campaign_id,
             intent=classification.intent.value,
             source=classification.source.value,
         )
@@ -204,12 +208,13 @@ class ReplyService:
             status=MessageStatus.QUEUED,
             scheduled_at=now,
             created_at=now,
-            updated_at=now,
         )
         await self._messages.add(message)
         result = await self._send(message, enrollment, outcome)
         message.status = MessageStatus.SENT
-        message.sent_at = self._clock.now()
+        sent_at = self._clock.now()
+        message.sent_at = sent_at
+        message.updated_at = sent_at
         message.provider_message_id = result.provider_message_id
         return message
 
@@ -255,33 +260,32 @@ class ReplyService:
             outbound=message_created_payload(outbound),
             enrollment=enrollment_payload(enrollment),
             follow_up=follow_up_created_payload(outcome.follow_up),
+            enrollment_id=str(enrollment.id),
+            donor_id=str(enrollment.donor_id),
+            campaign_id=str(enrollment.campaign_id),
+            follow_up_created=outcome.follow_up_created,
         )
 
-    async def _publish(
-        self,
-        enrollment: Enrollment,
-        outcome: FlowOutcome,
-        payloads: ReplyEventPayloads,
-    ) -> None:
+    async def _publish(self, payloads: ReplyEventPayloads) -> None:
         await self._publisher.publish(
             EventType.SIMULATOR_TYPING.value,
-            {"donor_id": str(enrollment.donor_id), "is_typing": True},
+            {"donor_id": payloads.donor_id, "is_typing": True},
         )
         await self._sleep(self._typing_seconds)
         await self._publisher.publish(EventType.MESSAGE_CREATED.value, payloads.inbound)
         await self._publisher.publish(EventType.MESSAGE_CREATED.value, payloads.outbound)
         await self._publisher.publish(
             EventType.SIMULATOR_TYPING.value,
-            {"donor_id": str(enrollment.donor_id), "is_typing": False},
+            {"donor_id": payloads.donor_id, "is_typing": False},
         )
         await self._publisher.publish(EventType.ENROLLMENT_UPDATED.value, payloads.enrollment)
         event = (
             EventType.FOLLOWUP_CREATED.value
-            if outcome.follow_up_created
+            if payloads.follow_up_created
             else EventType.FOLLOWUP_UPDATED.value
         )
         await self._publisher.publish(event, payloads.follow_up)
         await self._publisher.publish(
             EventType.METRICS_UPDATED.value,
-            {"campaign_id": str(enrollment.campaign_id)},
+            {"campaign_id": payloads.campaign_id},
         )
