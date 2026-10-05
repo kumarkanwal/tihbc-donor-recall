@@ -8,7 +8,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.clock import clock
 from app.core.config import Settings
 from app.core.db import create_database_resources
+from app.core.redis import create_redis_client
 from app.repositories.demo_clock import DatabaseClockPersistence
+from app.services.events.redis import RedisEventPublisher
 
 
 @asynccontextmanager
@@ -23,3 +25,13 @@ async def messaging_session(settings: Settings) -> AsyncIterator[AsyncSession]:
             yield session
     finally:
         await resources.engine.dispose()
+
+
+@asynccontextmanager
+async def event_publisher(settings: Settings) -> AsyncIterator[RedisEventPublisher]:
+    """Own a Redis publisher for one CLI invocation."""
+    redis = create_redis_client(settings.redis_url)
+    try:
+        yield RedisEventPublisher(redis, clock)
+    finally:
+        await redis.aclose()

@@ -8,7 +8,7 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, get_event_publisher
 from app.core.clock import Clock, clock
 from app.core.db import get_db
 from app.core.errors import InvalidStateTransitionError
@@ -19,6 +19,7 @@ from app.repositories.enrollment import EnrollmentRepository
 from app.schemas.user import UserOut
 from app.services.campaigns.service import CampaignService
 from tests.integration.campaign_fixtures import CampaignFixture, add_campaign_fixture
+from tests.integration.messaging_fixtures import RecordingPublisher
 
 pytestmark = pytest.mark.postgres
 
@@ -180,6 +181,7 @@ def _override_database(session: AsyncSession, fixture: CampaignFixture) -> None:
 
     app.dependency_overrides[get_db] = override_db
     app.dependency_overrides[get_current_user] = lambda: UserOut.model_validate(fixture.user)
+    app.dependency_overrides[get_event_publisher] = lambda: RecordingPublisher(session)
 
 
 def _campaign_payload(fixture: CampaignFixture, start_at: datetime) -> dict[str, str]:

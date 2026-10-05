@@ -470,10 +470,13 @@ uv sync
 uv run alembic upgrade head
 uv run uvicorn app.main:app --reload --reload-dir app
 uv run python -m app.scheduler     # dispatcher worker
+uv run python -m app.tools.run_tick # run one dispatcher tick in demo mode
+uv run python -m app.tools.ws_listen --email <staff-email> # login and watch live events
 uv run python -m app.seed
 uv run python -m app.export_openapi # write the stable schema to frontend/openapi.json
 uv run ruff check . && uv run ruff format --check . && uv run mypy app && uv run pytest
 uv run pytest --run-postgres         # isolated TEST_DATABASE_URL; creates and migrates it if needed
+uv run pytest --run-postgres --run-redis # include real Redis fan-out on unique channels
 
 # Frontend
 cd frontend

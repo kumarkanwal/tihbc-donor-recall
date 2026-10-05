@@ -27,6 +27,8 @@ All variables are read only through `backend/app/core/config.py` (pydantic-setti
 | `MEDIA_PUBLIC_URL` | yes | `https://api.example.com/media` | |
 | `MESSAGING_PROVIDER` | yes | `simulator` | Only `simulator` in the MVP |
 | `DISPATCHER_INTERVAL_SECONDS` | no | `5` | Scheduler polling interval |
+| `DISPATCHER_BATCH_SIZE` | no | `100` | Maximum campaigns or enrollments processed per scheduler phase and tick |
+| `TEST_REDIS_URL` | no | `redis://localhost:6380/15` | Optional Redis integration-test connection; defaults to `REDIS_URL`. Tests use unique pub/sub channels and never flush Redis. |
 | `SIM_DELIVERY_DELAY_SECONDS` | no | `2` | Delay before `delivered` |
 | `SIM_AUTO_READ_RATE` | no | `0.6` | Share of delivered messages auto-marked read for metrics realism |
 | `SIM_AUTO_READ_DELAY_SECONDS` | no | `10` | |

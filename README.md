@@ -26,7 +26,7 @@ uv run alembic upgrade head
 uv run uvicorn app.main:app --reload --reload-dir app
 ```
 
-In a second terminal, start the placeholder scheduler worker:
+In a second terminal, start the scheduler worker:
 
 ```powershell
 Set-Location backend
@@ -73,15 +73,22 @@ docker compose exec api python -m app.seed.users
 
 The command creates or updates the configured admin and coordinator and is safe to run repeatedly.
 
-Seed the next 21 demo days of appointment slots, then manually exercise messaging before the
-scheduler is implemented:
+Seed the next 21 demo days of appointment slots, then run one scheduler tick or exercise the
+lower-level messaging tools:
 
 ```powershell
 Set-Location backend
 uv run python -m app.seed.slots
+uv run python -m app.tools.run_tick
 uv run python -m app.tools.send_next_step --enrollment <enrollment-uuid>
 uv run python -m app.tools.advance_delivery
 ```
+
+Watch live events with `uv run python -m app.tools.ws_listen --email <staff-email>` (password is
+prompted). Run `uv run pytest --run-postgres --run-redis` with PostgreSQL and Redis available to
+verify the database flows and independent worker-to-WebSocket fan-out. Redis tests use unique
+channels and never flush the server. Set `TEST_REDIS_URL` if the test connection differs from
+`REDIS_URL`.
 
 These commands require `DEMO_MODE=true`. Delivery progression follows the configured simulator
 delivery and automatic-read delays, so run it again after the read delay to observe a read receipt.

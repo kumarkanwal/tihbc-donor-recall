@@ -74,6 +74,7 @@ def test_settings_load_root_env_from_backend_working_directory(
     assert settings.jwt_expires_minutes == 720
     assert settings.run_migrations is True
     assert settings.media_storage_dir == Path("/data/media")
+    assert settings.dispatcher_batch_size == 100
 
 
 def test_production_env_path_is_absolute() -> None:

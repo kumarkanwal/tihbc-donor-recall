@@ -2,10 +2,12 @@
 
 ## Unreleased
 
+- Added authenticated staff live events with Redis delivery across API and scheduler processes, isolated WebSocket broadcasts, automatic heartbeats, and coalesced metrics notifications.
 - Added Settings views for mocked WhatsApp integration status, template approvals, active staff users, and administrator-only demo clock and data-reset controls.
 - Added delivery, response, and inactive-number Reports with shared filters, theme-aware charts, detailed tables, summary cards, pagination, and CSV exports.
 - Added the campaign performance Dashboard with filters, six KPI cards, theme-aware activity and outcome charts, active campaign progress, recent follow-ups, and plain-language insights.
 - Added the coordinator Follow-up Inbox with filtered work queues, donor-response details, assignment and resolution workflows, notes, chat access, and CSV export.
+- Added automatic campaign scheduling, primary-to-secondary non-responder escalation, coordinator call follow-ups, campaign completion, and administrator demo time controls.
 - Added the administrator demo clock and Skip time control plus shared realtime cache-update infrastructure with reconnect handling and follow-up notifications.
 - Added campaign management screens with status browsing, draft configuration, audience and schedule previews, lifecycle controls, enrollment monitoring, donor details, and direct chat access.
 - Added provider-backed bilingual campaign messaging with capacity-safe appointment booking, deterministic simulated delivery and read states, unreachable-number handling, post-commit live events, and demo CLI controls.

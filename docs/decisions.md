@@ -321,6 +321,14 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Reason:** A single connection prevents duplicate events and reconnect loops, while centralized cache effects keep feature components independent of transport details and make reconnect-wide active-query refresh reliable.
 - **Consequences:** New event types must be added to the typed event union and central router; they must not introduce component-level WebSocket connections or event handlers.
 
+## D-044 — Bounded row-claimed scheduler transactions
+
+- **Date:** 2026-10-04
+- **Status:** Accepted
+- **Decision:** Run scheduler phases in a fixed order and process each claimed campaign or enrollment in its own transaction. Claim work with PostgreSQL `FOR UPDATE SKIP LOCKED`, exclude a processed or failed record for the remainder of that tick, and cap each phase with `DISPATCHER_BATCH_SIZE`.
+- **Reason:** Separate transactions isolate failures, skip-locked claims allow concurrent workers without duplicate sends, per-tick exclusion prevents an idempotent no-op from starving later records, and bounded phases keep polling responsive.
+- **Consequences:** A failed record is retried on a later tick, while other due work continues during the current tick. Campaign completion and delivery progression run after enrollment dispatch in the same ordered tick.
+
 ## D-107 — Single pending frontend contract boundary
 
 - **Date:** 2026-10-04
@@ -337,3 +345,11 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Decision:** Keep the temporary integration-status and demo-data-reset shapes for Task 3.12 in the existing `frontend/lib/api/pending-contracts.ts` boundary, alongside the follow-up and metrics contracts. Continue using the normal authenticated API client and surface HTTP 404 as an explicit backend-update state. Remove each domain from the boundary independently when its generated OpenAPI contract lands.
 - **Reason:** Backend Task 2.12 is not implemented, while the Settings UI must follow the documented contract now. Extending the one compatibility boundary avoids a second handwritten API-type module and keeps every temporary frontend contract easy to locate and retire.
 - **Consequences:** Backend Tasks 2.10/2.11 close KI-008 and remove their types without waiting for Settings. Backend Task 2.12 closes KI-009 and allows the remaining compatibility types and reset call to use the generated client directly.
+
+## D-045 — Lifecycle-owned Redis event fan-out and public payload boundary
+
+- **Date:** 2026-10-05
+- **Status:** Accepted
+- **Decision:** Define domain event names and allow-listed payload models once in `ws/events.py`. Inject a Redis publisher into API, scheduler, and demo tools; own one subscriber and connection manager per API process. Coalesce metrics by campaign into the latest notification within a two-second window. Use Uvicorn's native ping/pong heartbeat and revalidate the active user every 20 seconds; check token expiry before every broadcast. Validate payloads at publication and reception and discard internal fields.
+- **Reason:** Worker events must reach every API process without duplicate local broadcast paths, clients must receive only the shared staff REST fields, and burst invalidations should not cause repeated metric queries. Native control frames preserve the documented event union.
+- **Consequences:** Redis outages are logged and subscribers retry; an outage cannot undo committed domain writes. Pub/sub has no replay guarantee, so clients refetch after reconnect. Real Redis tests use unique temporary channels and do not flush server data. The listener omits message bodies from logs.

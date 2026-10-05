@@ -1,0 +1,1 @@
+"""Authenticated WebSocket fan-out."""

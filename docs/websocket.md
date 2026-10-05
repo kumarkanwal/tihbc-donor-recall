@@ -33,3 +33,22 @@ Event types and payload models are defined once in `backend/app/ws/events.py` an
 - Payloads never contain unmasked data beyond what the REST API already returns to that role.
 - The frontend reconnects with exponential backoff (1 s → 30 s max) and refetches active queries after reconnect.
 - Unknown event types are ignored by the client and logged at debug level.
+
+## 4. Transport lifecycle and verification
+
+Uvicorn supplies WebSocket protocol ping/pong heartbeats every 20 seconds with a 20-second pong
+timeout. Use the `websockets` transport (the default with `uvicorn[standard]`); heartbeat frames are
+transport control frames and do not add event types to the envelope. Authentication is rechecked
+every 20 seconds and on incoming client frames, using short database sessions. Invalid, expired,
+or inactive-user tokens close with policy code 1008. No client frame triggers a business action.
+
+Each API process owns one Redis subscriber and connection manager. Metrics notifications for the
+same campaign are coalesced into the latest notification within a two-second window; global
+notifications use a separate window. Other events broadcast immediately. Subscriber reconnects
+after Redis errors; publication failures are logged without undoing committed domain writes.
+Pub/sub does not replay missed events; clients refetch active queries when reconnecting.
+
+Run `uv run python -m app.tools.ws_listen --email <staff-email>` to log in and observe public events.
+The tool prompts for the password and never logs the access token. Run `uv run pytest --run-redis`
+for real transport coverage on unique temporary channels. Combine with `--run-postgres` for the
+complete integration suite; neither option requires Docker when the services are already running.

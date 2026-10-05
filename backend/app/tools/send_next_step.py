@@ -10,7 +10,7 @@ from app.core.clock import clock
 from app.core.config import get_settings
 from app.core.logging import configure_logging
 from app.services.messaging.dependencies import build_messaging_service
-from app.tools.runtime import messaging_session
+from app.tools.runtime import event_publisher, messaging_session
 
 logger = structlog.get_logger(__name__)
 
@@ -19,8 +19,8 @@ async def run(enrollment_id: UUID) -> None:
     """Send one due enrollment step and log its non-sensitive outcome."""
     settings = get_settings()
     configure_logging(settings.log_level)
-    async with messaging_session(settings) as session:
-        result = await build_messaging_service(session, settings, clock).send_next_step(
+    async with messaging_session(settings) as session, event_publisher(settings) as publisher:
+        result = await build_messaging_service(session, settings, clock, publisher).send_next_step(
             enrollment_id
         )
     logger.info(

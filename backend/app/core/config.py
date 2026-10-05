@@ -33,6 +33,7 @@ class Settings(BaseSettings):
     database_url: str
     test_database_url: str | None = None
     redis_url: str
+    test_redis_url: str | None = None
     run_migrations: bool = False
     jwt_secret: SecretStr
     jwt_expires_minutes: int = Field(default=720, gt=0)
@@ -45,6 +46,7 @@ class Settings(BaseSettings):
     media_public_url: str
     messaging_provider: Literal["simulator"]
     dispatcher_interval_seconds: float = Field(default=5, gt=0)
+    dispatcher_batch_size: int = Field(default=100, gt=0, le=1000)
     sim_delivery_delay_seconds: float = Field(default=2, ge=0)
     sim_auto_read_rate: float = Field(default=0.6, ge=0, le=1)
     sim_auto_read_delay_seconds: float = Field(default=10, ge=0)

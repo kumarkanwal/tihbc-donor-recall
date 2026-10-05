@@ -864,6 +864,45 @@
         "title": "DeclineReason",
         "type": "string"
       },
+      "DemoClockAdvance": {
+        "description": "Non-negative whole-hour demo-clock advance.",
+        "properties": {
+          "days": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Days",
+            "type": "integer"
+          },
+          "hours": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Hours",
+            "type": "integer"
+          }
+        },
+        "title": "DemoClockAdvance",
+        "type": "object"
+      },
+      "DemoClockOut": {
+        "description": "Current demo time and durable offset.",
+        "properties": {
+          "now": {
+            "format": "date-time",
+            "title": "Now",
+            "type": "string"
+          },
+          "offset_seconds": {
+            "title": "Offset Seconds",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "now",
+          "offset_seconds"
+        ],
+        "title": "DemoClockOut",
+        "type": "object"
+      },
       "DonorBatchDetail": {
         "description": "Batch summary with segment and language counts.",
         "properties": {
@@ -4050,6 +4089,107 @@
         "summary": "Update a content-series step",
         "tags": [
           "Content Series"
+        ]
+      }
+    },
+    "/api/v1/demo/clock": {
+      "get": {
+        "description": "Return the current demo time and offset.",
+        "operationId": "get_demo_clock_api_v1_demo_clock_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoClockOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get the demo clock",
+        "tags": [
+          "Demo"
+        ]
+      }
+    },
+    "/api/v1/demo/clock/actions/advance": {
+      "post": {
+        "description": "Advance the demo clock and immediately run one scheduler tick.",
+        "operationId": "advance_demo_clock_api_v1_demo_clock_actions_advance_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DemoClockAdvance"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoClockOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Advance the demo clock",
+        "tags": [
+          "Demo"
+        ]
+      }
+    },
+    "/api/v1/demo/clock/actions/reset": {
+      "post": {
+        "description": "Reset the demo clock offset to zero.",
+        "operationId": "reset_demo_clock_api_v1_demo_clock_actions_reset_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoClockOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Reset the demo clock",
+        "tags": [
+          "Demo"
         ]
       }
     },

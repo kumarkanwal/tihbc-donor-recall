@@ -19,6 +19,9 @@ from app.services.campaigns.transitions import (
     validate_campaign_transition,
 )
 from app.services.campaigns.validation import launch_problems
+from app.services.events.base import EventPublisher
+from app.services.events.logging import LoggingEventPublisher
+from app.ws.events import EventType
 
 
 class CampaignService:
@@ -30,11 +33,13 @@ class CampaignService:
         campaign_repository: CampaignRepository,
         enrollment_repository: EnrollmentRepository,
         current_clock: Clock,
+        publisher: EventPublisher | None = None,
     ) -> None:
         self._session = session
         self._campaigns = campaign_repository
         self._enrollments = enrollment_repository
         self._clock = current_clock
+        self._publisher = publisher or LoggingEventPublisher()
 
     async def create(self, request: CampaignCreate, created_by: UserOut) -> CampaignDetail:
         """Create one campaign in draft status."""
@@ -114,7 +119,7 @@ class CampaignService:
         campaign.launched_at = now
         await self._enrollments.add_many(enrollments)
         await self._commit()
-        return await self._detail(campaign.id)
+        return await self._publish_detail(campaign.id)
 
     async def start_scheduled(self, campaign_id: UUID) -> CampaignDetail:
         """Start a scheduled campaign once its configured time is reached."""
@@ -128,7 +133,7 @@ class CampaignService:
             )
         transition_campaign(campaign, CampaignStatus.RUNNING)
         await self._commit()
-        return await self._detail(campaign.id)
+        return await self._publish_detail(campaign.id)
 
     async def pause(self, campaign_id: UUID) -> CampaignDetail:
         """Pause a running campaign."""
@@ -144,13 +149,27 @@ class CampaignService:
         transition_campaign(campaign, CampaignStatus.COMPLETED)
         campaign.completed_at = self._clock.now()
         await self._commit()
-        return await self._detail(campaign.id)
+        return await self._publish_detail(campaign.id)
 
     async def _transition(self, campaign_id: UUID, target: CampaignStatus) -> CampaignDetail:
         campaign = await self._required_locked(campaign_id)
         transition_campaign(campaign, target)
         await self._commit()
-        return await self._detail(campaign.id)
+        return await self._publish_detail(campaign.id)
+
+    async def _publish_detail(self, campaign_id: UUID) -> CampaignDetail:
+        detail = await self._detail(campaign_id)
+        # Finish the read transaction as well before calling the external publisher.
+        await self._commit()
+        await self._publisher.publish(
+            EventType.CAMPAIGN_UPDATED.value,
+            {
+                "id": str(detail.id),
+                "status": detail.status.value,
+                "counts": {key.value: value for key, value in detail.enrollment_counts.items()},
+            },
+        )
+        return detail
 
     async def _required_locked(self, campaign_id: UUID) -> Campaign:
         campaign = await self._campaigns.get_full_for_update(campaign_id)

@@ -24,6 +24,7 @@ from app.repositories.enrollment import EnrollmentRepository
 from app.repositories.message import MessageRepository
 from app.services.appointments.service import AppointmentService
 from app.services.events.base import EventPublisher
+from app.services.events.campaign import publish_campaign_counts
 from app.services.events.types import EventType
 from app.services.messaging.payloads import (
     enrollment_payload,
@@ -235,3 +236,4 @@ class MessagingService:
             EventType.METRICS_UPDATED.value,
             {"campaign_id": str(enrollment.campaign_id)},
         )
+        await publish_campaign_counts(self._session, enrollment, self._publisher)

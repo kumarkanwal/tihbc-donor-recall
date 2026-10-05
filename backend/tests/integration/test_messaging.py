@@ -59,6 +59,7 @@ async def test_send_next_step_renders_updates_and_is_idempotent(
             EventType.MESSAGE_CREATED.value,
             EventType.ENROLLMENT_UPDATED.value,
             EventType.METRICS_UPDATED.value,
+            EventType.CAMPAIGN_UPDATED.value,
         ]
         created_payload = publisher.events[0][1]
         assert created_payload["buttons"] == [{"id": "btn_confirm", "label": "Confirm"}]

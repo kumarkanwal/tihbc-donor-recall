@@ -33,12 +33,22 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         default=False,
         help="run tests marked postgres against the isolated TEST_DATABASE_URL",
     )
+    parser.addoption(
+        "--run-redis",
+        action="store_true",
+        default=False,
+        help="run real Redis pub/sub tests on unique temporary channels",
+    )
 
 
 def pytest_configure(config: pytest.Config) -> None:
     """Set isolated defaults and route database tests away from development data."""
     run_postgres = bool(config.getoption("--run-postgres"))
     database_url = TEST_ENVIRONMENT["DATABASE_URL"]
+    redis_url = TEST_ENVIRONMENT["REDIS_URL"]
+    if config.getoption("--run-redis"):
+        redis_settings = Settings()
+        redis_url = redis_settings.test_redis_url or redis_settings.redis_url
     if run_postgres:
         settings = Settings()
         database_url = resolve_test_database_url(
@@ -49,6 +59,7 @@ def pytest_configure(config: pytest.Config) -> None:
     for variable_name, value in TEST_ENVIRONMENT.items():
         os.environ[variable_name] = value
     os.environ["DATABASE_URL"] = database_url
+    os.environ["REDIS_URL"] = redis_url
     get_settings.cache_clear()
 
 
@@ -64,9 +75,9 @@ def pytest_sessionstart(session: pytest.Session) -> None:
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
     """Skip live PostgreSQL tests unless explicitly requested."""
-    if config.getoption("--run-postgres"):
-        return
     skip_postgres = pytest.mark.skip(reason="use --run-postgres to enable live database tests")
     for item in items:
-        if "postgres" in item.keywords:
+        if "postgres" in item.keywords and not config.getoption("--run-postgres"):
             item.add_marker(skip_postgres)
+        if "redis" in item.keywords and not config.getoption("--run-redis"):
+            item.add_marker(pytest.mark.skip(reason="use --run-redis for real pub/sub tests"))

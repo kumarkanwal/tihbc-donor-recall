@@ -3,14 +3,14 @@
 from collections.abc import Awaitable, Callable
 from typing import Annotated, cast
 
-from fastapi import Depends
+from fastapi import Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.clock import Clock, get_clock
 from app.core.config import Settings, get_settings
-from app.core.db import get_db
+from app.core.db import DatabaseResources, get_db
 from app.core.errors import ForbiddenError, UnauthorizedError
 from app.core.redis import get_redis
 from app.models.enums import UserRole
@@ -20,6 +20,8 @@ from app.repositories.donor import DonorRepository, SegmentRepository
 from app.repositories.donor_batch import DonorBatchRepository
 from app.repositories.enrollment import EnrollmentRepository
 from app.repositories.user import UserRepository
+from app.scheduler.factory import build_scheduler_tick
+from app.scheduler.tick import SchedulerTick
 from app.schemas.user import UserOut
 from app.services.auth_service import INVALID_TOKEN_MESSAGE, AuthService
 from app.services.batch_upload.preview_store import PreviewCache, PreviewStore
@@ -31,10 +33,21 @@ from app.services.content_series.access import ContentSeriesAccess
 from app.services.content_series.query_service import ContentSeriesQueryService
 from app.services.content_series.service import ContentSeriesService
 from app.services.content_series.step_service import SeriesStepService
+from app.services.demo_clock import DemoClockService
+from app.services.events.base import EventPublisher
+from app.services.events.redis import RedisEventPublisher
 from app.services.media_service import MediaService
 from app.services.user_service import UserService
 
 bearer_scheme = HTTPBearer(auto_error=False)
+
+
+def get_event_publisher(
+    redis: Annotated[Redis, Depends(get_redis)],
+    current_clock: Annotated[Clock, Depends(get_clock)],
+) -> EventPublisher:
+    """Return the application transport for committed domain changes."""
+    return RedisEventPublisher(redis, current_clock)
 
 
 def get_auth_service(
@@ -115,6 +128,7 @@ def get_content_series_query_service(
 def get_campaign_service(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_clock: Annotated[Clock, Depends(get_clock)],
+    publisher: Annotated[EventPublisher, Depends(get_event_publisher)],
 ) -> CampaignService:
     """Build the request-scoped campaign mutation service."""
     return CampaignService(
@@ -122,6 +136,7 @@ def get_campaign_service(
         CampaignRepository(db),
         EnrollmentRepository(db),
         current_clock,
+        publisher,
     )
 
 
@@ -130,6 +145,37 @@ def get_campaign_query_service(
 ) -> CampaignQueryService:
     """Build the request-scoped campaign query service."""
     return CampaignQueryService(CampaignRepository(db), EnrollmentRepository(db))
+
+
+def get_scheduler_tick(
+    request: Request,
+    settings: Annotated[Settings, Depends(get_settings)],
+    current_clock: Annotated[Clock, Depends(get_clock)],
+    redis: Annotated[Redis, Depends(get_redis)],
+) -> SchedulerTick:
+    """Build a tick against the application's shared database resources."""
+    resources = cast(DatabaseResources, request.app.state.database)
+    return build_scheduler_tick(
+        resources.session_factory,
+        settings,
+        current_clock,
+        RedisEventPublisher(redis, current_clock),
+    )
+
+
+def get_demo_clock_service(
+    settings: Annotated[Settings, Depends(get_settings)],
+    current_clock: Annotated[Clock, Depends(get_clock)],
+    tick: Annotated[SchedulerTick, Depends(get_scheduler_tick)],
+    redis: Annotated[Redis, Depends(get_redis)],
+) -> DemoClockService:
+    """Build the request-scoped demo-clock service."""
+    return DemoClockService(
+        current_clock,
+        tick,
+        RedisEventPublisher(redis, current_clock),
+        demo_mode=settings.demo_mode,
+    )
 
 
 def get_media_service(

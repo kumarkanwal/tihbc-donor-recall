@@ -183,6 +183,13 @@
 - **Next:** Complete the remaining Task 3.13 live-update integration after the WebSocket and outstanding feature APIs are committed, then enable and verify realtime against the running stack.
 - **Blockers:** None for part 1; live WebSocket acceptance intentionally waits for backend Task 2.6.
 
+## S-028 — 2026-10-04 — [BE] Scheduler, escalation, and demo clock
+
+- **Done:** Completed Task 2.5 with an ordered, bounded scheduler tick; skip-locked campaign and enrollment claims; isolated per-record transactions and failure handling; scheduled campaign starts; due primary and secondary step dispatch; idempotent needs-call escalation and follow-up activity creation; automatic campaign completion; simulated delivery progression; a polling worker and one-tick CLI; and authenticated demo-clock read, advance, and reset endpoints. Added durable clock reloads so API time skips reach the worker, post-commit event publication, role and demo-mode guards, concurrency coverage, and per-tick no-op exclusion so one stale enrollment cannot starve later work. Regenerated the deterministic OpenAPI contract and recorded D-044.
+- **Verification:** Ruff lint and format checks pass, strict mypy passes across 118 source files, and the non-PostgreSQL suite reports 204 passed and 30 skipped with only KI-002. OpenAPI export completed. The user deferred the 234-test PostgreSQL run and manual worker/clock lifecycle; KI-007 tracks both outstanding acceptance checks.
+- **Next:** Implement Task 2.6, authenticated WebSockets and Redis-backed cross-process event delivery; later close KI-007 when Task 2.5 is verified with Task 2.6.
+- **Blockers:** No implementation blocker. User verification is pending under KI-007.
+
 ## S-029 — 2026-10-04 — [FE] Follow-up inbox
 
 - **Done:** Completed Task 3.9 with Needs call/Reschedule/Declined/Confirmed/All count tabs; status, assigned-to-me, campaign, and donor/reply filters; paginated queue cards; donor, response, appointment, and activity detail; copy number, assign, start, resolve outcome/note, add note, and View chat actions; and filtered CSV export. Query keys align with the Task 3.13 `followup.*` invalidation route so new and updated items refresh live once realtime is enabled. Added the single documented pending-contract boundary and the explicit HTTP 404 “Available after backend update” state.
@@ -210,3 +217,17 @@
 - **Verification:** Task 3.11 passes ESLint, strict TypeScript, all 56 Vitest tests, and the production build. Task 3.12 passes ESLint, strict TypeScript, all 60 Vitest tests, and the production build. Settings coverage verifies integration data, coordinator role gating, reset confirmation, and HTTP 404 presentation. No named temporary artifact exists or is tracked.
 - **Next:** Pause frontend feature work until backend Tasks 2.6–2.12 land. Then regenerate OpenAPI, retire compatibility bridges, enable realtime, and perform live browser acceptance for Inbox, Dashboard, Reports, and Settings.
 - **Blockers:** None in the frontend implementation. Live data and actions depend on backend Tasks 2.6–2.12 under KI-005, KI-006, KI-008, and KI-009.
+
+## S-033 — 2026-10-05 — [BE] WebSockets and Redis event transport
+
+- **Done:** Verified Task 2.5's pending-verification status and KI-007. Implemented authenticated `/ws`, active-user and expiry checks using short sessions, per-process connection management, isolated concurrent broadcasts and shutdown, the canonical event envelope and public payload models, Redis publication/subscription with outage retry, two-second per-campaign metrics coalescing, and native Uvicorn ping/pong heartbeats. Wired API campaign lifecycle/count events, demo clock, worker dispatch/delivery/escalation, and CLI tools through Redis. Added the password-prompting `ws_listen` tool with message-body omission, real Redis opt-in tests on unique channels, and D-045. Exported OpenAPI; WebSockets add no HTTP schema paths.
+- **Verification:** Ruff lint and format checks pass, strict mypy passes across 126 source files, and pytest reports 218 passed, 31 skipped, and only KI-002. The local suite covers authentication rejection, active-user checks, mid-connection expiry, broadcasts to multiple clients, failed clients, unknown events, internal-field filtering, debounce races and shutdown, and publisher outages. OpenAPI export completed. Live PostgreSQL/Redis and manual checks remain deferred by the user under KI-007 and KI-010.
+- **Next:** Reconcile the Task 2.5 commit hash/branch, commit the Task 2.6 changes, then run the combined database/Redis suite and listener/clock walkthrough when the user is available.
+- **Blockers:** This checkout has no Task 2.5 commit in `git log --all`; its scheduler and demo-clock modules remain untracked. A coherent Task 2.6 commit depends on those files. The user asked not to recommit Task 2.5, so the commit-hash/branch clarification is pending. Frontend implementation changes were preserved.
+
+## S-034 — 2026-10-05 — [BE] Combined scheduler and realtime commit
+
+- **Done:** The user confirmed that Task 2.5 had never been committed and authorized one combined Tasks 2.5/2.6 commit: `feat(scheduler,realtime): add scheduler, demo clock API, and WebSocket events (tasks 2.5, 2.6)`. Marked both tasks Done (pending user verification), retained KI-007 and KI-010, and staged only backend code, the backend-owned OpenAPI export, documentation, environment example, and project memory.
+- **Verification:** The combined implementation passes Ruff, format, strict mypy, and 218 local tests with 31 integration tests skipped and only KI-002; OpenAPI is current.
+- **Next:** Implement Task 2.7 Simulator API, retaining intent classification and follow-up handling for Task 2.8.
+- **Blockers:** No commit blocker remains. PostgreSQL/Redis and manual acceptance are deferred by the user.

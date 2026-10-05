@@ -37,6 +37,7 @@ addopts = "-q -p no:cacheprovider"
 asyncio_mode = "auto"
 markers = [
     "postgres: requires --run-postgres and a reachable PostgreSQL server",
+    "redis: requires --run-redis and a reachable Redis server",
 ]
 testpaths = ["tests"]
 

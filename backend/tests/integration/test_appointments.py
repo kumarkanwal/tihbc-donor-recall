@@ -40,6 +40,8 @@ async def test_booking_skips_full_slot_and_does_not_double_book(
         first = await service.book_default(fixture.enrollment)
         second = await service.book_default(fixture.enrollment)
 
+        assert first is not None
+        assert second is not None
         assert first.id == fallback.id
         assert second.id == fallback.id
         assert fallback.booked_count == 4
