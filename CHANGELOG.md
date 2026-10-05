@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added campaign management screens with status browsing, draft configuration, audience and schedule previews, lifecycle controls, enrollment monitoring, donor details, and direct chat access.
 - Added provider-backed bilingual campaign messaging with capacity-safe appointment booking, deterministic simulated delivery and read states, unreachable-number handling, post-commit live events, and demo CLI controls.
 - Added campaign creation and lifecycle controls with aggregate launch checks, transactional donor enrollments, status counts, enrollment detail, and coordinator read access.
 - Added the persistent WhatsApp-style donor phone simulator with searchable mock conversations, bilingual replies, realistic typing and delivery ticks, media previews, unreachable-number states, and a switchable API/WebSocket source boundary.

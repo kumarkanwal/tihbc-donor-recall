@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDown, LockKeyhole } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import type {
   SimulatorButton,
@@ -36,21 +36,20 @@ export function MessageList({
 }: MessageListProps): React.JSX.Element {
   const viewportRef = useRef<HTMLDivElement>(null);
   const [isNearBottom, setIsNearBottom] = useState(true);
-  const previousCount = useRef(messages.length);
-  const hasNewMessages =
-    messages.length > previousCount.current && !isNearBottom;
+  const [acknowledgedCount, setAcknowledgedCount] = useState(messages.length);
+  const hasNewMessages = messages.length > acknowledgedCount && !isNearBottom;
 
-  function scrollToBottom(): void {
+  const scrollToBottom = useCallback((): void => {
     const viewport = viewportRef.current;
     if (!viewport) return;
     viewport.scrollTo({ top: viewport.scrollHeight, behavior: "smooth" });
     setIsNearBottom(true);
-  }
+    setAcknowledgedCount(messages.length);
+  }, [messages.length]);
 
   useEffect(() => {
     if (isNearBottom) scrollToBottom();
-    previousCount.current = messages.length;
-  }, [isNearBottom, messages.length]);
+  }, [isNearBottom, scrollToBottom]);
 
   return (
     <div className="relative min-h-0 flex-1">

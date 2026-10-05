@@ -304,3 +304,11 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Decision:** Calculate the default appointment from the later of campaign start and demo-clock time, then add two local calendar days and target 10:00 Asia/Karachi. Search the donor's city-selected center through the following 14 days before searching either demo center over the same window, locking the selected row before incrementing capacity. If no slot is available, send the message without an appointment, render `at your earliest convenience` in English or `اپنی جلد از جلد سہولت کے مطابق` in Urdu, and log a warning without donor personal data. Map Nazimabad cities to North Nazimabad Donor Center and default all other or missing cities to Korangi Campus Blood Center.
 - **Reason:** Running campaigns may have historical start dates or temporarily exhausted slots. Appointment inventory must remain capacity-safe without stopping donor outreach or crashing the messaging worker.
 - **Consequences:** Enrollment appointment data may remain null for a successfully sent message; downstream reply and rescheduling flows must support that state.
+
+## D-105 — Complete campaign catalog for frontend search and sorting
+
+- **Date:** 2026-10-04
+- **Status:** Accepted
+- **Decision:** Load every page of the status-filtered campaign collection through the generated API client, then apply campaign search, sorting, and UI pagination to the complete result in the frontend. Keep enrollment search and pagination server-driven because that endpoint already exposes those query parameters.
+- **Reason:** The campaign API currently filters only by status and page. The required campaign-wide search and sortable columns must remain correct beyond the backend's 100-row maximum page size without bypassing the generated client or adding an undocumented API contract.
+- **Consequences:** Campaign catalog reads may make multiple paginated requests when there are more than 100 campaigns; a future backend search/sort contract can replace this aggregation without changing the table component.

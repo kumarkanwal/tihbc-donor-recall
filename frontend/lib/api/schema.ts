@@ -44,6 +44,134 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/campaigns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List campaigns
+         * @description Return a status-filtered campaign page.
+         */
+        get: operations["list_campaigns_api_v1_campaigns_get"];
+        put?: never;
+        /**
+         * Create a campaign
+         * @description Create one draft campaign.
+         */
+        post: operations["create_campaign_api_v1_campaigns_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/campaigns/{campaign_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get campaign details
+         * @description Return one campaign with enrollment-status counts.
+         */
+        get: operations["get_campaign_api_v1_campaigns__campaign_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update a draft campaign
+         * @description Update selected fields on a draft campaign.
+         */
+        patch: operations["update_campaign_api_v1_campaigns__campaign_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/campaigns/{campaign_id}/actions/launch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Launch a campaign
+         * @description Validate a draft and create its donor enrollments.
+         */
+        post: operations["launch_campaign_api_v1_campaigns__campaign_id__actions_launch_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/campaigns/{campaign_id}/actions/pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pause a campaign
+         * @description Pause a running campaign.
+         */
+        post: operations["pause_campaign_api_v1_campaigns__campaign_id__actions_pause_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/campaigns/{campaign_id}/actions/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resume a campaign
+         * @description Resume a paused campaign.
+         */
+        post: operations["resume_campaign_api_v1_campaigns__campaign_id__actions_resume_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/campaigns/{campaign_id}/enrollments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List campaign enrollments
+         * @description Return filtered enrollments with masked list phone values.
+         */
+        get: operations["list_campaign_enrollments_api_v1_campaigns__campaign_id__enrollments_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/content-series": {
         parameters: {
             query?: never;
@@ -360,6 +488,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/enrollments/{enrollment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get enrollment details
+         * @description Return a full donor enrollment timeline and follow-up.
+         */
+        get: operations["get_enrollment_api_v1_enrollments__enrollment_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media": {
         parameters: {
             query?: never;
@@ -445,6 +593,24 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         /**
+         * AppointmentSlotSummary
+         * @description Booked appointment associated with an enrollment.
+         */
+        AppointmentSlotSummary: {
+            /** Center Name */
+            center_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+        };
+        /**
          * BatchImportRequest
          * @description Request to persist the valid rows from one preview.
          */
@@ -495,6 +661,159 @@ export interface components {
              * @description JPG, PNG, WebP, or MP4 media
              */
             file: string;
+        };
+        /**
+         * CampaignCreate
+         * @description Create one draft campaign.
+         */
+        CampaignCreate: {
+            /**
+             * Batch Id
+             * Format: uuid
+             */
+            batch_id: string;
+            /** Name */
+            name: string;
+            /**
+             * Primary Series Id
+             * Format: uuid
+             */
+            primary_series_id: string;
+            /**
+             * Secondary Series Id
+             * Format: uuid
+             */
+            secondary_series_id: string;
+            /**
+             * Start At
+             * Format: date-time
+             */
+            start_at: string;
+        };
+        /**
+         * CampaignDetail
+         * @description Campaign summary with every enrollment-status count.
+         */
+        CampaignDetail: {
+            batch: components["schemas"]["NamedResourceSummary"];
+            /** Completed At */
+            completed_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            created_by: components["schemas"]["UploadedBySummary"];
+            /** Enrollment Count */
+            enrollment_count: number;
+            /** Enrollment Counts */
+            enrollment_counts: {
+                [key: string]: number;
+            };
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Launched At */
+            launched_at: string | null;
+            /** Name */
+            name: string;
+            primary_series: components["schemas"]["NamedResourceSummary"];
+            /** Responded Count */
+            responded_count: number;
+            /** Response Rate */
+            response_rate: number;
+            secondary_series: components["schemas"]["NamedResourceSummary"];
+            /**
+             * Start At
+             * Format: date-time
+             */
+            start_at: string;
+            status: components["schemas"]["CampaignStatus"];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /**
+         * CampaignOut
+         * @description Campaign list representation.
+         */
+        CampaignOut: {
+            batch: components["schemas"]["NamedResourceSummary"];
+            /** Completed At */
+            completed_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            created_by: components["schemas"]["UploadedBySummary"];
+            /** Enrollment Count */
+            enrollment_count: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Launched At */
+            launched_at: string | null;
+            /** Name */
+            name: string;
+            primary_series: components["schemas"]["NamedResourceSummary"];
+            /** Responded Count */
+            responded_count: number;
+            /** Response Rate */
+            response_rate: number;
+            secondary_series: components["schemas"]["NamedResourceSummary"];
+            /**
+             * Start At
+             * Format: date-time
+             */
+            start_at: string;
+            status: components["schemas"]["CampaignStatus"];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /**
+         * CampaignPage
+         * @description Paginated campaign summaries.
+         */
+        CampaignPage: {
+            /** Items */
+            items: components["schemas"]["CampaignOut"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /**
+         * CampaignStatus
+         * @enum {string}
+         */
+        CampaignStatus: "draft" | "scheduled" | "running" | "paused" | "completed";
+        /**
+         * CampaignUpdate
+         * @description Update selected draft campaign settings.
+         */
+        CampaignUpdate: {
+            /** Batch Id */
+            batch_id?: string | null;
+            /** Name */
+            name?: string | null;
+            /** Primary Series Id */
+            primary_series_id?: string | null;
+            /** Secondary Series Id */
+            secondary_series_id?: string | null;
+            /** Start At */
+            start_at?: string | null;
         };
         /**
          * ContentSeriesCreate
@@ -621,6 +940,11 @@ export interface components {
             /** Tag Names */
             tag_names?: string[] | null;
         };
+        /**
+         * DeclineReason
+         * @enum {string}
+         */
+        DeclineReason: "travelling" | "health" | "recently_donated" | "not_interested" | "other";
         /**
          * DonorBatchDetail
          * @description Batch summary with segment and language counts.
@@ -762,6 +1086,149 @@ export interface components {
             segment: string;
         };
         /**
+         * EnrollmentDetail
+         * @description Enrollment with full donor data and related activity.
+         */
+        EnrollmentDetail: {
+            appointment: components["schemas"]["AppointmentSlotSummary"] | null;
+            campaign: components["schemas"]["NamedResourceSummary"];
+            /**
+             * Campaign Id
+             * Format: uuid
+             */
+            campaign_id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            current_series_kind: components["schemas"]["SeriesKind"] | null;
+            /** Current Step Order */
+            current_step_order: number | null;
+            decline_reason: components["schemas"]["DeclineReason"] | null;
+            donor: components["schemas"]["EnrollmentDonorOut"];
+            follow_up: components["schemas"]["FollowUpSummary"] | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Next Action At */
+            next_action_at: string | null;
+            /** Responded At */
+            responded_at: string | null;
+            status: components["schemas"]["EnrollmentStatus"];
+            /** Timeline */
+            timeline: components["schemas"]["EnrollmentTimelineItem"][];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /**
+         * EnrollmentDonorOut
+         * @description Donor information returned with an enrollment.
+         */
+        EnrollmentDonorOut: {
+            /** Blood Group */
+            blood_group: string | null;
+            /** City */
+            city: string | null;
+            /** Full Name */
+            full_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            language: components["schemas"]["LanguageCode"];
+            /** Last Donation Date */
+            last_donation_date: string | null;
+            /** Phone E164 */
+            phone_e164: string;
+            /** Segment */
+            segment: string;
+        };
+        /**
+         * EnrollmentOut
+         * @description Enrollment list representation.
+         */
+        EnrollmentOut: {
+            /**
+             * Campaign Id
+             * Format: uuid
+             */
+            campaign_id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            current_series_kind: components["schemas"]["SeriesKind"] | null;
+            /** Current Step Order */
+            current_step_order: number | null;
+            decline_reason: components["schemas"]["DeclineReason"] | null;
+            donor: components["schemas"]["EnrollmentDonorOut"];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Next Action At */
+            next_action_at: string | null;
+            /** Responded At */
+            responded_at: string | null;
+            status: components["schemas"]["EnrollmentStatus"];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /**
+         * EnrollmentPage
+         * @description Paginated campaign enrollments.
+         */
+        EnrollmentPage: {
+            /** Items */
+            items: components["schemas"]["EnrollmentOut"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /**
+         * EnrollmentStatus
+         * @enum {string}
+         */
+        EnrollmentStatus: "pending" | "in_primary" | "in_secondary" | "escalated" | "confirmed" | "reschedule_requested" | "rescheduled" | "declined" | "invalid_number" | "undeliverable";
+        /**
+         * EnrollmentTimelineItem
+         * @description Chronological message or response event.
+         */
+        EnrollmentTimelineItem: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            message?: components["schemas"]["MessageTimelineEntry"] | null;
+            response?: components["schemas"]["ResponseTimelineEntry"] | null;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "message" | "response";
+        };
+        /**
          * ExistingPhoneWarning
          * @description A valid phone that also appears in an earlier batch.
          */
@@ -773,6 +1240,47 @@ export interface components {
             /** Row */
             row: number;
         };
+        /**
+         * FollowUpPriority
+         * @enum {string}
+         */
+        FollowUpPriority: "normal" | "high";
+        /**
+         * FollowUpStatus
+         * @enum {string}
+         */
+        FollowUpStatus: "open" | "in_progress" | "done";
+        /**
+         * FollowUpSummary
+         * @description Current or most recent coordinator follow-up.
+         */
+        FollowUpSummary: {
+            /** Assigned To Id */
+            assigned_to_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            priority: components["schemas"]["FollowUpPriority"];
+            status: components["schemas"]["FollowUpStatus"];
+            type: components["schemas"]["FollowUpType"];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /**
+         * FollowUpType
+         * @enum {string}
+         */
+        FollowUpType: "confirmed" | "reschedule" | "declined" | "needs_call";
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -851,6 +1359,44 @@ export interface components {
          */
         MessageStatus: "queued" | "sent" | "delivered" | "read" | "failed";
         /**
+         * MessageTimelineEntry
+         * @description Message data embedded in an enrollment timeline.
+         */
+        MessageTimelineEntry: {
+            /** Body */
+            body: string;
+            /** Delivered At */
+            delivered_at: string | null;
+            direction: components["schemas"]["MessageDirection"];
+            kind: components["schemas"]["MessageKind"];
+            media_type: components["schemas"]["MediaType"];
+            /** Media Url */
+            media_url: string | null;
+            /** Read At */
+            read_at: string | null;
+            /**
+             * Scheduled At
+             * Format: date-time
+             */
+            scheduled_at: string;
+            /** Sent At */
+            sent_at: string | null;
+            status: components["schemas"]["MessageStatus"];
+        };
+        /**
+         * NamedResourceSummary
+         * @description Identifier and display name for a related resource.
+         */
+        NamedResourceSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+        };
+        /**
          * PreviewButtonOut
          * @description Quick reply localized for simulator preview.
          */
@@ -908,6 +1454,31 @@ export interface components {
              * @constant
              */
             status: "ready";
+        };
+        /**
+         * ResponseIntent
+         * @enum {string}
+         */
+        ResponseIntent: "confirm" | "reschedule" | "decline" | "question" | "unknown";
+        /**
+         * ResponseSource
+         * @enum {string}
+         */
+        ResponseSource: "button" | "agent";
+        /**
+         * ResponseTimelineEntry
+         * @description Classified response data embedded in an enrollment timeline.
+         */
+        ResponseTimelineEntry: {
+            /** Confidence */
+            confidence: string;
+            decline_reason: components["schemas"]["DeclineReason"] | null;
+            /** Detected Language */
+            detected_language: string;
+            intent: components["schemas"]["ResponseIntent"];
+            /** Requested Date */
+            requested_date: string | null;
+            source: components["schemas"]["ResponseSource"];
         };
         /**
          * SegmentBreakdown
@@ -1218,6 +1789,267 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserOut"];
+                };
+            };
+        };
+    };
+    list_campaigns_api_v1_campaigns_get: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["CampaignStatus"] | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CampaignPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_campaign_api_v1_campaigns_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CampaignCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CampaignDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_campaign_api_v1_campaigns__campaign_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                campaign_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CampaignDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_campaign_api_v1_campaigns__campaign_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                campaign_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CampaignUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CampaignDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    launch_campaign_api_v1_campaigns__campaign_id__actions_launch_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                campaign_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CampaignDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pause_campaign_api_v1_campaigns__campaign_id__actions_pause_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                campaign_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CampaignDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resume_campaign_api_v1_campaigns__campaign_id__actions_resume_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                campaign_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CampaignDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_campaign_enrollments_api_v1_campaigns__campaign_id__enrollments_get: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["EnrollmentStatus"] | null;
+                search?: string | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path: {
+                campaign_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnrollmentPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -1829,6 +2661,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ValidationIssue"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_enrollment_api_v1_enrollments__enrollment_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                enrollment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnrollmentDetail"];
                 };
             };
             /** @description Validation Error */

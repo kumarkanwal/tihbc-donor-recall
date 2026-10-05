@@ -153,6 +153,7 @@ export function useDonorBatch(
       });
       return requireResponseData(data, "Donor batch");
     },
+    enabled: Boolean(batchId),
   });
 }
 

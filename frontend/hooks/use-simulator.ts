@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   simulatorSource,
@@ -24,7 +24,10 @@ export function useSimulatorConversations(filters: ConversationFilters) {
 export function useSimulatorMessages(donorId: string | null) {
   const queryClient = useQueryClient();
   const [isTyping, setIsTyping] = useState(false);
-  const messagesKey = ["simulator", "messages", donorId] as const;
+  const messagesKey = useMemo(
+    () => ["simulator", "messages", donorId] as const,
+    [donorId],
+  );
   const query = useQuery({
     queryKey: messagesKey,
     queryFn: () => simulatorSource.listMessages(donorId ?? ""),
@@ -43,7 +46,7 @@ export function useSimulatorMessages(donorId: string | null) {
       void queryClient.invalidateQueries({ queryKey: messagesKey });
       void queryClient.invalidateQueries({ queryKey: conversationKey });
     });
-  }, [donorId, queryClient]);
+  }, [donorId, messagesKey, queryClient]);
 
   return { ...query, isTyping };
 }
