@@ -203,3 +203,10 @@
 - **Verification:** ESLint, strict TypeScript, all 56 Vitest tests, and the Next.js production build pass. Focused tests cover report-tab content, export contract selection, inactive totals, and missing-backend presentation. Every chart reads its colors from brand CSS tokens, and all report components remain below 150 lines.
 - **Next:** After backend Tasks 2.10 and 2.11, export OpenAPI, run `pnpm gen:api`, replace `lib/api/pending-contracts.ts` with generated types, and verify live data and downloads per KI-008.
 - **Blockers:** None; live report data awaits backend Task 2.11 and is tracked in KI-008.
+
+## S-032 — 2026-10-05 — [FE] Settings and frontend handoff
+
+- **Done:** Re-ran and committed the complete Task 3.11 Reports gate, removed all named temporary patch/recharts artifacts, ignored future `.tmp-*` directories, and confirmed that Recharts 3.3.0 is the only added direct dependency with no Next.js or existing-package version change. Completed Task 3.12 with mocked WhatsApp integration status rows, template approval table, read-only paginated staff users, administrator-only demo clock controls, and confirmed seeded-data reset. Coordinators cannot see demo controls, and unavailable Task 2.12 routes have a clear backend-update state. Recorded D-108 and KI-009 while keeping KI-008 open.
+- **Verification:** Task 3.11 passes ESLint, strict TypeScript, all 56 Vitest tests, and the production build. Task 3.12 passes ESLint, strict TypeScript, all 60 Vitest tests, and the production build. Settings coverage verifies integration data, coordinator role gating, reset confirmation, and HTTP 404 presentation. No named temporary artifact exists or is tracked.
+- **Next:** Pause frontend feature work until backend Tasks 2.6–2.12 land. Then regenerate OpenAPI, retire compatibility bridges, enable realtime, and perform live browser acceptance for Inbox, Dashboard, Reports, and Settings.
+- **Blockers:** None in the frontend implementation. Live data and actions depend on backend Tasks 2.6–2.12 under KI-005, KI-006, KI-008, and KI-009.

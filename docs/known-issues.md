@@ -23,3 +23,9 @@
 - **Status:** Open
 - **Affects:** Frontend Tasks 3.9, 3.10, and 3.11
 - **Details:** Backend Tasks 2.10/2.11 are not implemented, so the documented follow-up, metrics, and reports shapes temporarily live in `frontend/lib/api/pending-contracts.ts`. These pages show “Available after backend update” for HTTP 404. Regenerate OpenAPI and remove the pending contract boundary when those backend APIs land.
+
+## KI-009 — Settings frontend contract pending generation
+
+- **Status:** Open
+- **Affects:** Frontend Task 3.12 integration status and demo-data reset
+- **Details:** Backend Task 2.12 has not exported `/settings/integration` or `/demo/actions/reset-data`, so their documented shapes temporarily share `frontend/lib/api/pending-contracts.ts`. The Settings page shows “Available after backend update” when the integration endpoint returns HTTP 404. Regenerate OpenAPI, replace the compatibility calls, and verify reset behavior when Task 2.12 lands.

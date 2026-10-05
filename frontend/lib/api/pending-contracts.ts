@@ -2,8 +2,8 @@ import { apiClient } from "@/lib/api/client";
 import { ApiError } from "@/lib/api/errors";
 
 /**
- * Temporary contracts for docs/api.md sections 8 and 9.
- * Delete this file and use generated schema types after backend Tasks 2.10/2.11.
+ * Temporary contracts for docs/api.md sections 8–10.
+ * Remove each area as backend Tasks 2.10–2.12 add generated schema types.
  */
 
 export type FollowUpType =
@@ -161,6 +161,21 @@ export interface InactiveNumberPage extends PendingPage<InactiveNumberRow> {
   summary: InactiveNumberSummary;
 }
 
+export interface IntegrationTemplate {
+  name: string;
+  status: string;
+  category: string;
+}
+
+export interface IntegrationSettings {
+  business_verified: boolean;
+  phone_number: string;
+  display_name: string;
+  quality_rating: string;
+  messaging_limit: string | number;
+  templates: IntegrationTemplate[];
+}
+
 type PendingResult<Data> = Promise<{
   data?: Data;
   error?: unknown;
@@ -168,6 +183,7 @@ type PendingResult<Data> = Promise<{
 }>;
 
 export interface PendingApiClient {
+  GET(path: "/api/v1/settings/integration"): PendingResult<IntegrationSettings>;
   GET(
     path: "/api/v1/follow-ups",
     options: { params: { query: FollowUpFilters } },
@@ -206,6 +222,7 @@ export interface PendingApiClient {
       body: { outcome: FollowUpOutcome; note?: string };
     },
   ): PendingResult<FollowUpDetail>;
+  POST(path: "/api/v1/demo/actions/reset-data"): PendingResult<unknown>;
   GET(
     path: "/api/v1/metrics/overview",
     options: { params: { query: MetricsFilters } },

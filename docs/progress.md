@@ -52,7 +52,7 @@ Update after every task. Add a note for Blocked items.
 | 3.9 | Follow-up inbox | Done | Added the filtered coordinator queue, count tabs, detail workflow, assignment/start/resolve/note actions, CSV export, chat entry point, realtime-compatible query keys, and backend-update empty state. Lint, strict typecheck, 52 tests, and production build pass. |
 | 3.10 | Dashboard | Done | Added campaign/date filters, six KPI cards, token-driven daily activity and outcome charts, active campaign progress, recent follow-ups, deterministic insights, realtime-compatible metrics keys, and the documented backend-update state. Lint, strict typecheck, 54 tests, and production build pass. |
 | 3.11 | Reports | Done | Added delivery/engagement, responses, and inactive-number tabs with shared filters, token-driven Recharts, aggregate tables and cards, pagination, per-report CSV exports, and backend-update states. Lint, strict typecheck, 56 tests, and production build pass. |
-| 3.12 | Settings | Not started | |
+| 3.12 | Settings | Done | Added mocked integration status and template approval views, a read-only paginated user directory, administrator-only demo clock controls and confirmed data reset, role/demo-mode gating, and backend-update states. Lint, strict typecheck, 60 tests, and production build pass. |
 | 3.13 | WebSocket live updates | In progress | Part 1 complete: added the shared authenticated realtime client, centralized event-to-cache routing, reconnect refresh, API-simulator integration, and the administrator demo-clock/Skip time control. Realtime remains disabled by default until backend Task 2.6. |
 
 ## Phase 4: Integration and deployment

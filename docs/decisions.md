@@ -324,7 +324,16 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 ## D-107 — Single pending frontend contract boundary
 
 - **Date:** 2026-10-04
-- **Status:** Accepted
+- **Status:** Superseded by D-108
 - **Decision:** Define every temporary request and response type for the unimplemented follow-up, metrics, and reports endpoints in `frontend/lib/api/pending-contracts.ts`, alongside one narrow compatibility view of the normal authenticated API client. Feature hooks consume this boundary and expose a specific backend-update state for HTTP 404.
 - **Reason:** Tasks 3.9–3.11 must implement the documented UI before backend Tasks 2.10/2.11 export OpenAPI types, while keeping temporary contracts easy to find, review, and delete without introducing component-level requests.
 - **Consequences:** After backend Tasks 2.10/2.11, regenerate the API client, replace all pending-contract imports with generated types, remove the compatibility file, and close KI-008.
+
+## D-108 — Extend the pending frontend contract boundary through Settings
+
+- **Date:** 2026-10-05
+- **Status:** Accepted
+- **Supersedes:** D-107
+- **Decision:** Keep the temporary integration-status and demo-data-reset shapes for Task 3.12 in the existing `frontend/lib/api/pending-contracts.ts` boundary, alongside the follow-up and metrics contracts. Continue using the normal authenticated API client and surface HTTP 404 as an explicit backend-update state. Remove each domain from the boundary independently when its generated OpenAPI contract lands.
+- **Reason:** Backend Task 2.12 is not implemented, while the Settings UI must follow the documented contract now. Extending the one compatibility boundary avoids a second handwritten API-type module and keeps every temporary frontend contract easy to locate and retire.
+- **Consequences:** Backend Tasks 2.10/2.11 close KI-008 and remove their types without waiting for Settings. Backend Task 2.12 closes KI-009 and allows the remaining compatibility types and reset call to use the generated client directly.
