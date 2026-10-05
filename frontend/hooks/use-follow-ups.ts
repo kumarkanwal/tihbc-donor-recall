@@ -8,8 +8,8 @@ import {
   type UseQueryResult,
 } from "@tanstack/react-query";
 
-import { ApiError } from "@/lib/api/errors";
 import {
+  isPendingBackendUpdate,
   pendingApiClient,
   type FollowUpDetail,
   type FollowUpFilters,
@@ -30,9 +30,7 @@ export const followUpKeys = {
   detail: (id: string) => ["follow-ups", "detail", id] as const,
 };
 
-export function isPendingBackendUpdate(error: unknown): boolean {
-  return error instanceof ApiError && error.status === 404;
-}
+export { isPendingBackendUpdate };
 
 export function useFollowUps(
   filters: FollowUpFilters,

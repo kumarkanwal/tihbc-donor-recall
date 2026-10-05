@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api/client";
+import { ApiError } from "@/lib/api/errors";
 
 /**
  * Temporary contracts for docs/api.md sections 8 and 9.
@@ -246,3 +247,8 @@ export interface PendingApiClient {
 }
 
 export const pendingApiClient = apiClient as unknown as PendingApiClient;
+
+/** Identify endpoints intentionally waiting for backend Tasks 2.10/2.11. */
+export function isPendingBackendUpdate(error: unknown): boolean {
+  return error instanceof ApiError && error.status === 404;
+}

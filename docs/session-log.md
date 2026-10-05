@@ -189,3 +189,10 @@
 - **Verification:** ESLint, strict TypeScript, all 52 Vitest tests, and the Next.js production build pass. Focused tests cover missing-backend presentation, type-tab filtering, and the shared donor-chat helper.
 - **Next:** Build Task 3.10 Dashboard against the same pending contract boundary.
 - **Blockers:** None; live data awaits backend Task 2.10 and is tracked in KI-008.
+
+## S-030 — 2026-10-05 — [FE] Dashboard
+
+- **Done:** Completed Task 3.10 with campaign and date-range filters; six headline KPI cards; theme-token-driven daily activity and response-outcome Recharts visualizations; active campaign progress; the latest five open follow-ups; and deterministic plain-text insights from segment, language, and decline-reason aggregates. Metrics use the centralized pending-contract boundary and `metrics` query-key root so Task 3.13 realtime invalidation refreshes the page. Added the explicit HTTP 404 “Available after backend update” state.
+- **Verification:** ESLint, strict TypeScript, all 54 Vitest tests, and the Next.js production build pass. Focused tests cover all six documented KPIs and missing-backend presentation. Recharts 3.3.0 was added as the project-specified chart library; chart colors come only from brand CSS tokens in both themes.
+- **Next:** Build Task 3.11 Reports against the same pending contract and shared metrics hooks.
+- **Blockers:** None; live data awaits backend Task 2.11 and is tracked in KI-008.

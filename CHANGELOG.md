@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added the campaign performance Dashboard with filters, six KPI cards, theme-aware activity and outcome charts, active campaign progress, recent follow-ups, and plain-language insights.
 - Added the coordinator Follow-up Inbox with filtered work queues, donor-response details, assignment and resolution workflows, notes, chat access, and CSV export.
 - Added the administrator demo clock and Skip time control plus shared realtime cache-update infrastructure with reconnect handling and follow-up notifications.
 - Added campaign management screens with status browsing, draft configuration, audience and schedule previews, lifecycle controls, enrollment monitoring, donor details, and direct chat access.
