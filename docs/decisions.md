@@ -296,3 +296,11 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Status:** Accepted
 - **Decision:** On launch, lock the donor batch and reject the campaign when another campaign for that batch is `scheduled`, `running`, or `paused`. Draft and completed campaigns do not block launch.
 - **Reason:** A donor batch represents one messaging audience; allowing two live campaigns to enroll it would double-message the same donors. The batch lock also prevents concurrent launches from bypassing the check.
+
+## D-043 — Clock-anchored appointments with non-blocking fallback
+
+- **Date:** 2026-10-04
+- **Status:** Accepted
+- **Decision:** Calculate the default appointment from the later of campaign start and demo-clock time, then add two local calendar days and target 10:00 Asia/Karachi. Search the donor's city-selected center through the following 14 days before searching either demo center over the same window, locking the selected row before incrementing capacity. If no slot is available, send the message without an appointment, render `at your earliest convenience` in English or `اپنی جلد از جلد سہولت کے مطابق` in Urdu, and log a warning without donor personal data. Map Nazimabad cities to North Nazimabad Donor Center and default all other or missing cities to Korangi Campus Blood Center.
+- **Reason:** Running campaigns may have historical start dates or temporarily exhausted slots. Appointment inventory must remain capacity-safe without stopping donor outreach or crashing the messaging worker.
+- **Consequences:** Enrollment appointment data may remain null for a successfully sent message; downstream reply and rescheduling flows must support that state.

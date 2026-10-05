@@ -55,7 +55,7 @@ class MessageRepository(BaseRepository[Message]):
             .join(Donor, Message.donor_id == Donor.id)
             .where(*filters)
             .order_by(Message.created_at, Message.id)
-            .with_for_update(skip_locked=True)
+            .with_for_update(of=Message, skip_locked=True)
             .options(selectinload(Message.donor), selectinload(Message.enrollment))
         )
         messages = await self._session.scalars(statement)

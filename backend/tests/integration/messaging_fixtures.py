@@ -22,7 +22,7 @@ from app.models.enums import (
 )
 from app.models.series import ContentSeries, SeriesStep, SeriesStepContent
 from app.services.appointments.centers import KORANGI_CENTER
-from app.services.appointments.service import default_appointment_start
+from app.services.appointments.service import AppointmentService, default_appointment_start
 from tests.integration.campaign_fixtures import CampaignFixture, add_campaign_fixture
 
 
@@ -114,6 +114,17 @@ class RecordingPublisher:
     async def publish(self, event_type: str, payload: Mapping[str, object]) -> None:
         assert not self._session.in_transaction()
         self.events.append((event_type, payload))
+
+
+class UnavailableAppointmentService(AppointmentService):
+    """Return no slot to exercise the non-blocking send fallback."""
+
+    def __init__(self) -> None:
+        pass
+
+    async def book_default(self, enrollment: Enrollment) -> None:
+        del enrollment
+        return None
 
 
 async def add_messaging_fixture(

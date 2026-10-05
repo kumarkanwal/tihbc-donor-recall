@@ -19,20 +19,20 @@ class AppointmentRepository(BaseRepository[AppointmentSlot]):
     async def next_available_for_update(
         self,
         *,
-        center_name: str,
+        center_name: str | None,
         starts_at: datetime,
         before: datetime,
     ) -> AppointmentSlot | None:
-        """Lock the earliest available slot in the requested two-day window."""
+        """Lock the earliest available slot in the requested search window."""
+        statement = select(AppointmentSlot).where(
+            AppointmentSlot.starts_at >= starts_at,
+            AppointmentSlot.starts_at < before,
+            AppointmentSlot.booked_count < AppointmentSlot.capacity,
+        )
+        if center_name is not None:
+            statement = statement.where(AppointmentSlot.center_name == center_name)
         statement = (
-            select(AppointmentSlot)
-            .where(
-                AppointmentSlot.center_name == center_name,
-                AppointmentSlot.starts_at >= starts_at,
-                AppointmentSlot.starts_at < before,
-                AppointmentSlot.booked_count < AppointmentSlot.capacity,
-            )
-            .order_by(AppointmentSlot.starts_at, AppointmentSlot.id)
+            statement.order_by(AppointmentSlot.starts_at, AppointmentSlot.id)
             .with_for_update(skip_locked=True)
             .limit(1)
         )

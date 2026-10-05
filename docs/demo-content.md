@@ -107,7 +107,11 @@ Slot buttons label format: EN `Sat 10 Oct, 11:00 AM` · UR `ہفتہ ۱۰ اکت
 - **Slots:** each center, every day for the next 21 demo days, 9:00 AM to 4:00 PM hourly, capacity 4.
   Some slots pre-filled so availability looks realistic.
 - **Default appointment date** for `{{appointment_date}}`: campaign start + 2 days, 10:00 AM, at the donor's
-  nearest center (by city; default Korangi).
+  nearest center (by city; default Korangi). For an already-running campaign, use the later of the
+  campaign start and the current demo-clock time before adding two days. If that slot is unavailable,
+  search forward through 14 days at the same center, then at either center. If no slot exists, leave the
+  appointment unbooked and render `at your earliest convenience` (EN) or
+  `اپنی جلد از جلد سہولت کے مطابق` (UR) for `{{appointment_date}}`.
 - **Donors:** about 200, segments roughly 50% regular, 30% lapsed, 20% first-time; languages about 60% Urdu,
   40% English; about 5% unreachable (`sim_reachable=false`), about 25% without read receipts.
 - **Sample upload file:** `backend/app/seed/assets/sample-donors.xlsx` with 40 rows, including 5 invalid

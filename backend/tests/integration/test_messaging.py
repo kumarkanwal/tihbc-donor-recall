@@ -60,6 +60,11 @@ async def test_send_next_step_renders_updates_and_is_idempotent(
             EventType.ENROLLMENT_UPDATED.value,
             EventType.METRICS_UPDATED.value,
         ]
+        created_payload = publisher.events[0][1]
+        assert created_payload["buttons"] == [{"id": "btn_confirm", "label": "Confirm"}]
+        assert "enrollment_id" not in created_payload
+        assert created_payload["button_id"] is None
+        assert created_payload["reply_to_message_id"] is None
 
         duplicate = await service.send_next_step(fixture.enrollment.id)
         message_count = await session.scalar(
@@ -260,7 +265,11 @@ def _messaging_service(
         session,
         EnrollmentRepository(session),
         MessageRepository(session),
-        AppointmentService(AppointmentRepository(session), "Asia/Karachi"),
+        AppointmentService(
+            AppointmentRepository(session),
+            current_clock,
+            "Asia/Karachi",
+        ),
         provider,
         publisher,
         current_clock,

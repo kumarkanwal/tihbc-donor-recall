@@ -45,6 +45,17 @@ def test_appointment_date_has_english_and_urdu_formats() -> None:
     )
 
 
+def test_missing_appointment_uses_localized_fallback() -> None:
+    assert (
+        format_appointment_date(None, LanguageCode.EN, "Asia/Karachi")
+        == "at your earliest convenience"
+    )
+    assert (
+        format_appointment_date(None, LanguageCode.UR, "Asia/Karachi")
+        == "اپنی جلد از جلد سہولت کے مطابق"
+    )
+
+
 def test_buttons_are_localized_for_requested_language() -> None:
     buttons = [
         ButtonTemplate(

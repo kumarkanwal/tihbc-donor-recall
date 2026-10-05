@@ -25,13 +25,17 @@ async def test_booking_skips_full_slot_and_does_not_double_book(
         fixture.default_slot.booked_count = fixture.default_slot.capacity
         fallback = AppointmentSlot(
             center_name=fixture.default_slot.center_name,
-            starts_at=fixture.default_slot.starts_at + timedelta(hours=1),
+            starts_at=fixture.default_slot.starts_at + timedelta(days=1),
             capacity=4,
             booked_count=3,
         )
         session.add(fallback)
         await session.flush()
-        service = AppointmentService(AppointmentRepository(session), "Asia/Karachi")
+        service = AppointmentService(
+            AppointmentRepository(session),
+            FixedClock(NOW),
+            "Asia/Karachi",
+        )
 
         first = await service.book_default(fixture.enrollment)
         second = await service.book_default(fixture.enrollment)
@@ -40,6 +44,27 @@ async def test_booking_skips_full_slot_and_does_not_double_book(
         assert second.id == fallback.id
         assert fallback.booked_count == 4
         assert fixture.default_slot.booked_count == 4
+
+
+@pytest.mark.asyncio
+async def test_past_campaign_uses_current_clock_for_default_date(
+    postgres_session_factory: async_sessionmaker[AsyncSession],
+) -> None:
+    async with postgres_session_factory() as session:
+        fixture = await add_messaging_fixture(session, NOW)
+        fixture.campaign.start_at = datetime(2026, 1, 1, tzinfo=UTC)
+        await session.flush()
+        service = AppointmentService(
+            AppointmentRepository(session),
+            FixedClock(NOW),
+            "Asia/Karachi",
+        )
+
+        booked = await service.book_default(fixture.enrollment)
+
+        assert booked is not None
+        assert booked.id == fixture.default_slot.id
+        assert booked.starts_at == datetime(2026, 10, 6, 5, 0, tzinfo=UTC)
 
 
 @pytest.mark.asyncio

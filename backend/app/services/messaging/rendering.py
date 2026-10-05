@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from app.models.campaign import AppointmentSlot, Enrollment
 from app.schemas.content_series import QuickReplyButtonInput
+from app.services.appointments.centers import center_for_city
 from app.services.messaging.selection import SelectedStep
 from app.services.templates.renderer import (
     ButtonTemplate,
@@ -24,7 +25,7 @@ class RenderedStep:
 def render_step(
     enrollment: Enrollment,
     selection: SelectedStep,
-    appointment: AppointmentSlot,
+    appointment: AppointmentSlot | None,
     timezone_display: str,
 ) -> RenderedStep:
     """Render the donor-language content and quick-reply labels."""
@@ -40,8 +41,12 @@ def render_step(
     )
     values = TemplateValues(
         donor_name=enrollment.donor.full_name,
-        center_name=appointment.center_name,
-        appointment_date=appointment.starts_at,
+        center_name=(
+            appointment.center_name
+            if appointment is not None
+            else center_for_city(enrollment.donor.city)
+        ),
+        appointment_date=appointment.starts_at if appointment is not None else None,
     )
     return RenderedStep(
         body=render_body(content.body, language, values, timezone_display),

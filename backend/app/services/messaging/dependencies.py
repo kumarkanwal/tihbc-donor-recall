@@ -24,7 +24,11 @@ def build_messaging_service(
         session,
         EnrollmentRepository(session),
         MessageRepository(session),
-        AppointmentService(AppointmentRepository(session), settings.timezone_display),
+        AppointmentService(
+            AppointmentRepository(session),
+            current_clock,
+            settings.timezone_display,
+        ),
         create_messaging_provider(settings.messaging_provider),
         LoggingEventPublisher(),
         current_clock,

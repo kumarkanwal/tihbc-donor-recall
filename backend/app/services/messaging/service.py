@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from uuid import UUID
 
+import structlog
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.clock import Clock
@@ -36,6 +37,7 @@ UNREACHABLE_REASON = "Simulated unreachable number"
 SENDABLE_STATUSES = frozenset(
     {EnrollmentStatus.PENDING, EnrollmentStatus.IN_PRIMARY, EnrollmentStatus.IN_SECONDARY}
 )
+logger = structlog.get_logger(__name__)
 
 
 @dataclass(frozen=True)
@@ -95,6 +97,7 @@ class MessagingService:
             sent_at = await self._send(message, enrollment, rendered)
             self._advance_enrollment(enrollment, selection, sent_at)
         await self._commit()
+        self._log_send(message, enrollment)
         await self._publish_send(message, enrollment)
         return SendNextStepResult(message_id=message.id, status=message.status)
 
@@ -201,6 +204,18 @@ class MessagingService:
         except Exception:
             await self._session.rollback()
             raise
+
+    @staticmethod
+    def _log_send(message: Message, enrollment: Enrollment) -> None:
+        event = "message_failed" if message.status == MessageStatus.FAILED else "message_sent"
+        logger.info(
+            event,
+            message_id=str(message.id),
+            enrollment_id=str(enrollment.id),
+            campaign_id=str(enrollment.campaign_id),
+            status=message.status.value,
+            failed_reason=message.failed_reason,
+        )
 
     async def _publish_send(self, message: Message, enrollment: Enrollment) -> None:
         await self._publisher.publish(

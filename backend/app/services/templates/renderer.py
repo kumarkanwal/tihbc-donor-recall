@@ -42,6 +42,10 @@ URDU_MONTHS = (
     "دسمبر",
 )
 URDU_DIGITS = str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹")
+APPOINTMENT_FALLBACKS = {
+    LanguageCode.EN: "at your earliest convenience",
+    LanguageCode.UR: "اپنی جلد از جلد سہولت کے مطابق",
+}
 
 
 @dataclass(frozen=True)
@@ -50,7 +54,7 @@ class TemplateValues:
 
     donor_name: str
     center_name: str
-    appointment_date: datetime
+    appointment_date: datetime | None
 
 
 @dataclass(frozen=True)
@@ -120,11 +124,13 @@ def localize_buttons(
 
 
 def format_appointment_date(
-    value: datetime,
+    value: datetime | None,
     language: LanguageCode,
     timezone_display: str,
 ) -> str:
     """Format an appointment using the documented bilingual slot style."""
+    if value is None:
+        return APPOINTMENT_FALLBACKS[language]
     if value.tzinfo is None:
         raise ValidationError("Appointment date must include a timezone")
     try:

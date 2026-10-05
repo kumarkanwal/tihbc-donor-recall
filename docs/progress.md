@@ -26,7 +26,7 @@ Update after every task. Add a note for Blocked items.
 | 2.1 | Batch upload: preview, validation, import | Not started | |
 | 2.2 | Content series, steps, media upload | Done | Bilingual series lifecycle, ordered steps, previews, media validation/storage, role guards, and isolated PostgreSQL coverage are complete. Manual `/docs` acceptance and all 170 automated tests pass. |
 | 2.3 | Campaigns: create, launch, pause, resume | Done | Added campaign CRUD and lifecycle actions, aggregate launch validation, isolated batch enrollment creation, status counts, enrollment browsing/detail, coordinator read access, and live-series protection. All 203 PostgreSQL tests and the complete `/docs` acceptance flow pass. |
-| 2.4 | Messaging provider (simulator) | In progress | Building provider injection, appointment booking, step sending, deterministic delivery progression, events, CLI tools, and coverage. |
+| 2.4 | Messaging provider (simulator) | Done | Added provider-injected bilingual step sending, capacity-safe appointment booking with a non-blocking localized fallback, deterministic simulated delivery/read progression, post-commit events, demo CLI tools, and idempotency. All 221 PostgreSQL tests and the live CLI/API acceptance flow pass. |
 | 2.5 | Scheduler: dispatcher and escalation | Not started | |
 | 2.6 | WebSockets and Redis events | Not started | |
 | 2.7 | Simulator API | Not started | |
