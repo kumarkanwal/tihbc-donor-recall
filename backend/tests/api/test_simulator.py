@@ -68,14 +68,16 @@ def test_reply_shapes_are_validated_without_echoing_input(body: dict[str, str]) 
 
 @pytest.mark.parametrize("role", [UserRole.ADMIN, UserRole.COORDINATOR])
 def test_both_staff_roles_can_submit_replies(role: UserRole) -> None:
-    _, _, _, _, _, _, person, source, _ = reply_service()
+    fixture = reply_service()
     replies = AsyncMock()
-    replies.reply.return_value = SimulatorMessage.model_validate(message_created_payload(source))
+    replies.reply.return_value = SimulatorMessage.model_validate(
+        message_created_payload(fixture.source)
+    )
     app.dependency_overrides[get_current_user] = lambda: _user(role)
     app.dependency_overrides[get_simulator_reply_service] = lambda: replies
     try:
         response = TestClient(app).post(
-            f"/api/v1/simulator/conversations/{person.id}/replies",
+            f"/api/v1/simulator/conversations/{fixture.person.id}/replies",
             json={"type": "text", "text": "Hello"},
         )
         assert response.status_code == 201

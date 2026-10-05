@@ -42,8 +42,8 @@
 - **Affects:** Redis worker-to-browser fan-out and authenticated WebSocket acceptance
 - **Details:** The real Redis integration test, PostgreSQL suite, and manual `ws_listen` plus clock-advance check are deferred for combined user verification with Task 2.5. Local auth, broadcast, failure isolation, payload filtering, expiry, and metrics debounce tests pass. Run `uv run pytest --run-postgres --run-redis`; Redis tests use unique channels and never flush Redis. KI-006 remains open until browser realtime is enabled and verified.
 
-## KI-011 — Task 2.7 simulator acceptance pending
+## KI-011 — Tasks 2.7/2.8 simulator acceptance pending
 
 - **Status:** Open
-- **Affects:** PostgreSQL simulator queries, read receipts, reply persistence, and live events
-- **Details:** User verification of the PostgreSQL suite and manual conversation/open/reply walkthrough is deferred together with Tasks 2.5/2.6. Local service and API tests pass; new PostgreSQL tests cover HTTP replies, scheduling suspension, no intent records, outbound-only delivery progression, and stable cursor pagination. Intent handling and automatic acknowledgements are intentionally reserved for Task 2.8.
+- **Affects:** PostgreSQL simulator queries, read receipts, deterministic reply flows, appointment booking, follow-ups, and live events
+- **Details:** User verification of the PostgreSQL suite and manual conversation/open/reply walkthrough is deferred together with Tasks 2.5/2.6. Local service and API tests pass; PostgreSQL coverage includes HTTP replies, scheduling suspension, outbound-only delivery progression, stable cursor pagination, and selected-slot capacity protection. Task 2.8 adds classified responses, bilingual acknowledgements, follow-up creation/update, and ordered typing/message/status events; verify these against the running API, worker, PostgreSQL, and Redis before closing this issue.

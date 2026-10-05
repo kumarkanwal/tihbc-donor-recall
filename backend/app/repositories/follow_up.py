@@ -32,3 +32,8 @@ class FollowUpRepository(BaseRepository[FollowUpItem]):
         """Add a follow-up and its initial activity in the current transaction."""
         self._session.add_all((item, activity))
         await self._session.flush()
+
+    async def add_activity(self, activity: FollowUpActivity) -> None:
+        """Append and flush an activity on an existing follow-up."""
+        self._session.add(activity)
+        await self._session.flush()

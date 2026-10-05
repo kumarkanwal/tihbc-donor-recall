@@ -1,6 +1,7 @@
 """Unit-test simulator models and repositories with no external services."""
 
 from collections.abc import Mapping
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from unittest.mock import AsyncMock
 from uuid import uuid4
@@ -21,9 +22,13 @@ from app.models.enums import (
 from app.models.message import Message
 from app.repositories.donor import DonorRepository
 from app.repositories.enrollment import EnrollmentRepository
+from app.repositories.follow_up import FollowUpRepository
+from app.repositories.response import DonorResponseRepository
 from app.repositories.simulator_messages import SimulatorMessageRepository
-from app.services.simulator.replies import SimulatorReplyService
-from tests.integration.messaging_fixtures import FixedClock
+from app.services.appointments.service import AppointmentService
+from app.services.replies.flow import ReplyFlow
+from app.services.reply_service import ReplyService
+from tests.integration.messaging_fixtures import FixedClock, RecordingProvider
 
 NOW = datetime(2026, 10, 5, tzinfo=UTC)
 
@@ -70,20 +75,33 @@ def message(person: Donor, *, status: MessageStatus = MessageStatus.DELIVERED) -
     )
 
 
-def reply_service() -> tuple[
-    SimulatorReplyService,
-    AsyncMock,
-    AsyncMock,
-    AsyncMock,
-    AsyncMock,
-    Publisher,
-    Donor,
-    Message,
-    Enrollment,
-]:
+@dataclass
+class ReplyFixture:
+    """Mocks and models used by deterministic reply-service tests."""
+
+    service: ReplyService
+    session: AsyncMock
+    donors: AsyncMock
+    messages: AsyncMock
+    enrollments: AsyncMock
+    appointments: AsyncMock
+    follow_ups: AsyncMock
+    responses: AsyncMock
+    provider: RecordingProvider
+    publisher: Publisher
+    sleep: AsyncMock
+    person: Donor
+    source: Message
+    enrollment: Enrollment
+
+
+def reply_service() -> ReplyFixture:
     session = AsyncMock(spec=AsyncSession)
     donors, messages = AsyncMock(spec=DonorRepository), AsyncMock(spec=SimulatorMessageRepository)
     enrollments = AsyncMock(spec=EnrollmentRepository)
+    appointments = AsyncMock(spec=AppointmentService)
+    follow_ups = AsyncMock(spec=FollowUpRepository)
+    responses = AsyncMock(spec=DonorResponseRepository)
     person = donor()
     source = message(person)
     enrollment = Enrollment(
@@ -95,11 +113,23 @@ def reply_service() -> tuple[
         current_step_order=1,
         next_action_at=NOW,
     )
+    enrollment.donor = person
     donors.get.return_value = person
     messages.get.return_value = source
     messages.latest_outbound.return_value = source
     messages.has_reply.return_value = False
     enrollments.get_for_messaging_update.return_value = enrollment
+    follow_ups.open_for_enrollment.return_value = None
+    appointments.offer.return_value = ()
+    responses.unknown_count.return_value = 1
+
+    async def persist_follow_up(item: object, activity: object) -> None:
+        del activity
+        item.id = uuid4()
+        item.created_at = NOW
+        item.updated_at = NOW
+
+    follow_ups.add_with_activity.side_effect = persist_follow_up
 
     async def persist(item: Message) -> Message:
         item.id = uuid4()
@@ -107,7 +137,34 @@ def reply_service() -> tuple[
 
     messages.add.side_effect = persist
     publisher = Publisher(session)
-    service = SimulatorReplyService(
-        session, donors, messages, enrollments, publisher, FixedClock(NOW)
+    provider = RecordingProvider()
+    sleep = AsyncMock()
+    service = ReplyService(
+        session,
+        donors,
+        messages,
+        enrollments,
+        ReplyFlow(appointments, follow_ups, responses, "Asia/Karachi"),
+        provider,
+        publisher,
+        FixedClock(NOW),
+        "Asia/Karachi",
+        typing_seconds=1.5,
+        sleep=sleep,
     )
-    return service, session, donors, messages, enrollments, publisher, person, source, enrollment
+    return ReplyFixture(
+        service,
+        session,
+        donors,
+        messages,
+        enrollments,
+        appointments,
+        follow_ups,
+        responses,
+        provider,
+        publisher,
+        sleep,
+        person,
+        source,
+        enrollment,
+    )

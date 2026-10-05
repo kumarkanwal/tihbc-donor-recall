@@ -10,11 +10,20 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.api.deps import get_current_user, get_event_publisher
-from app.core.config import Settings
+from app.core.config import Settings, get_settings
 from app.core.db import get_db
 from app.main import app
 from app.models.campaign import Enrollment
-from app.models.enums import MediaType, MessageDirection, MessageKind, MessageStatus, UserRole
+from app.models.enums import (
+    EnrollmentStatus,
+    FollowUpType,
+    MediaType,
+    MessageDirection,
+    MessageKind,
+    MessageStatus,
+    UserRole,
+)
+from app.models.follow_up import FollowUpItem
 from app.models.message import Message
 from app.models.response import DonorResponse
 from app.schemas.user import UserOut
@@ -30,7 +39,7 @@ pytestmark = pytest.mark.postgres
 
 
 @pytest.mark.asyncio
-async def test_simulator_http_reply_stops_schedule_without_creating_response(
+async def test_simulator_http_reply_applies_deterministic_flow(
     postgres_session_factory: async_sessionmaker[AsyncSession],
 ) -> None:
     async with postgres_session_factory() as session:
@@ -54,6 +63,9 @@ async def test_simulator_http_reply_stops_schedule_without_creating_response(
         app.dependency_overrides[get_db] = override_db
         app.dependency_overrides[get_current_user] = lambda: user
         app.dependency_overrides[get_event_publisher] = lambda: publisher
+        app.dependency_overrides[get_settings] = lambda: Settings().model_copy(
+            update={"sim_typing_seconds": 0}
+        )
         path = f"/api/v1/simulator/conversations/{fixture.enrollment.donor_id}"
         try:
             async with AsyncClient(
@@ -72,6 +84,7 @@ async def test_simulator_http_reply_stops_schedule_without_creating_response(
                 assert opened.json()["read_count"] == 1
                 repeated = await client.post(f"{path}/actions/open")
                 assert repeated.json()["read_count"] == 0
+                publisher.events.clear()
                 button = {
                     "type": "button",
                     "button_id": "btn_confirm",
@@ -81,17 +94,27 @@ async def test_simulator_http_reply_stops_schedule_without_creating_response(
                 assert reply.status_code == 201
                 assert reply.json()["body"] == "Confirm"
                 assert reply.json()["status"] == "delivered"
+                assert [event for event, _ in publisher.events] == [
+                    "simulator.typing",
+                    "message.created",
+                    "message.created",
+                    "simulator.typing",
+                    "enrollment.updated",
+                    "followup.created",
+                    "metrics.updated",
+                ]
                 assert (await client.post(f"{path}/replies", json=button)).status_code == 409
                 text = await client.post(
                     f"{path}/replies", json={"type": "text", "text": "Please call me"}
                 )
                 assert text.status_code == 201
                 history = await client.get(f"{path}/messages")
-                assert len(history.json()["items"]) == 3
+                assert len(history.json()["items"]) == 5
         finally:
             app.dependency_overrides.clear()
         enrollment = await session.get(Enrollment, fixture.enrollment.id)
         assert enrollment is not None and enrollment.next_action_at is None
+        assert enrollment.status == EnrollmentStatus.CONFIRMED
         assert enrollment.responded_at is not None
         assert await service.send_next_step(enrollment.id) is None
         response_count = await session.scalar(
@@ -99,7 +122,11 @@ async def test_simulator_http_reply_stops_schedule_without_creating_response(
             .select_from(DonorResponse)
             .where(DonorResponse.enrollment_id == enrollment.id)
         )
-        assert response_count == 0
+        assert response_count == 2
+        follow_up = await session.scalar(
+            select(FollowUpItem).where(FollowUpItem.enrollment_id == enrollment.id)
+        )
+        assert follow_up is not None and follow_up.type == FollowUpType.NEEDS_CALL
         await build_delivery_service(
             session, Settings(), FixedClock(NOW + timedelta(days=1)), publisher
         ).advance()

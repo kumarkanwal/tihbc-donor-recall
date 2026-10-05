@@ -70,6 +70,39 @@ async def test_past_campaign_uses_current_clock_for_default_date(
 
 
 @pytest.mark.asyncio
+async def test_selected_slot_booking_never_exceeds_capacity(
+    postgres_session_factory: async_sessionmaker[AsyncSession],
+) -> None:
+    async with postgres_session_factory() as session:
+        fixture = await add_messaging_fixture(session, NOW)
+        service = AppointmentService(
+            AppointmentRepository(session), FixedClock(NOW), "Asia/Karachi"
+        )
+        fixture.default_slot.booked_count = fixture.default_slot.capacity
+        await session.flush()
+
+        unavailable = await service.book_selected(fixture.enrollment, fixture.default_slot.id)
+
+        assert unavailable is None
+        assert fixture.default_slot.booked_count == fixture.default_slot.capacity
+        available = AppointmentSlot(
+            center_name=fixture.default_slot.center_name,
+            starts_at=fixture.default_slot.starts_at + timedelta(hours=1),
+            capacity=4,
+            booked_count=3,
+        )
+        session.add(available)
+        await session.flush()
+
+        booked = await service.book_selected(fixture.enrollment, available.id)
+        await session.flush()
+        repeated = await service.book_selected(fixture.enrollment, available.id)
+
+        assert booked is repeated
+        assert available.booked_count == 4
+
+
+@pytest.mark.asyncio
 async def test_slot_seed_is_idempotent_without_assuming_empty_database(
     postgres_session_factory: async_sessionmaker[AsyncSession],
 ) -> None:

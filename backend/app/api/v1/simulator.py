@@ -20,9 +20,9 @@ from app.schemas.simulator import (
     SimulatorReply,
 )
 from app.schemas.user import UserOut
+from app.services.reply_service import ReplyService
 from app.services.simulator.query import SimulatorQueryService
 from app.services.simulator.receipts import SimulatorReceiptService
-from app.services.simulator.replies import SimulatorReplyService
 
 router = APIRouter(prefix="/simulator/conversations", tags=["Simulator"])
 staff_access = require_role(UserRole.ADMIN, UserRole.COORDINATOR)
@@ -82,8 +82,8 @@ async def reply(
     donor_id: UUID,
     request: SimulatorReply,
     current_user: Annotated[UserOut, Depends(staff_access)],
-    service: Annotated[SimulatorReplyService, Depends(get_simulator_reply_service)],
+    service: Annotated[ReplyService, Depends(get_simulator_reply_service)],
 ) -> SimulatorMessage:
-    """Store an inbound message and suspend further steps without classifying intent."""
+    """Store, classify, and apply one deterministic donor reply."""
     del current_user
     return await service.reply(donor_id, request)

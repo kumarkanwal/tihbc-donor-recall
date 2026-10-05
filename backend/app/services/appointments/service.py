@@ -1,6 +1,7 @@
 """Default appointment calculation and capacity-safe booking."""
 
-from datetime import UTC, datetime, time, timedelta
+from datetime import UTC, date, datetime, time, timedelta
+from uuid import UUID
 from zoneinfo import ZoneInfo
 
 import structlog
@@ -66,6 +67,32 @@ class AppointmentService:
         slot.booked_count += 1
         enrollment.appointment_slot = slot
         return slot
+
+    async def offer(self, requested_date: date | None = None) -> tuple[AppointmentSlot, ...]:
+        """Return up to three available slots nearest to the requested date."""
+        starts_at = self._clock.now()
+        if requested_date is not None:
+            starts_at = datetime.combine(requested_date, time.min, self._timezone).astimezone(UTC)
+        return await self._repository.available(
+            starts_at=starts_at,
+            before=starts_at + timedelta(days=SEARCH_FORWARD_DAYS + 1),
+            limit=3,
+        )
+
+    async def book_selected(self, enrollment: Enrollment, slot_id: UUID) -> AppointmentSlot | None:
+        """Book one selected slot under row locks, releasing a prior booking."""
+        if enrollment.appointment_slot_id == slot_id:
+            return enrollment.appointment_slot or await self._repository.get_slot(slot_id)
+        selected = await self._repository.available_for_update(slot_id)
+        if selected is None:
+            return None
+        if enrollment.appointment_slot_id is not None:
+            previous = await self._repository.get_for_update(enrollment.appointment_slot_id)
+            if previous is not None and previous.booked_count > 0:
+                previous.booked_count -= 1
+        selected.booked_count += 1
+        enrollment.appointment_slot = selected
+        return selected
 
 
 def default_appointment_start(campaign_start: datetime, timezone: ZoneInfo) -> datetime:

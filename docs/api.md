@@ -198,9 +198,12 @@ Replies return HTTP 201 and the inbound message. Text is trimmed, nonempty, and 
 Button replies must reference that donor's sent outbound message and one of its localized buttons;
 invalid references/buttons return 422, and repeated button replies return 409. Unreachable donors
 cannot reply (409). Text replies link to the latest sent outbound message. Both reply forms suspend
-the enrollment's next scheduled action and record its first response time. In Task 2.7 the enrollment
-status is unchanged, inbound messages are `delivered`, and no intent, acknowledgement, or follow-up
-is created; reply handling belongs to Task 2.8. Read/delivery events apply only to outbound messages.
+the enrollment's next scheduled action and record its first response time. Deterministic reply handling
+stores one `donor_responses` row, transitions the enrollment through the reply state machine, creates or
+updates its open follow-up, and sends the localized acknowledgement or next question. Reschedule replies
+offer up to three capacity-available slot buttons and lock the selected slot when booking; decline replies
+ask once for a localized reason. Question, unknown, unavailable-slot, and twice-unclear slot replies create
+a high-priority `needs_call` follow-up. Read/delivery events apply only to outbound messages.
 
 ## 8. Follow-up Inbox
 

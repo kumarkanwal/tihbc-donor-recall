@@ -357,7 +357,16 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 ## D-046 — Unclassified simulator replies and stable history cursors
 
 - **Date:** 2026-10-05
-- **Status:** Accepted
+- **Status:** Superseded by D-047
 - **Decision:** Store button/text replies as delivered inbound messages under the enrollment row lock, clear `next_action_at`, and preserve the first `responded_at` without changing enrollment status or creating intent/follow-up records. Link text replies to the latest sent outbound message and button replies to their validated source; reject repeated button replies after either reply form. Publish public message/enrollment/metrics events only after commit. Limit simulated delivery progression and conversation-open read updates to outbound messages. Use exclusive message-UUID cursors resolved to `(created_at, id)` for history; return each latest slice chronologically with `next_before` and `limit`, excluding failed messages while retaining failed conversation previews for unreachable donors.
 - **Reason:** Task 2.7 must stop outreach immediately without implementing Task 2.8 classification. Shared enrollment locks serialize replies against dispatch. UUID tie-breaking prevents missing or repeated messages when demo-clock timestamps match, and outbound-only receipts avoid treating incoming replies as simulated TIHBC deliveries.
 - **Consequences:** The API specification now documents the previously unspecified pagination and donor-preview fields. Frontend generated-client regeneration and compatibility-bridge removal remain a frontend handoff (KI-005); live database acceptance is pending (KI-011).
+
+## D-047 — Deterministic reply context in simulator messages
+
+- **Date:** 2026-10-05
+- **Status:** Accepted
+- **Supersedes:** D-046 reply-classification behavior only; its cursor and receipt rules remain accepted.
+- **Decision:** Route simulator replies through `services/reply_service.py`. Infer the pending deterministic context from the latest outbound message's internal button definitions: `slot_<uuid>` identifies offered appointment rows and the documented reason IDs identify decline-reason capture. Store free-text fallback classifications with the existing `agent` response source because the database contract intentionally exposes only `button` and `agent`; Task 2.9 can replace the classifier without changing persistence. Keep exact automatic reply text in language-specific modules under `services/replies/` and publish typing followed by both committed messages, enrollment, follow-up, and metrics events.
+- **Reason:** Persisting conversation state in a second table is unnecessary for the bounded slot/reason flows because the sent message already records the offered choices. Stable internal IDs keep selection capacity-safe, preserve the documented public button shape, and leave the Task 2.9 agent as a drop-in classification replacement.
+- **Consequences:** Button IDs are part of deterministic reply context and must remain stable after send. Repeated final-status intents add a system note to the open follow-up; changed intents use the enrollment reply state machine. D-046's temporary no-classification behavior no longer applies.

@@ -57,6 +57,40 @@ class AppointmentRepository(BaseRepository[AppointmentSlot]):
         """Return one appointment slot by identifier."""
         return await self.get(slot_id)
 
+    async def available(
+        self, *, starts_at: datetime, before: datetime, limit: int
+    ) -> tuple[AppointmentSlot, ...]:
+        """Return the next available slots without reserving capacity."""
+        statement = (
+            select(AppointmentSlot)
+            .where(
+                AppointmentSlot.starts_at >= starts_at,
+                AppointmentSlot.starts_at < before,
+                AppointmentSlot.booked_count < AppointmentSlot.capacity,
+            )
+            .order_by(AppointmentSlot.starts_at, AppointmentSlot.center_name, AppointmentSlot.id)
+            .limit(limit)
+        )
+        return tuple(await self._session.scalars(statement))
+
+    async def available_for_update(self, slot_id: UUID) -> AppointmentSlot | None:
+        """Lock one slot if it still has capacity."""
+        statement = (
+            select(AppointmentSlot)
+            .where(
+                AppointmentSlot.id == slot_id,
+                AppointmentSlot.booked_count < AppointmentSlot.capacity,
+            )
+            .with_for_update()
+        )
+        return await self._session.scalar(statement)
+
+    async def get_for_update(self, slot_id: UUID) -> AppointmentSlot | None:
+        """Lock one slot regardless of its remaining capacity."""
+        return await self._session.scalar(
+            select(AppointmentSlot).where(AppointmentSlot.id == slot_id).with_for_update()
+        )
+
     async def add_many(self, slots: list[AppointmentSlot]) -> None:
         """Add slot seed rows to the current transaction."""
         self._session.add_all(slots)
