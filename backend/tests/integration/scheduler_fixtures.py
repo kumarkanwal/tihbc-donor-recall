@@ -6,11 +6,12 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from app.core.clock import Clock, ClockPersistence
 from app.core.config import Settings
 from app.messaging.base import OutboundButton, ProviderSendResult
 from app.models.enums import MediaType
 from app.scheduler.tick import SchedulerTick
-from tests.integration.messaging_fixtures import FixedClock, RecordingProvider
+from tests.integration.messaging_fixtures import RecordingProvider
 
 
 class StaticClockPersistence:
@@ -24,6 +25,26 @@ class StaticClockPersistence:
 
     async def set_offset_seconds(self, seconds: int) -> int:
         return seconds
+
+
+class MutableClockPersistence:
+    """Expose mutable persisted offsets and count worker reloads."""
+
+    def __init__(self, offset_seconds: int = 0) -> None:
+        self.offset_seconds = offset_seconds
+        self.load_calls = 0
+
+    async def load_offset_seconds(self) -> int:
+        self.load_calls += 1
+        return self.offset_seconds
+
+    async def increment_offset_seconds(self, seconds: int) -> int:
+        self.offset_seconds += seconds
+        return self.offset_seconds
+
+    async def set_offset_seconds(self, seconds: int) -> int:
+        self.offset_seconds = seconds
+        return self.offset_seconds
 
 
 class CollectingPublisher:
@@ -98,16 +119,17 @@ class BlockingProvider(RecordingProvider):
 
 def build_test_tick(
     session_factory: async_sessionmaker[AsyncSession],
-    current_clock: FixedClock,
+    current_clock: Clock,
     provider: RecordingProvider,
     publisher: CollectingPublisher | None = None,
+    clock_persistence: ClockPersistence | None = None,
 ) -> SchedulerTick:
     """Build a tick with deterministic in-memory external dependencies."""
     return SchedulerTick(
         session_factory,
         Settings(),
         current_clock,
-        StaticClockPersistence(),
+        clock_persistence or StaticClockPersistence(),
         provider,
         publisher or CollectingPublisher(),
     )

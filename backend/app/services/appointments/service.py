@@ -32,15 +32,36 @@ class AppointmentService:
         self._timezone = ZoneInfo(timezone_display)
 
     async def book_default(self, enrollment: Enrollment) -> AppointmentSlot | None:
-        """Book once under a row lock, or allow fallback text when no slot exists."""
+        """Keep a future booking or replace a stale one under row locks."""
+        now = self._clock.now()
+        existing = await self._existing(enrollment)
+        if existing is not None and existing.starts_at >= now:
+            return existing
+        if existing is not None:
+            await self._release_stale(enrollment, existing)
+        return await self._book_new(enrollment, now)
+
+    async def _existing(self, enrollment: Enrollment) -> AppointmentSlot | None:
         if enrollment.appointment_slot is not None:
             return enrollment.appointment_slot
-        if enrollment.appointment_slot_id is not None:
-            existing = await self._repository.get_slot(enrollment.appointment_slot_id)
-            if existing is None:
-                raise NotFoundError("Enrollment appointment slot not found")
-            return existing
-        base = max(enrollment.campaign.start_at, self._clock.now())
+        if enrollment.appointment_slot_id is None:
+            return None
+        existing = await self._repository.get_slot(enrollment.appointment_slot_id)
+        if existing is None:
+            raise NotFoundError("Enrollment appointment slot not found")
+        return existing
+
+    async def _release_stale(self, enrollment: Enrollment, existing: AppointmentSlot) -> None:
+        locked = await self._repository.get_for_update(existing.id)
+        if locked is None:
+            raise NotFoundError("Enrollment appointment slot not found")
+        if locked.booked_count > 0:
+            locked.booked_count -= 1
+        enrollment.appointment_slot = None
+        enrollment.appointment_slot_id = None
+
+    async def _book_new(self, enrollment: Enrollment, now: datetime) -> AppointmentSlot | None:
+        base = max(enrollment.campaign.start_at, now)
         target = default_appointment_start(base, self._timezone)
         window_end = _search_window_end(target, self._timezone)
         preferred_center = center_for_city(enrollment.donor.city)

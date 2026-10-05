@@ -90,7 +90,7 @@ class MessagingService:
             return None
         appointment = await self._appointments.book_default(enrollment)
         rendered = render_step(enrollment, selection, appointment, self._timezone_display)
-        message = self._new_message(enrollment, selection, rendered)
+        message = self._new_message(enrollment, selection, rendered, now)
         await self._messages.add_message(message)
         if not enrollment.donor.sim_reachable:
             self._mark_unreachable(message, enrollment)
@@ -115,6 +115,7 @@ class MessagingService:
         enrollment: Enrollment,
         selection: SelectedStep,
         rendered: RenderedStep,
+        now: datetime,
     ) -> Message:
         return Message(
             donor_id=enrollment.donor_id,
@@ -128,6 +129,7 @@ class MessagingService:
             buttons=list(rendered.buttons) or None,
             status=MessageStatus.QUEUED,
             scheduled_at=enrollment.next_action_at,
+            created_at=now,
         )
 
     async def _send(
@@ -140,6 +142,7 @@ class MessagingService:
         message.status = MessageStatus.SENT
         sent_at = self._clock.now()
         message.sent_at = sent_at
+        message.updated_at = sent_at
         message.provider_message_id = result.provider_message_id
         return sent_at
 
@@ -192,10 +195,10 @@ class MessagingService:
                 hours=selection.series.response_window_hours
             )
 
-    @staticmethod
-    def _mark_unreachable(message: Message, enrollment: Enrollment) -> None:
+    def _mark_unreachable(self, message: Message, enrollment: Enrollment) -> None:
         message.status = MessageStatus.FAILED
         message.failed_reason = UNREACHABLE_REASON
+        message.updated_at = self._clock.now()
         enrollment.status = EnrollmentStatus.UNDELIVERABLE
         enrollment.next_action_at = None
 

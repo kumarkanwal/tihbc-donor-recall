@@ -2,6 +2,7 @@
 
 from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock
+from zoneinfo import ZoneInfo
 
 import pytest
 from sqlalchemy import func, select
@@ -12,7 +13,7 @@ from app.models.message import Message
 from app.repositories.appointment import AppointmentRepository
 from app.repositories.enrollment import EnrollmentRepository
 from app.repositories.message import MessageRepository
-from app.services.appointments.service import AppointmentService
+from app.services.appointments.service import AppointmentService, default_appointment_start
 from app.services.events.types import EventType
 from app.services.messaging.delivery import DeliveryProgressionService
 from app.services.messaging.service import UNREACHABLE_REASON, MessagingService
@@ -44,6 +45,9 @@ async def test_send_next_step_renders_updates_and_is_idempotent(
         message = await session.get(Message, result.message_id)
         assert message is not None
         assert message.status == MessageStatus.SENT
+        assert message.created_at == NOW
+        assert message.updated_at == NOW
+        assert message.sent_at == NOW
         assert message.body == (
             "Hello Campaign Donor 0 at Korangi Campus Blood Center on Tue 6 Oct, 10:00 AM"
         )
@@ -77,6 +81,52 @@ async def test_send_next_step_renders_updates_and_is_idempotent(
         assert duplicate is None
         assert message_count == 1
         assert len(provider.sends) == 1
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("replacement_available", [True, False])
+async def test_later_step_rebooks_stale_appointment_before_rendering(
+    postgres_session_factory: async_sessionmaker[AsyncSession],
+    replacement_available: bool,
+) -> None:
+    async with postgres_session_factory() as session:
+        fixture = await add_messaging_fixture(session, NOW)
+        fixture.primary_steps[1].contents[0].body = "Reminder for {{appointment_date}}"
+        await session.commit()
+        provider = RecordingProvider()
+        publisher = RecordingPublisher(session)
+        first = await _messaging_service(
+            session, FixedClock(NOW), provider, publisher
+        ).send_next_step(fixture.enrollment.id)
+        assert first is not None
+        old_slot = fixture.default_slot
+        later = NOW + timedelta(days=3)
+        replacement = None
+        if replacement_available:
+            replacement = type(old_slot)(
+                center_name=old_slot.center_name,
+                starts_at=default_appointment_start(later, ZoneInfo("Asia/Karachi")),
+                capacity=4,
+                booked_count=0,
+            )
+            session.add(replacement)
+            await session.commit()
+
+        second = await _messaging_service(
+            session, FixedClock(later), provider, publisher
+        ).send_next_step(fixture.enrollment.id)
+
+        assert second is not None
+        message = await session.get(Message, second.message_id)
+        assert message is not None
+        assert old_slot.booked_count == 0
+        if replacement is None:
+            assert fixture.enrollment.appointment_slot_id is None
+            assert message.body == "Reminder for at your earliest convenience"
+        else:
+            assert fixture.enrollment.appointment_slot_id == replacement.id
+            assert replacement.booked_count == 1
+            assert message.body == "Reminder for Fri 9 Oct, 10:00 AM"
 
 
 @pytest.mark.asyncio

@@ -63,9 +63,11 @@ class DeliveryProgressionService:
         for message in delivered:
             message.status = MessageStatus.DELIVERED
             message.delivered_at = now
+            message.updated_at = now
         for message in read:
             message.status = MessageStatus.READ
             message.read_at = now
+            message.updated_at = now
         await self._commit()
         for message in (*delivered, *read):
             await self._report_and_publish(message)

@@ -6,6 +6,7 @@ import pytest
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from app.core.clock import Clock
 from app.models.campaign import Campaign, Enrollment
 from app.models.enums import CampaignStatus, EnrollmentStatus, MessageStatus
 from app.models.follow_up import FollowUpActivity, FollowUpItem
@@ -16,7 +17,11 @@ from tests.integration.messaging_fixtures import (
     RecordingProvider,
     add_messaging_fixture,
 )
-from tests.integration.scheduler_fixtures import CollectingPublisher, build_test_tick
+from tests.integration.scheduler_fixtures import (
+    CollectingPublisher,
+    MutableClockPersistence,
+    build_test_tick,
+)
 
 pytestmark = pytest.mark.postgres
 NOW = datetime(2026, 10, 4, 7, 0, tzinfo=UTC)
@@ -85,6 +90,41 @@ async def test_tick_runs_full_primary_secondary_escalation_lifecycle(
     event_types = {event_type for event_type, _payload in publisher.events}
     assert EventType.FOLLOWUP_CREATED.value in event_types
     assert EventType.CAMPAIGN_UPDATED.value in event_types
+
+
+@pytest.mark.asyncio
+async def test_each_tick_reloads_offset_and_stamps_messages_with_demo_time(
+    postgres_session_factory: async_sessionmaker[AsyncSession],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr("app.core.clock.wall_clock_now", lambda: NOW)
+    async with postgres_session_factory() as session:
+        fixture = await add_messaging_fixture(session, NOW)
+        await session.commit()
+    current_clock = Clock()
+    persistence = MutableClockPersistence()
+    tick = build_test_tick(
+        postgres_session_factory,
+        current_clock,
+        RecordingProvider(),
+        clock_persistence=persistence,
+    )
+
+    await tick.run()
+    persistence.offset_seconds = int(timedelta(days=3).total_seconds())
+    await tick.run()
+
+    async with postgres_session_factory() as session:
+        messages = tuple(
+            await session.scalars(
+                select(Message)
+                .where(Message.enrollment_id == fixture.enrollment.id)
+                .order_by(Message.sent_at)
+            )
+        )
+    assert persistence.load_calls == 2
+    assert [message.sent_at for message in messages] == [NOW, NOW + timedelta(days=3)]
+    assert [message.created_at for message in messages] == [NOW, NOW + timedelta(days=3)]
 
 
 @pytest.mark.asyncio

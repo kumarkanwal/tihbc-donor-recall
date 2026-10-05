@@ -45,6 +45,7 @@ class SimulatorReceiptService:
         for message in messages:
             message.status = MessageStatus.READ
             message.read_at = now
+            message.updated_at = now
         await self._session.commit()
         campaign_ids = set()
         for message in messages:
