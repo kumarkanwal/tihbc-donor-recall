@@ -196,3 +196,10 @@
 - **Verification:** ESLint, strict TypeScript, all 54 Vitest tests, and the Next.js production build pass. Focused tests cover all six documented KPIs and missing-backend presentation. Recharts 3.3.0 was added as the project-specified chart library; chart colors come only from brand CSS tokens in both themes.
 - **Next:** Build Task 3.11 Reports against the same pending contract and shared metrics hooks.
 - **Blockers:** None; live data awaits backend Task 2.11 and is tracked in KI-008.
+
+## S-031 — 2026-10-05 — [FE] Reports
+
+- **Done:** Completed Task 3.11 with Delivery and engagement, Responses, and Inactive numbers tabs; shared campaign/date filters; a sent-to-responded funnel; campaign comparison; intent, segment, language, and decline-reason charts; a response data table; invalid/undeliverable summary cards and paginated detail; and filtered CSV export for every tab. Moved the dashboard metrics filter into a shared component to avoid duplication. All report data stays behind the single pending-contract boundary and uses the realtime-compatible `metrics` query-key root, with explicit HTTP 404 “Available after backend update” states.
+- **Verification:** ESLint, strict TypeScript, all 56 Vitest tests, and the Next.js production build pass. Focused tests cover report-tab content, export contract selection, inactive totals, and missing-backend presentation. Every chart reads its colors from brand CSS tokens, and all report components remain below 150 lines.
+- **Next:** After backend Tasks 2.10 and 2.11, export OpenAPI, run `pnpm gen:api`, replace `lib/api/pending-contracts.ts` with generated types, and verify live data and downloads per KI-008.
+- **Blockers:** None; live report data awaits backend Task 2.11 and is tracked in KI-008.

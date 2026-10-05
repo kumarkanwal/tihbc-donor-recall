@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import type { NamedPendingResource } from "@/lib/api/pending-contracts";
 
-interface DashboardFiltersProps {
+interface MetricsFiltersProps {
   campaignId: string;
   from: string;
   to: string;
@@ -11,10 +11,8 @@ interface DashboardFiltersProps {
   onToChange: (value: string) => void;
 }
 
-/** Shared dashboard scope filters defined by the metrics contract. */
-export function DashboardFilters(
-  props: DashboardFiltersProps,
-): React.JSX.Element {
+/** Campaign and date scope shared by dashboard and report metrics. */
+export function MetricsFilters(props: MetricsFiltersProps): React.JSX.Element {
   return (
     <section className="rounded-card border-border bg-surface shadow-surface grid gap-4 border p-4 md:grid-cols-3">
       <label className="space-y-1.5 text-sm font-medium">

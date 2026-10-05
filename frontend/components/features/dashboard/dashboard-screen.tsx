@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
+import { MetricsFilters } from "@/components/shared/metrics-filters";
 import { PageHeader } from "@/components/shared/page-header";
 import { useCampaignCatalog } from "@/hooks/use-campaigns";
 import { useFollowUps } from "@/hooks/use-follow-ups";
@@ -16,12 +17,11 @@ import {
 } from "@/hooks/use-metrics";
 import {
   isPendingBackendUpdate,
-  type MetricsFilters,
+  type MetricsFilters as MetricsFilterValues,
 } from "@/lib/api/pending-contracts";
 
 import { ActiveCampaignsTable } from "./active-campaigns-table";
 import { DailyActivityChart } from "./daily-activity-chart";
-import { DashboardFilters } from "./dashboard-filters";
 import { DashboardInsight } from "./dashboard-insight";
 import { DashboardKpis } from "./dashboard-kpis";
 import { RecentFollowUps } from "./recent-follow-ups";
@@ -32,7 +32,7 @@ export function DashboardScreen(): React.JSX.Element {
   const [campaignId, setCampaignId] = useState("");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
-  const filters = useMemo<MetricsFilters>(
+  const filters = useMemo<MetricsFilterValues>(
     () => ({
       campaign_id: campaignId || undefined,
       from: from || undefined,
@@ -74,7 +74,7 @@ export function DashboardScreen(): React.JSX.Element {
         title="Dashboard"
         description="Monitor donor recall activity and campaign performance."
       />
-      <DashboardFilters
+      <MetricsFilters
         campaignId={campaignId}
         from={from}
         to={to}

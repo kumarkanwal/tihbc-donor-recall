@@ -1,6 +1,10 @@
 "use client";
 
-import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  type UseQueryResult,
+} from "@tanstack/react-query";
 
 import {
   pendingApiClient,
@@ -10,8 +14,10 @@ import {
   type MetricsOverview,
   type MetricsResponseBreakdown,
   type MetricsTimeseriesItem,
+  type InactiveNumberPage,
 } from "@/lib/api/pending-contracts";
 import { requireResponseData } from "@/lib/api/response";
+import { downloadBlob } from "@/lib/utils/download";
 
 export const metricsKeys = {
   all: ["metrics"] as const,
@@ -25,6 +31,9 @@ export const metricsKeys = {
     [...metricsKeys.all, "decline-reasons", filters] as const,
   campaigns: (filters: MetricsFilters) =>
     [...metricsKeys.all, "campaigns", filters] as const,
+  inactiveNumbers: (
+    filters: MetricsFilters & { page: number; page_size: number },
+  ) => [...metricsKeys.all, "inactive-numbers", filters] as const,
 };
 
 export function useMetricsOverview(
@@ -99,5 +108,39 @@ export function useCampaignMetrics(
       });
       return requireResponseData(data, "Campaign metrics");
     },
+  });
+}
+
+export function useInactiveNumbers(
+  filters: MetricsFilters & { page: number; page_size: number },
+): UseQueryResult<InactiveNumberPage> {
+  return useQuery({
+    queryKey: metricsKeys.inactiveNumbers(filters),
+    queryFn: async () => {
+      const { data } = await pendingApiClient.GET(
+        "/api/v1/reports/inactive-numbers",
+        { params: { query: filters } },
+      );
+      return requireResponseData(data, "Inactive number report");
+    },
+  });
+}
+
+export type ReportExport =
+  "inactive-numbers" | "response-breakdown" | "campaigns";
+
+export function useExportReport(report: ReportExport, filters: MetricsFilters) {
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await pendingApiClient.GET(
+        "/api/v1/reports/{report}/export",
+        {
+          params: { path: { report }, query: filters },
+          parseAs: "blob",
+        },
+      );
+      return requireResponseData(data, "Report export");
+    },
+    onSuccess: (blob) => downloadBlob(blob, `tihbc-${report}.csv`),
   });
 }
