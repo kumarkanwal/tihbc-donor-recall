@@ -8,10 +8,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql.elements import ColumnElement
 
-from app.models.campaign import Enrollment
+from app.models.campaign import Campaign, Enrollment
 from app.models.donor import Donor, Segment
 from app.models.enums import EnrollmentStatus
 from app.models.follow_up import FollowUpItem
+from app.models.series import ContentSeries, SeriesStep
 from app.repositories.base import BaseRepository
 
 
@@ -107,6 +108,26 @@ class EnrollmentRepository(BaseRepository[Enrollment]):
                 selectinload(Enrollment.responses),
                 selectinload(Enrollment.follow_up_items).selectinload(FollowUpItem.activities),
                 selectinload(Enrollment.appointment_slot),
+            )
+        )
+        return await self._session.scalar(statement)
+
+    async def get_for_messaging_update(self, enrollment_id: UUID) -> Enrollment | None:
+        """Lock an enrollment and load everything needed to render its next step."""
+        primary_series = selectinload(Enrollment.campaign).selectinload(Campaign.primary_series)
+        secondary_series = selectinload(Enrollment.campaign).selectinload(Campaign.secondary_series)
+        statement = (
+            select(Enrollment)
+            .where(Enrollment.id == enrollment_id)
+            .with_for_update()
+            .execution_options(populate_existing=True)
+            .options(
+                selectinload(Enrollment.donor),
+                selectinload(Enrollment.appointment_slot),
+                primary_series.selectinload(ContentSeries.steps).selectinload(SeriesStep.contents),
+                secondary_series.selectinload(ContentSeries.steps).selectinload(
+                    SeriesStep.contents
+                ),
             )
         )
         return await self._session.scalar(statement)

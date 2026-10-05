@@ -41,6 +41,7 @@ markers = [
 testpaths = ["tests"]
 
 [tool.ruff]
+extend-exclude = [".pytest_tmp", ".pytest_tmp_codex"]
 line-length = 100
 target-version = "py312"
 

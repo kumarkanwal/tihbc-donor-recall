@@ -73,6 +73,19 @@ docker compose exec api python -m app.seed.users
 
 The command creates or updates the configured admin and coordinator and is safe to run repeatedly.
 
+Seed the next 21 demo days of appointment slots, then manually exercise messaging before the
+scheduler is implemented:
+
+```powershell
+Set-Location backend
+uv run python -m app.seed.slots
+uv run python -m app.tools.send_next_step --enrollment <enrollment-uuid>
+uv run python -m app.tools.advance_delivery
+```
+
+These commands require `DEMO_MODE=true`. Delivery progression follows the configured simulator
+delivery and automatic-read delays, so run it again after the read delay to observe a read receipt.
+
 ## Tests and checks
 
 From `backend/`:
