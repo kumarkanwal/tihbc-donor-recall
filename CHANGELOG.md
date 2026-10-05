@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added the administrator demo clock and Skip time control plus shared realtime cache-update infrastructure with reconnect handling and follow-up notifications.
 - Added campaign management screens with status browsing, draft configuration, audience and schedule previews, lifecycle controls, enrollment monitoring, donor details, and direct chat access.
 - Added provider-backed bilingual campaign messaging with capacity-safe appointment booking, deterministic simulated delivery and read states, unreachable-number handling, post-commit live events, and demo CLI controls.
 - Added campaign creation and lifecycle controls with aggregate launch checks, transactional donor enrollments, status counts, enrollment detail, and coordinator read access.

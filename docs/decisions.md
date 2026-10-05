@@ -312,3 +312,11 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Decision:** Load every page of the status-filtered campaign collection through the generated API client, then apply campaign search, sorting, and UI pagination to the complete result in the frontend. Keep enrollment search and pagination server-driven because that endpoint already exposes those query parameters.
 - **Reason:** The campaign API currently filters only by status and page. The required campaign-wide search and sortable columns must remain correct beyond the backend's 100-row maximum page size without bypassing the generated client or adding an undocumented API contract.
 - **Consequences:** Campaign catalog reads may make multiple paginated requests when there are more than 100 campaigns; a future backend search/sort contract can replace this aggregation without changing the table component.
+
+## D-106 — One centralized realtime client and cache router
+
+- **Date:** 2026-10-04
+- **Status:** Accepted
+- **Decision:** Own one authenticated WebSocket client at the application-provider boundary per browser tab, and route every documented event through one cache-mapping module. API-backed simulator subscriptions share this client. Gate the connection with `NEXT_PUBLIC_REALTIME=on|off`, defaulting to `off` until the backend WebSocket task is complete.
+- **Reason:** A single connection prevents duplicate events and reconnect loops, while centralized cache effects keep feature components independent of transport details and make reconnect-wide active-query refresh reliable.
+- **Consequences:** New event types must be added to the typed event union and central router; they must not introduce component-level WebSocket connections or event handlers.

@@ -1,16 +1,15 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
 
 import {
   simulatorSource,
   type ConversationFilters,
-  type SimulatorEvent,
   type SimulatorReply,
 } from "@/lib/simulator";
+import { simulatorKeys } from "@/lib/simulator/query-keys";
 
-const conversationKey = ["simulator", "conversations"] as const;
+const conversationKey = simulatorKeys.conversations;
 
 /** Load donor conversations from the active simulator source. */
 export function useSimulatorConversations(filters: ConversationFilters) {
@@ -22,33 +21,20 @@ export function useSimulatorConversations(filters: ConversationFilters) {
 
 /** Load one donor chat and reconcile its live events. */
 export function useSimulatorMessages(donorId: string | null) {
-  const queryClient = useQueryClient();
-  const [isTyping, setIsTyping] = useState(false);
-  const messagesKey = useMemo(
-    () => ["simulator", "messages", donorId] as const,
-    [donorId],
-  );
+  const messagesKey = simulatorKeys.messages(donorId);
   const query = useQuery({
     queryKey: messagesKey,
     queryFn: () => simulatorSource.listMessages(donorId ?? ""),
     enabled: Boolean(donorId),
   });
-
-  useEffect(() => {
-    if (!donorId) return;
-    return simulatorSource.subscribe((event: SimulatorEvent) => {
-      const eventDonorId = event.payload.donor_id;
-      if (eventDonorId !== donorId) return;
-      if (event.type === "simulator.typing") {
-        setIsTyping(event.payload.is_typing);
-        return;
-      }
-      void queryClient.invalidateQueries({ queryKey: messagesKey });
-      void queryClient.invalidateQueries({ queryKey: conversationKey });
-    });
-  }, [donorId, messagesKey, queryClient]);
-
-  return { ...query, isTyping };
+  const typing = useQuery({
+    queryKey: simulatorKeys.typing(donorId),
+    queryFn: () => false,
+    initialData: false,
+    staleTime: Infinity,
+    enabled: Boolean(donorId),
+  });
+  return { ...query, isTyping: typing.data };
 }
 
 /** Mark a conversation opened and refresh its read state. */

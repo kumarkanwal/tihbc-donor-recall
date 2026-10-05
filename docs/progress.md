@@ -53,7 +53,7 @@ Update after every task. Add a note for Blocked items.
 | 3.10 | Dashboard | Not started | |
 | 3.11 | Reports | Not started | |
 | 3.12 | Settings | Not started | |
-| 3.13 | WebSocket live updates | Not started | |
+| 3.13 | WebSocket live updates | In progress | Part 1 complete: added the shared authenticated realtime client, centralized event-to-cache routing, reconnect refresh, API-simulator integration, and the administrator demo-clock/Skip time control. Realtime remains disabled by default until backend Task 2.6. |
 
 ## Phase 4: Integration and deployment
 | # | Task | Status | Notes |

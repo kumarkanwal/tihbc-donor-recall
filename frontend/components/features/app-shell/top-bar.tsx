@@ -1,9 +1,8 @@
 "use client";
 
-import { Bell, ChevronDown, Clock3, LogOut } from "lucide-react";
+import { Bell, ChevronDown, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 
-import { RequireRole } from "@/components/shared/require-role";
 import { ThemeSwitch } from "@/components/shared/theme-switch";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +14,8 @@ import {
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useLogout } from "@/hooks/use-logout";
 import { getNavigationItem } from "@/lib/navigation";
+
+import { DemoClockControl } from "./demo-clock-control";
 
 /** Current page context and application-level controls. */
 export function TopBar(): React.JSX.Element {
@@ -33,19 +34,7 @@ export function TopBar(): React.JSX.Element {
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
-        <RequireRole allowed={["admin"]}>
-          <Button
-            type="button"
-            variant="secondary"
-            disabled
-            title="Demo clock controls will be connected in a later task"
-            className="hidden xl:inline-flex"
-          >
-            <Clock3 aria-hidden="true" strokeWidth={1.75} />
-            Skip time
-            <ChevronDown aria-hidden="true" strokeWidth={1.75} />
-          </Button>
-        </RequireRole>
+        <DemoClockControl />
 
         <Button
           type="button"

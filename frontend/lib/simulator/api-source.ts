@@ -1,6 +1,6 @@
 import { apiClient } from "@/lib/api/client";
 
-import { subscribeToSimulatorEvents } from "./websocket";
+import { realtimeClient } from "@/lib/ws/client";
 import type {
   ConversationFilters,
   SimulatorConversation,
@@ -82,7 +82,15 @@ export class ApiSimulatorSource implements SimulatorDataSource {
   }
 
   subscribe(listener: (event: SimulatorEvent) => void): () => void {
-    return subscribeToSimulatorEvents(listener);
+    return realtimeClient.subscribe((event) => {
+      if (
+        event.type === "message.created" ||
+        event.type === "message.status_updated" ||
+        event.type === "simulator.typing"
+      ) {
+        listener(event);
+      }
+    });
   }
 }
 

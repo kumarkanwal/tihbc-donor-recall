@@ -9,6 +9,10 @@ const publicEnvironmentSchema = z.object({
     .default("true")
     .transform((value) => value === "true"),
   NEXT_PUBLIC_SIMULATOR_SOURCE: z.enum(["mock", "api"]).default("mock"),
+  NEXT_PUBLIC_REALTIME: z
+    .enum(["on", "off"])
+    .default("off")
+    .transform((value) => value === "on"),
 });
 
 /** Validated public runtime configuration. */
@@ -18,4 +22,5 @@ export const env = publicEnvironmentSchema.parse({
   NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
   NEXT_PUBLIC_DEMO_MODE: process.env.NEXT_PUBLIC_DEMO_MODE,
   NEXT_PUBLIC_SIMULATOR_SOURCE: process.env.NEXT_PUBLIC_SIMULATOR_SOURCE,
+  NEXT_PUBLIC_REALTIME: process.env.NEXT_PUBLIC_REALTIME,
 });
