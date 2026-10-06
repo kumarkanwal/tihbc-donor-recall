@@ -112,6 +112,7 @@ export function LoginScreen({
             </label>
             <Input
               id="email"
+              data-testid="login-email"
               type="email"
               autoComplete="email"
               aria-invalid={Boolean(form.formState.errors.email)}
@@ -133,6 +134,7 @@ export function LoginScreen({
             </label>
             <Input
               id="password"
+              data-testid="login-password"
               type="password"
               autoComplete="current-password"
               aria-invalid={Boolean(form.formState.errors.password)}
@@ -151,7 +153,12 @@ export function LoginScreen({
             </p>
           ) : null}
 
-          <Button type="submit" className="w-full" disabled={login.isPending}>
+          <Button
+            type="submit"
+            data-testid="login-submit"
+            className="w-full"
+            disabled={login.isPending}
+          >
             {login.isPending ? "Signing in" : "Sign in"}
           </Button>
         </form>

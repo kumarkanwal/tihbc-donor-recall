@@ -36,6 +36,8 @@ export function ChatListItem({
   return (
     <button
       type="button"
+      data-testid="simulator-conversation-row"
+      data-donor-name={donor.name}
       onClick={onSelect}
       className={cn(
         "border-sim-secondary/15 flex w-full items-center gap-2 border-b px-3 py-2 text-left focus-visible:outline-2 focus-visible:outline-offset-[-2px]",

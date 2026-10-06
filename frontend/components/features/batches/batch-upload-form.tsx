@@ -47,6 +47,7 @@ export function BatchUploadForm({
           </label>
           <Input
             id="batch-name"
+            data-testid="batch-name-input"
             className="mt-2 max-w-xl"
             maxLength={120}
             placeholder="October regular donor recall"
@@ -90,7 +91,11 @@ export function BatchUploadForm({
         />
       </section>
       <div className="flex justify-end">
-        <Button type="submit" disabled={!file || previewPending}>
+        <Button
+          type="submit"
+          data-testid="batch-review-submit"
+          disabled={!file || previewPending}
+        >
           {previewPending ? "Validating file" : "Review batch"}
         </Button>
       </div>

@@ -19,6 +19,7 @@ export function QuickReplyButtons({
         <button
           key={button.id}
           type="button"
+          data-testid={`simulator-reply-${button.id}`}
           className="text-sim-button border-sim-secondary/20 w-full border-b px-3 py-2 text-center text-xs font-medium last:border-b-0 disabled:cursor-not-allowed disabled:opacity-45"
           disabled={disabled}
           onClick={() => onReply?.(button)}

@@ -49,6 +49,7 @@ export function DemoClockControl(): React.JSX.Element | null {
           <Button
             type="button"
             variant="secondary"
+            data-testid="skip-time-trigger"
             disabled={pending || clock.isPending || Boolean(clock.error)}
           >
             <Clock3 aria-hidden="true" strokeWidth={1.75} />
@@ -60,6 +61,7 @@ export function DemoClockControl(): React.JSX.Element | null {
           {skipOptions.map((option) => (
             <DropdownMenuItem
               key={option.label}
+              data-testid={`skip-time-${option.days}-days-${option.hours}-hours`}
               onSelect={() =>
                 advance.mutate({ days: option.days, hours: option.hours })
               }
@@ -67,7 +69,10 @@ export function DemoClockControl(): React.JSX.Element | null {
               {option.label}
             </DropdownMenuItem>
           ))}
-          <DropdownMenuItem onSelect={() => reset.mutate()}>
+          <DropdownMenuItem
+            data-testid="skip-time-reset"
+            onSelect={() => reset.mutate()}
+          >
             Reset clock
           </DropdownMenuItem>
         </DropdownMenuContent>

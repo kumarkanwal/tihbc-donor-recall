@@ -16,6 +16,7 @@ interface KpiCardProps {
   value: string | number;
   subValue?: string;
   trend?: KpiTrend;
+  testId?: string;
 }
 
 const trendIcons = {
@@ -36,11 +37,16 @@ export function KpiCard({
   value,
   subValue,
   trend,
+  testId,
 }: KpiCardProps): React.JSX.Element {
   const TrendIcon = trendIcons[trend?.direction ?? "neutral"];
 
   return (
-    <article className="rounded-card border-border bg-surface shadow-surface border p-5">
+    <article
+      data-testid={testId}
+      data-value={String(value)}
+      className="rounded-card border-border bg-surface shadow-surface border p-5"
+    >
       <p className="text-muted-foreground text-sm font-medium">{label}</p>
       <p className="mt-2 text-[1.75rem] leading-tight font-semibold tabular-nums">
         {value}

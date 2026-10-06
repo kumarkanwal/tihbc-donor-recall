@@ -41,6 +41,7 @@ export function CampaignSearchableSelect({
       />
       <select
         id={id}
+        data-testid={`${id}-select`}
         value={value}
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}

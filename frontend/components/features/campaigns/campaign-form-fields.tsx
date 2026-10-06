@@ -45,7 +45,11 @@ export function CampaignFormFields({
     <fieldset disabled={disabled} className="space-y-5">
       <label className="block text-sm font-medium">
         Campaign name
-        <Input className="mt-2" {...form.register("name")} />
+        <Input
+          className="mt-2"
+          data-testid="campaign-name-input"
+          {...form.register("name")}
+        />
         {errors.name ? (
           <span className="text-danger mt-1 block text-xs">
             {errors.name.message}

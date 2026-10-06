@@ -55,6 +55,7 @@ export function DonorPicker({
         <label>
           <span className="sr-only">Filter by campaign</span>
           <select
+            data-testid="simulator-campaign-filter"
             value={effectiveCampaignId}
             onChange={(event) => setCampaignId(event.target.value)}
             className="border-sim-secondary/30 bg-sim-incoming text-sim-text w-full rounded border px-2 py-1.5 text-xs"

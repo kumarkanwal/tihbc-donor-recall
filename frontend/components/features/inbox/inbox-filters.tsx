@@ -49,6 +49,7 @@ export function InboxFilters(props: InboxFiltersProps): React.JSX.Element {
             <button
               key={tab.value}
               type="button"
+              data-testid={`inbox-tab-${tab.value}`}
               role="tab"
               aria-selected={props.type === tab.value}
               onClick={() => props.onTypeChange(tab.value)}
@@ -99,6 +100,7 @@ export function InboxFilters(props: InboxFiltersProps): React.JSX.Element {
           Assigned to me
         </label>
         <Input
+          data-testid="inbox-search"
           aria-label="Search follow-ups"
           placeholder="Search donor or reply"
           value={props.search}

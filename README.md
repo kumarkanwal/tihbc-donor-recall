@@ -123,3 +123,52 @@ need `CREATEDB` after the database exists.
 Pytest uses the operating system's per-user temporary directory for normal local runs and disables its
 cache provider. Codex runs must override the base temp path as documented in `AGENTS.md`; they must
 never access the legacy human-owned `backend/.pytest_tmp` directory.
+
+## Playwright demo flow
+
+The end-to-end suite uses the real local API and the generated
+`backend/app/seed/assets/sample-donors.xlsx` workbook. Seed operational demo data before each manual
+run, and do not point these commands at an environment whose data must be preserved. Keep the default
+demo admin and coordinator credentials from `.env.example`; the suite signs in with both accounts.
+The demo time-skip action runs the required dispatcher tick, so a separate scheduler worker is not
+required for this test.
+
+First-time setup from the repository root:
+
+```powershell
+Copy-Item .env.example .env
+Copy-Item frontend/.env.example frontend/.env.local
+docker compose up -d db redis
+Set-Location frontend
+pnpm install
+pnpm exec playwright install chromium
+```
+
+Set `NEXT_PUBLIC_SIMULATOR_SOURCE=api` in `frontend/.env.local`. Then seed and start the backend in one
+terminal:
+
+```powershell
+Set-Location backend
+uv sync
+uv run alembic upgrade head
+uv run python -m app.seed
+uv run uvicorn app.main:app --reload --reload-dir app
+```
+
+Start the frontend in a second terminal:
+
+```powershell
+Set-Location frontend
+pnpm dev
+```
+
+Run the complete demo story in a third terminal:
+
+```powershell
+Set-Location frontend
+pnpm e2e
+```
+
+Playwright reuses the frontend at `http://127.0.0.1:3000` when it is already running. It verifies the
+admin upload and campaign flow, donor confirmation and automatic reply, live staff counters and inbox,
+dashboard KPIs, logout, and coordinator role restrictions without fixed sleeps.

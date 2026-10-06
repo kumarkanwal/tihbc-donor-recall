@@ -92,7 +92,7 @@ export function CampaignListScreen(): React.JSX.Element {
         actions={
           canManage ? (
             <Button asChild>
-              <Link href="/campaigns/new">
+              <Link href="/campaigns/new" data-testid="new-campaign-action">
                 <Plus aria-hidden="true" />
                 New campaign
               </Link>

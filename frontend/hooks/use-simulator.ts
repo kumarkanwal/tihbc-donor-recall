@@ -113,10 +113,16 @@ export function useSendSimulatorReply(donorId: string) {
       queryClient.setQueryData<MessageHistory>(key, (history) =>
         updateReplyCache(history, optimisticId ?? "", message),
       );
-      void queryClient.invalidateQueries({
-        queryKey: ["simulator", "messages", donorId],
-      });
-      void queryClient.invalidateQueries({ queryKey: conversationKey });
+      void Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["simulator", "messages", donorId],
+        }),
+        queryClient.invalidateQueries({ queryKey: conversationKey }),
+        queryClient.invalidateQueries({ queryKey: ["campaigns"] }),
+        queryClient.invalidateQueries({ queryKey: ["enrollments"] }),
+        queryClient.invalidateQueries({ queryKey: ["follow-ups"] }),
+        queryClient.invalidateQueries({ queryKey: ["metrics"] }),
+      ]);
     },
   });
 }

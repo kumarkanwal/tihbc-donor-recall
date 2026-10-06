@@ -50,6 +50,8 @@ export function EnrollmentStatusCards({
           <button
             key={status}
             type="button"
+            data-testid={`enrollment-status-${status}`}
+            data-count={counts[status] ?? 0}
             onClick={() => onSelect(status)}
             className={cn(
               "rounded-card border-border bg-surface border p-4 text-left transition-colors",

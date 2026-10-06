@@ -104,6 +104,7 @@ export function FileDropzone({
       >
         <input
           ref={inputRef}
+          data-testid="batch-file-input"
           type="file"
           accept={accept}
           disabled={disabled}

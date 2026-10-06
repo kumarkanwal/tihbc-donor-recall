@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added a full Playwright demo-flow regression covering administrator setup, donor confirmation, live campaign and inbox updates, dashboard metrics, logout, and coordinator role restrictions.
 - Added production deployment files for the single-domain VPS stack, including private data-service networking, standalone frontend and backend images, Caddy routing, persistent storage, health checks, backups, and an operations runbook.
 - Polished the donor phone and demo-time presentation with collision-safe page spacing, campaign-labelled donor rows, newest-running-campaign defaults, shared demo-relative timestamps, a live phone clock, corrected Karachi AM/PM formatting, and stable blood-group symbols.
 - Connected Inbox, Dashboard, Reports, Settings, and demo controls to their generated backend contracts and removed the temporary backend-update states.

@@ -71,7 +71,7 @@ export function CampaignDetailScreen({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="campaign-detail">
       <PageHeader
         title={campaign.name}
         description={`${campaign.enrollment_count} enrolled · ${campaign.response_rate.toFixed(1)}% response rate`}

@@ -49,7 +49,11 @@ export function TopBar(): React.JSX.Element {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="button" variant="secondary">
+            <Button
+              type="button"
+              variant="secondary"
+              data-testid="user-menu-trigger"
+            >
               <span className="hidden text-left sm:block">
                 <span className="block text-xs font-medium">
                   {user?.full_name ?? "Staff user"}
@@ -63,7 +67,7 @@ export function TopBar(): React.JSX.Element {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onSelect={logout}>
+            <DropdownMenuItem onSelect={logout} data-testid="logout-action">
               <LogOut aria-hidden="true" strokeWidth={1.75} />
               Logout
             </DropdownMenuItem>

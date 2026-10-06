@@ -68,7 +68,10 @@ export function ImportSuccess({
   batch: DonorBatch;
 }): React.JSX.Element {
   return (
-    <section className="border-border bg-surface rounded-card mx-auto max-w-2xl border p-8 text-center">
+    <section
+      data-testid="batch-import-success"
+      className="border-border bg-surface rounded-card mx-auto max-w-2xl border p-8 text-center"
+    >
       <CheckCircle2
         className="text-success mx-auto size-10"
         aria-hidden="true"
@@ -82,7 +85,12 @@ export function ImportSuccess({
           <Link href={`/batches/${batch.id}`}>View batch</Link>
         </Button>
         <Button asChild variant="secondary">
-          <Link href="/campaigns">Create campaign</Link>
+          <Link
+            href="/campaigns/new"
+            data-testid="batch-create-campaign-action"
+          >
+            Create campaign
+          </Link>
         </Button>
       </div>
     </section>
@@ -99,11 +107,23 @@ export function ReviewStep({
   onContinue: () => void;
 }): React.JSX.Element {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="batch-review-step">
       <div className="grid gap-4 sm:grid-cols-3">
-        <KpiCard label="Total rows" value={preview.total_rows} />
-        <KpiCard label="Valid rows" value={preview.valid_rows} />
-        <KpiCard label="Invalid rows" value={preview.invalid_rows} />
+        <KpiCard
+          testId="batch-review-total-rows"
+          label="Total rows"
+          value={preview.total_rows}
+        />
+        <KpiCard
+          testId="batch-review-valid-rows"
+          label="Valid rows"
+          value={preview.valid_rows}
+        />
+        <KpiCard
+          testId="batch-review-invalid-rows"
+          label="Invalid rows"
+          value={preview.invalid_rows}
+        />
       </div>
       <BatchBreakdowns {...preview} />
       <BatchWarnings warnings={preview.warnings} />
@@ -113,7 +133,11 @@ export function ReviewStep({
         <Button type="button" variant="secondary" onClick={onBack}>
           Back
         </Button>
-        <Button type="button" onClick={onContinue}>
+        <Button
+          type="button"
+          data-testid="batch-review-continue"
+          onClick={onContinue}
+        >
           Continue to confirm
         </Button>
       </div>
@@ -141,7 +165,10 @@ export function ConfirmStep({
   const previewExpired =
     error instanceof ApiError && error.code === "PREVIEW_EXPIRED";
   return (
-    <section className="border-border bg-surface rounded-card border p-6">
+    <section
+      data-testid="batch-confirm-step"
+      className="border-border bg-surface rounded-card border p-6"
+    >
       <h2 className="text-lg font-semibold">Confirm import</h2>
       <p className="text-muted-foreground mt-2 text-sm">
         Import {preview.valid_rows} valid donors into{" "}
@@ -182,6 +209,7 @@ export function ConfirmStep({
             trigger={
               <Button
                 type="button"
+                data-testid="batch-import-trigger"
                 disabled={preview.valid_rows === 0 || pending || previewExpired}
               >
                 Import {preview.valid_rows} valid donors

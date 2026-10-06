@@ -107,7 +107,7 @@ export function BatchListScreen(): React.JSX.Element {
         actions={
           canUpload ? (
             <Button asChild>
-              <Link href="/batches/new">
+              <Link href="/batches/new" data-testid="upload-batch-action">
                 <Plus aria-hidden="true" />
                 Upload batch
               </Link>

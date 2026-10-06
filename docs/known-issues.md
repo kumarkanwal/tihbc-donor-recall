@@ -35,3 +35,9 @@
 - **Status:** Open
 - **Affects:** Task 4.3 production deployment completion
 - **Details:** Production Compose validation, topology assertions, shell syntax, environment parity, frontend lint, 79 unit tests, and the Next.js standalone production build pass. The local Docker Desktop Linux engine is unavailable, so the API/web image builds and live VPS checks must be run with the commands in `deploy/RUNBOOK.md` before Task 4.3 is marked Done.
+
+## KI-014 — Task 4.1 live Playwright acceptance pending
+
+- **Status:** Open
+- **Affects:** Full browser verification of the seeded demo story
+- **Details:** The serial Chromium suite is implemented and discovered, and frontend lint, strict typecheck, all 79 unit tests, and the production build pass. This host has no running Docker engine, PostgreSQL on `localhost:5433`, or Redis on `localhost:6380`, so the real `pnpm e2e` run awaits the documented local services and a fresh `uv run python -m app.seed`.

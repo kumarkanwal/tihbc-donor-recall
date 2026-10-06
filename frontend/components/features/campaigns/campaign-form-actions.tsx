@@ -23,7 +23,11 @@ export function CampaignFormActions({
       {allowLaunch ? (
         <ConfirmDialog
           trigger={
-            <Button type="button" disabled={pending}>
+            <Button
+              type="button"
+              data-testid="campaign-launch-trigger"
+              disabled={pending}
+            >
               Launch campaign
             </Button>
           }

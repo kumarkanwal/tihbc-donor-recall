@@ -45,6 +45,7 @@ export function FollowUpList(props: FollowUpListProps): React.JSX.Element {
           <li key={item.id}>
             <button
               type="button"
+              data-testid="follow-up-item"
               onClick={() => props.onSelect(item.id)}
               className={cn(
                 "focus-visible:outline-ring focus-visible:outline-inset w-full p-4 text-left focus-visible:outline-2",

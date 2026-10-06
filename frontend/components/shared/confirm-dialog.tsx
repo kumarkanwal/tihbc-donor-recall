@@ -32,7 +32,10 @@ export function ConfirmDialog({
       <AlertDialog.Trigger asChild>{trigger}</AlertDialog.Trigger>
       <AlertDialog.Portal>
         <AlertDialog.Overlay className="bg-foreground/20 fixed inset-0 z-50" />
-        <AlertDialog.Content className="rounded-card border-border bg-surface shadow-surface fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 border p-6">
+        <AlertDialog.Content
+          data-testid="confirm-dialog"
+          className="rounded-card border-border bg-surface shadow-surface fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 border p-6"
+        >
           <AlertDialog.Title className="text-lg font-semibold">
             {title}
           </AlertDialog.Title>
@@ -48,6 +51,7 @@ export function ConfirmDialog({
             <AlertDialog.Action asChild>
               <Button
                 type="button"
+                data-testid="confirm-dialog-submit"
                 variant={destructive ? "destructive" : "primary"}
                 disabled={pending}
                 onClick={onConfirm}

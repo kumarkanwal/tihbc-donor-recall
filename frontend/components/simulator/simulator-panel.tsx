@@ -38,6 +38,7 @@ export function SimulatorPanel(): React.JSX.Element {
     <>
       <Button
         type="button"
+        data-testid="donor-phone-launcher"
         className="shadow-surface fixed right-5 bottom-5 z-40"
         onClick={() => open()}
         aria-haspopup="dialog"
@@ -47,6 +48,7 @@ export function SimulatorPanel(): React.JSX.Element {
         Donor Phone
       </Button>
       <aside
+        data-testid="donor-phone-panel"
         role="dialog"
         aria-modal="false"
         aria-label="Donor phone simulator"
@@ -59,6 +61,7 @@ export function SimulatorPanel(): React.JSX.Element {
       >
         <button
           type="button"
+          data-testid="donor-phone-close"
           onClick={close}
           aria-label="Close donor phone"
           className="border-border bg-surface text-foreground absolute top-3 -left-11 flex size-10 items-center justify-center rounded-l-md border border-r-0 shadow-sm"

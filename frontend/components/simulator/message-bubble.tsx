@@ -52,6 +52,7 @@ export function SimulatorMessageBubble({
   return (
     <div className={cn("flex", outgoing ? "justify-end" : "justify-start")}>
       <article
+        data-testid="simulator-message"
         className={cn(
           "text-sim-text relative max-w-[80%] rounded-[7.5px] text-[14.2px] shadow-sm",
           outgoing ? "bg-sim-outgoing" : "bg-sim-incoming",

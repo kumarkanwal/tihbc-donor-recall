@@ -13,6 +13,7 @@ export function SettingsTabTrigger({
   return (
     <Tabs.Trigger
       value={value}
+      data-testid={`settings-tab-${value}`}
       className="text-muted-foreground border-primary focus-visible:outline-ring data-[state=active]:text-primary -mb-px border-b-2 border-transparent px-4 py-3 text-sm font-medium whitespace-nowrap focus-visible:outline-2 data-[state=active]:border-current"
     >
       {children}

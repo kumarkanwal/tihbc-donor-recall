@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  useSendSimulatorReply,
   useSimulatorConversations,
   useSimulatorMessages,
 } from "./use-simulator";
@@ -11,6 +12,7 @@ import { useUiStore } from "@/lib/stores/ui-store";
 const source = vi.hoisted(() => ({
   listMessagePage: vi.fn(),
   listConversations: vi.fn(),
+  sendReply: vi.fn(),
 }));
 const environment = vi.hoisted(() => ({
   NEXT_PUBLIC_SIMULATOR_SOURCE: "api",
@@ -95,6 +97,32 @@ describe("simulator message queries", () => {
       "older-cursor",
     );
     expect(result.current.hasNextPage).toBe(false);
+    unmount();
+    client.clear();
+  });
+
+  it("refreshes every staff view affected by a donor reply", async () => {
+    const { wrapper, client } = setup();
+    const message = createMockSeed().conversations[0].last_message;
+    source.sendReply.mockResolvedValue(message);
+    const invalidate = vi.spyOn(client, "invalidateQueries");
+    const { result, unmount } = renderHook(
+      () => useSendSimulatorReply("donor-aisha"),
+      { wrapper },
+    );
+
+    await act(async () => {
+      await result.current.mutateAsync({ type: "text", text: "Confirm" });
+    });
+
+    for (const queryKey of [
+      ["campaigns"],
+      ["enrollments"],
+      ["follow-ups"],
+      ["metrics"],
+    ]) {
+      expect(invalidate).toHaveBeenCalledWith({ queryKey });
+    }
     unmount();
     client.clear();
   });

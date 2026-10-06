@@ -20,13 +20,43 @@ import { cn } from "@/lib/utils/class-names";
 import { useUiStore } from "@/lib/stores/ui-store";
 
 const items = [
-  { href: "/", label: "Dashboard", icon: Gauge },
-  { href: "/batches", label: "Donor Batches", icon: UsersRound },
-  { href: "/series", label: "Content Series", icon: FolderHeart },
-  { href: "/campaigns", label: "Campaigns", icon: Megaphone },
-  { href: "/inbox", label: "Follow-up Inbox", icon: Inbox },
-  { href: "/reports", label: "Reports", icon: BarChart3 },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/", label: "Dashboard", testId: "nav-dashboard", icon: Gauge },
+  {
+    href: "/batches",
+    label: "Donor Batches",
+    testId: "nav-batches",
+    icon: UsersRound,
+  },
+  {
+    href: "/series",
+    label: "Content Series",
+    testId: "nav-series",
+    icon: FolderHeart,
+  },
+  {
+    href: "/campaigns",
+    label: "Campaigns",
+    testId: "nav-campaigns",
+    icon: Megaphone,
+  },
+  {
+    href: "/inbox",
+    label: "Follow-up Inbox",
+    testId: "nav-inbox",
+    icon: Inbox,
+  },
+  {
+    href: "/reports",
+    label: "Reports",
+    testId: "nav-reports",
+    icon: BarChart3,
+  },
+  {
+    href: "/settings",
+    label: "Settings",
+    testId: "nav-settings",
+    icon: Settings,
+  },
 ] as const;
 
 function isActiveRoute(pathname: string, href: string): boolean {
@@ -73,12 +103,13 @@ export function Sidebar(): React.JSX.Element {
       </div>
 
       <nav className="flex-1 space-y-1 p-2" aria-label="Primary navigation">
-        {items.map(({ href, label, icon: Icon }) => {
+        {items.map(({ href, label, testId, icon: Icon }) => {
           const isActive = isActiveRoute(pathname, href);
           return (
             <Link
               key={href}
               href={href}
+              data-testid={testId}
               title={isCollapsed ? label : undefined}
               aria-current={isActive ? "page" : undefined}
               className={cn(
