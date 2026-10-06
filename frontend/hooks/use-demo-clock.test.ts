@@ -5,6 +5,7 @@ import { apiClient } from "@/lib/api/client";
 
 import {
   advanceDemoClock,
+  formatDemoClock,
   invalidateAfterClockChange,
   resetDemoClock,
 } from "./use-demo-clock";
@@ -51,13 +52,12 @@ describe("demo clock actions", () => {
       .spyOn(queryClient, "invalidateQueries")
       .mockResolvedValue();
     await invalidateAfterClockChange(queryClient);
-    expect(
-      invalidate.mock.calls.map(([filters]) => filters?.queryKey),
-    ).toEqual([
-      ["campaigns"],
-      ["enrollments"],
-      ["simulator"],
-      ["metrics"],
-    ]);
+    expect(invalidate.mock.calls.map(([filters]) => filters?.queryKey)).toEqual(
+      [["campaigns"], ["enrollments"], ["simulator"], ["metrics"]],
+    );
+  });
+
+  it("formats Karachi evening times with the correct PM period", () => {
+    expect(formatDemoClock("2026-10-06T14:51:00Z")).toBe("6 Oct 2026, 7:51 PM");
   });
 });

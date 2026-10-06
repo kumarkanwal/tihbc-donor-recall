@@ -138,6 +138,7 @@ describe("Donor batch pages", () => {
     await user.click(screen.getByRole("button", { name: "Review batch" }));
 
     expect(await screen.findByText("Ayesha Khan")).toBeVisible();
+    expect(screen.getByText("O+")).toHaveAttribute("dir", "ltr");
     await user.click(
       screen.getByRole("button", { name: "Continue to confirm" }),
     );

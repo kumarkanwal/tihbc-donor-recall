@@ -411,3 +411,11 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Decision:** Rebuild the entire operational demo dataset from deterministic code after the D-050 root truncation. Use three batches containing 195 valid donors in the documented approximate mix, seed fixed campaign outcome distributions and histories relative to the current demo clock, and derive the committed 40-row workbook from the same valid/invalid row definitions. Copy the optional recall video to configured media storage only when the repository asset exists; otherwise seed those steps as text-only.
 - **Reason:** Repeatable counts and content make demonstrations, automated assertions, and data-reset recovery reliable, while sharing workbook definitions prevents the downloadable/manual upload sample from drifting from the seeded batch report.
 - **Consequences:** `python -m app.seed` and the reset-data API now produce the same database state and preserve users and clock offset. Changing demo distributions or exact series content requires updating the seed regression expectations. The absent optional video does not block the seed.
+
+## D-110 — One shared demo-time presentation source
+
+- **Date:** 2026-10-06
+- **Status:** Accepted
+- **Decision:** Load the authoritative demo clock once at the dashboard-shell boundary and expose it through a small React context. Relative timestamps and the simulator phone status bar consume that context and never fall back to the browser wall clock while demo time is unavailable.
+- **Reason:** Time-skipped business data must remain internally consistent across staff tables and the donor phone, while a shell-level observer avoids per-row clock requests and keeps formatting components reusable.
+- **Consequences:** Demo-clock cache updates rerender every relative timestamp and phone frame consistently. Absolute timestamps remain formatted directly in Asia/Karachi, and isolated components without the provider display absolute time instead of a misleading relative value.

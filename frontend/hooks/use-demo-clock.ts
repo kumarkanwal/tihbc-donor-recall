@@ -75,9 +75,15 @@ export function useResetDemoClock() {
 }
 
 export function formatDemoClock(value: string): string {
-  return new Intl.DateTimeFormat("en-PK", {
-    dateStyle: "medium",
-    timeStyle: "short",
+  return new Intl.DateTimeFormat("en-GB", {
     timeZone: "Asia/Karachi",
-  }).format(new Date(value));
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  })
+    .format(new Date(value))
+    .replace(/\b(am|pm)\b/, (period) => period.toUpperCase());
 }

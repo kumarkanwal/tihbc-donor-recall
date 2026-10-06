@@ -1,3 +1,7 @@
+"use client";
+
+import { useDemoNow } from "@/lib/demo-time";
+
 const displayTimeZone = "Asia/Karachi";
 
 interface DateTimeProps {
@@ -52,12 +56,16 @@ function formatRelative(value: Date, now: Date): string {
 export function DateTime({
   value,
   relative = false,
-  now = new Date(),
+  now,
 }: DateTimeProps): React.JSX.Element {
+  const demoNow = useDemoNow();
   const date = toDate(value);
   const absolute = formatDateTime(date);
+  const referenceTime = now ?? demoNow;
   const label =
-    relative && absolute !== "—" ? formatRelative(date, now) : absolute;
+    relative && absolute !== "—" && referenceTime
+      ? formatRelative(date, referenceTime)
+      : absolute;
 
   return (
     <time

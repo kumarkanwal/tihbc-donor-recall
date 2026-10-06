@@ -70,7 +70,13 @@ export function PreviewDonorsTable({
                   {donor.city || "—"}
                 </td>
                 <td className="border-border border-b px-4 py-3">
-                  {donor.blood_group || "—"}
+                  {donor.blood_group ? (
+                    <bdi dir="ltr" className="font-sans whitespace-nowrap">
+                      {donor.blood_group}
+                    </bdi>
+                  ) : (
+                    "—"
+                  )}
                 </td>
               </tr>
             ))}

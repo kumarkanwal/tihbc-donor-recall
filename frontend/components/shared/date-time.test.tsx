@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { DateTime, formatDateTime } from "@/components/shared/date-time";
+import { DemoTimeContext } from "@/lib/demo-time";
 
 describe("DateTime", () => {
   it("formats UTC values in Asia/Karachi", () => {
@@ -23,5 +24,15 @@ describe("DateTime", () => {
       "title",
       "03 Oct 2026, 11:30 AM",
     );
+  });
+
+  it("uses the shared demo clock for relative labels", () => {
+    render(
+      <DemoTimeContext.Provider value={new Date("2026-10-10T05:30:00Z")}>
+        <DateTime value="2026-10-10T06:30:00Z" relative />
+      </DemoTimeContext.Provider>,
+    );
+
+    expect(screen.getByText("in 1 hour")).toBeVisible();
   });
 });

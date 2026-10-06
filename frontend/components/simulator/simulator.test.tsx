@@ -3,11 +3,13 @@ import { describe, expect, it, vi } from "vitest";
 
 import { createMockSeed } from "@/lib/simulator/mock-data";
 import type { SimulatorMessage } from "@/lib/simulator";
+import { DemoTimeContext } from "@/lib/demo-time";
 
 import { ChatListItem } from "./chat-list-item";
 import { MessageList } from "./message-list";
 import { SimulatorMessageBubble } from "./message-bubble";
 import { MessageTicks } from "./message-ticks";
+import { SimulatorStatusBar } from "./status-bar";
 
 const baseMessage: SimulatorMessage = {
   id: "message-one",
@@ -88,5 +90,14 @@ describe("simulator presentation", () => {
     expect(screen.getByRole("button", { name: /Bilal Raza/ })).toHaveClass(
       "opacity-60",
     );
+  });
+
+  it("shows the Karachi demo-clock time in the phone status bar", () => {
+    render(
+      <DemoTimeContext.Provider value={new Date("2026-10-06T14:51:00Z")}>
+        <SimulatorStatusBar />
+      </DemoTimeContext.Provider>,
+    );
+    expect(screen.getByText("19:51")).toBeVisible();
   });
 });

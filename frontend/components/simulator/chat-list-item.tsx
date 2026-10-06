@@ -71,6 +71,7 @@ export function ChatListItem({
           ) : null}
         </span>
         <span className="text-sim-secondary text-[0.58rem]">
+          {donor.campaign_name ? `${donor.campaign_name} · ` : null}
           <MaskedPhone value={donor.phone} />
         </span>
       </span>
