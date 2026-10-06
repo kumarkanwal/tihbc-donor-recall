@@ -42,7 +42,8 @@ async def test_settings_and_reset_match_frontend_contract(
         fixture = await add_campaign_fixture(session)
         active_step = _step(fixture.primary, 1, MessageCategory.UTILITY)
         draft_series = _draft_series(fixture.user)
-        session.add_all((active_step, draft_series, _step(draft_series, 1, MessageCategory.MARKETING)))
+        draft_step = _step(draft_series, 1, MessageCategory.MARKETING)
+        session.add_all((active_step, draft_series, draft_step))
         await session.commit()
 
         current_user = UserOut.model_validate(fixture.user)

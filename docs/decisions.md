@@ -395,3 +395,11 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Decision:** Compute dashboard and report values directly from enrollments, messages, responses, batches, and campaigns. Interpret inclusive `from`/`to` dates in `TIMEZONE_DISPLAY`, convert those boundaries to UTC, and apply them to each metric's business event timestamp (`sent_at`, `delivered_at`, `read_at`, `responded_at`, or the relevant record timestamp). Build upload-invalid-number rows only from stored phone validation issues; because rejected rows have no donor entity or stored name, label them `Upload row N` and assign a deterministic UUID derived from batch, row, and issue position.
 - **Reason:** The specification forbids counter columns, demo-clock activity must group under the date staff saw in Karachi, and the validation report is the only durable source for rejected phone values. Deterministic derived IDs give the frontend stable table keys without adding report storage.
 - **Consequences:** Rates are returned as percentages from 0 to 100. Overall invalid-upload rows have no campaign name; campaign-filtered rows name the campaign whose batch produced the validation issue. Historical metrics automatically reflect corrected source data.
+
+## D-050 — Preserve identity and clock state across demo resets
+
+- **Date:** 2026-10-06
+- **Status:** Accepted
+- **Decision:** Reset operational demo aggregates in one transaction by truncating the donor-batch, content-series, appointment-slot, segment, and tag roots with cascading dependents. Preserve the users and demo-clock tables, then idempotently restore the configured demo users and appointment slots using the current demo time.
+- **Reason:** The reset action must clear campaign-facing data without invalidating the administrator's active JWT or unexpectedly resetting a presentation's chosen demo time. Root-level cascading keeps the cleanup complete as dependent tables evolve.
+- **Consequences:** Task 2.13 can replace the foundational user/slot restoration with the full seed orchestration while retaining the same transaction boundary and preservation rules. New operational roots must be added to the reset repository.

@@ -11,8 +11,8 @@ from app.api.v1.donor_batches import router as donor_batches_router
 from app.api.v1.follow_ups import router as follow_up_router
 from app.api.v1.media import router as media_router
 from app.api.v1.metrics import metrics_router, reports_router
-from app.api.v1.simulator import router as simulator_router
 from app.api.v1.settings import router as settings_router
+from app.api.v1.simulator import router as simulator_router
 from app.api.v1.users import router as users_router
 
 router = APIRouter()

@@ -2582,6 +2582,71 @@
         "title": "InactiveNumberSummary",
         "type": "object"
       },
+      "IntegrationSettingsOut": {
+        "description": "Mocked WhatsApp integration status for the demo settings screen.",
+        "properties": {
+          "business_verified": {
+            "title": "Business Verified",
+            "type": "boolean"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "messaging_limit": {
+            "title": "Messaging Limit",
+            "type": "integer"
+          },
+          "phone_number": {
+            "title": "Phone Number",
+            "type": "string"
+          },
+          "quality_rating": {
+            "title": "Quality Rating",
+            "type": "string"
+          },
+          "templates": {
+            "items": {
+              "$ref": "#/components/schemas/IntegrationTemplateOut"
+            },
+            "title": "Templates",
+            "type": "array"
+          }
+        },
+        "required": [
+          "business_verified",
+          "phone_number",
+          "display_name",
+          "quality_rating",
+          "messaging_limit",
+          "templates"
+        ],
+        "title": "IntegrationSettingsOut",
+        "type": "object"
+      },
+      "IntegrationTemplateOut": {
+        "description": "One mocked provider template sourced from an active series step.",
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/MessageCategory"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "status",
+          "category"
+        ],
+        "title": "IntegrationTemplateOut",
+        "type": "object"
+      },
       "LanguageBreakdown": {
         "description": "Preview or batch count for one donor language.",
         "properties": {
@@ -5491,6 +5556,26 @@
         ]
       }
     },
+    "/api/v1/demo/actions/reset-data": {
+      "post": {
+        "description": "Clear operational demo data and restore users and appointment slots.",
+        "operationId": "reset_demo_data_api_v1_demo_actions_reset_data_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Reset demo data",
+        "tags": [
+          "Demo"
+        ]
+      }
+    },
     "/api/v1/demo/clock": {
       "get": {
         "description": "Return the current demo time and offset.",
@@ -7450,6 +7535,33 @@
         "summary": "Export a metrics report",
         "tags": [
           "Reports"
+        ]
+      }
+    },
+    "/api/v1/settings/integration": {
+      "get": {
+        "description": "Return provider status and templates derived from active series steps.",
+        "operationId": "get_integration_settings_api_v1_settings_integration_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationSettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get mocked messaging integration settings",
+        "tags": [
+          "Settings"
         ]
       }
     },
