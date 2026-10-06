@@ -1,0 +1,12 @@
+tihbc.kanwalkumar.com {
+	encode zstd gzip
+
+	@tihbc_backend path /api/* /ws* /media/* /health/*
+	handle @tihbc_backend {
+		reverse_proxy tihbc-api:8000
+	}
+
+	handle {
+		reverse_proxy tihbc-web:3000
+	}
+}

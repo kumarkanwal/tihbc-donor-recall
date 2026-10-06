@@ -419,3 +419,11 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Decision:** Load the authoritative demo clock once at the dashboard-shell boundary and expose it through a small React context. Relative timestamps and the simulator phone status bar consume that context and never fall back to the browser wall clock while demo time is unavailable.
 - **Reason:** Time-skipped business data must remain internally consistent across staff tables and the donor phone, while a shell-level observer avoids per-row clock requests and keeps formatting components reusable.
 - **Consequences:** Demo-clock cache updates rerender every relative timestamp and phone frame consistently. Absolute timestamps remain formatted directly in Asia/Karachi, and isolated components without the provider display absolute time instead of a misleading relative value.
+
+## D-052 — Single-origin production routing with isolated state services
+
+- **Date:** 2026-10-06
+- **Status:** Accepted
+- **Decision:** Serve the production demo from `tihbc.kanwalkumar.com` through the shared external Docker network `proxy`, using the unique aliases `tihbc-web` and `tihbc-api`. Attach every application service to an internal-only `tihbc-internal` network, and keep PostgreSQL and Redis off `proxy` with no published host ports. Build public frontend configuration into a non-root Next.js standalone image, retain the existing non-root backend image for both API and worker, and allow only the API container to run Alembic migrations.
+- **Reason:** One same-origin site avoids cross-origin browser complexity, unique proxy names cannot collide with the VPS's existing `backend` and `frontend` services, and private state services reduce exposure. API-owned migrations preserve the established D-032 startup contract.
+- **Consequences:** Caddy owns public TLS and path routing; Compose never publishes ports. Changing any `NEXT_PUBLIC_*` production value requires rebuilding the web image. Production operations use `.env.production`, persistent database/Redis/media volumes, daily seven-day local backups, and the documented validate-and-reload Caddy procedure.

@@ -29,3 +29,9 @@
 - **Status:** Open
 - **Affects:** Live multilingual LLM accuracy, provider fallback latency, and hosted trace inspection
 - **Details:** All documented agent examples, provider ordering, authentication handling, Redis circuit behavior, total timeout budget, low-confidence fallback, trace persistence, and PII boundaries pass with mocked LLMs. Real provider keys and LangSmith credentials are not available in this session; run `python -m app.agents.evaluate` with the configured environment and inspect a `donor_reply` trace before closing this issue.
+
+## KI-013 — Production image and VPS acceptance pending
+
+- **Status:** Open
+- **Affects:** Task 4.3 production deployment completion
+- **Details:** Production Compose validation, topology assertions, shell syntax, environment parity, frontend lint, 79 unit tests, and the Next.js standalone production build pass. The local Docker Desktop Linux engine is unavailable, so the API/web image builds and live VPS checks must be run with the commands in `deploy/RUNBOOK.md` before Task 4.3 is marked Done.
