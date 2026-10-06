@@ -3,13 +3,6 @@
 from sqlalchemy import TextClause, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-RESET_ROOT_TABLES = (
-    "donor_batches",
-    "content_series",
-    "appointment_slots",
-    "segments",
-    "tags",
-)
 RESET_STATEMENT: TextClause = text(
     "TRUNCATE TABLE donor_batches, content_series, appointment_slots, segments, tags CASCADE"
 )

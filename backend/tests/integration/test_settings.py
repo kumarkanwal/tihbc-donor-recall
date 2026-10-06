@@ -87,6 +87,8 @@ async def test_settings_and_reset_match_frontend_contract(
                 }
 
                 current_user.role = UserRole.COORDINATOR
+                coordinator_integration = await client.get("/api/v1/settings/integration")
+                assert coordinator_integration.status_code == 200
                 denied = await client.post("/api/v1/demo/actions/reset-data")
                 assert denied.status_code == 403
 

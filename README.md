@@ -61,29 +61,31 @@ Stop the stack without deleting persistent database, Redis, or media volumes:
 docker compose down
 ```
 
-## Seed demo users
+## Seed demo data
 
 Local mode:
 
 ```powershell
 Set-Location backend
-uv run python -m app.seed.users
+uv run python -m app.seed
 ```
 
 Docker mode:
 
 ```powershell
-docker compose exec api python -m app.seed.users
+docker compose exec api python -m app.seed
 ```
 
-The command creates or updates the configured admin and coordinator and is safe to run repeatedly.
+The command is safe to run repeatedly. It preserves staff accounts and the current demo-clock offset,
+then transactionally rebuilds the full operational demo dataset: donors, slots, bilingual series,
+campaigns, simulator history, responses, follow-ups, and appointments. It also generates
+`backend/app/seed/assets/sample-donors.xlsx`. The same full reset is available to administrators from
+Settings when `DEMO_MODE=true`.
 
-Seed the next 21 demo days of appointment slots, then run one scheduler tick or exercise the
-lower-level messaging tools:
+Run one scheduler tick or exercise the lower-level messaging tools:
 
 ```powershell
 Set-Location backend
-uv run python -m app.seed.slots
 uv run python -m app.tools.run_tick
 uv run python -m app.tools.send_next_step --enrollment <enrollment-uuid>
 uv run python -m app.tools.advance_delivery
@@ -105,12 +107,14 @@ From `backend/`:
 ```powershell
 uv run ruff check .
 uv run ruff format --check .
-uv run mypy app tests
+uv run mypy app
 uv run pytest
-uv run pytest --run-postgres
+uv run pytest --run-postgres --run-redis
+uv run python -m app.export_openapi
 ```
 
-PostgreSQL tests run only with `--run-postgres`. They never use `DATABASE_URL`: pytest selects
+PostgreSQL tests run only with `--run-postgres`; Redis fan-out tests additionally require
+`--run-redis`. Database tests never use `DATABASE_URL`: pytest selects
 `TEST_DATABASE_URL`, or derives `tihbc_test` on the same server when that variable is unset. At session
 start it creates the test database if needed and applies all Alembic migrations, then each test rolls
 back its writes. The database user must be able to create `tihbc_test` on the first run; it does not

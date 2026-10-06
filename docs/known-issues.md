@@ -1,16 +1,10 @@
 # Known Issues
 
-## KI-002 — TestClient dependency deprecation warning
-
-- **Status:** Open
-- **Affects:** Backend test output
-- **Details:** FastAPI's current `TestClient` import emits a Starlette warning that its HTTPX-based implementation is deprecated in favor of `httpx2`. The required test stack still passes; dependency substitution is outside task 1.1 and requires review before changing the approved stack.
-
 ## KI-006 — Frontend realtime connection intentionally disabled
 
 - **Status:** Open
 - **Affects:** Live cache updates from server WebSocket events
-- **Details:** `NEXT_PUBLIC_REALTIME` defaults to `off` until backend Task 2.6 provides the authenticated `/ws` endpoint. The shared client, reconnect policy, event router, and API-simulator handoff are complete and tested. Enable it with `NEXT_PUBLIC_REALTIME=on` after Task 2.6 and close this issue after live verification.
+- **Details:** Backend Task 2.6 now provides the authenticated `/ws` endpoint and the complete Redis suite passes. The frontend still defaults `NEXT_PUBLIC_REALTIME` to `off`; enable it with `NEXT_PUBLIC_REALTIME=on` during the generated-client handoff and close this issue after live browser verification.
 
 ## KI-007 — Task 2.5 acceptance verification pending
 
