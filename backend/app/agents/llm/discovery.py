@@ -34,7 +34,6 @@ async def model_available(client: httpx.AsyncClient, provider: EnabledProvider) 
         response = await client.get(
             f"{provider.definition.base_url}/models",
             headers=_headers(provider),
-            params=_params(provider),
         )
         response.raise_for_status()
         models = _model_ids(ModelCatalog.model_validate(response.json()))
@@ -49,14 +48,8 @@ async def model_available(client: httpx.AsyncClient, provider: EnabledProvider) 
 
 def _headers(provider: EnabledProvider) -> Mapping[str, str]:
     if provider.definition.client_type == "gemini":
-        return {}
+        return {"x-goog-api-key": provider.api_key.get_secret_value()}
     return {"Authorization": f"Bearer {provider.api_key.get_secret_value()}"}
-
-
-def _params(provider: EnabledProvider) -> Mapping[str, str]:
-    if provider.definition.client_type != "gemini":
-        return {}
-    return {"key": provider.api_key.get_secret_value()}
 
 
 def _model_ids(catalog: ModelCatalog) -> set[str]:

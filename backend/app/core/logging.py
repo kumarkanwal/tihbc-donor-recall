@@ -12,6 +12,12 @@ from structlog.typing import EventDict, WrappedLogger
 
 REQUEST_ID_HEADER = "X-Request-ID"
 PHONE_PATTERN = re.compile(r"(\+923\d{2})\d{5}(\d{2})")
+SECRET_PATTERN = re.compile(
+    r"(?i)(\b(?:api_key|key|token)\s*[=:]\s*)([^&\s,;\"']+)"
+    r"|(\bauthorization\s*[=:]\s*)(?:bearer\s+)?([^&\s,;\"']+)"
+)
+SECRET_KEYS = {"authorization", "api_key", "key", "token"}
+REDACTED = "***"
 
 
 def _mask_value(value: object) -> object:
@@ -26,6 +32,26 @@ def _mask_value(value: object) -> object:
     return value
 
 
+def _redact_value(value: object) -> object:
+    if isinstance(value, str):
+        return SECRET_PATTERN.sub(_replace_secret, value)
+    if isinstance(value, Mapping):
+        return {
+            key: REDACTED if str(key).lower() in SECRET_KEYS else _redact_value(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, list):
+        return [_redact_value(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(_redact_value(item) for item in value)
+    return value
+
+
+def _replace_secret(match: re.Match[str]) -> str:
+    prefix = match.group(1) or match.group(3)
+    return f"{prefix}{REDACTED}"
+
+
 def mask_phone_numbers(
     logger: WrappedLogger,
     method_name: str,
@@ -34,6 +60,19 @@ def mask_phone_numbers(
     """Mask Pakistani mobile numbers throughout a structured log event."""
     del logger, method_name
     return {key: _mask_value(value) for key, value in event_dict.items()}
+
+
+def redact_secrets(
+    logger: WrappedLogger,
+    method_name: str,
+    event_dict: EventDict,
+) -> EventDict:
+    """Redact credentials in structured fields and rendered URL-like strings."""
+    del logger, method_name
+    return {
+        key: REDACTED if str(key).lower() in SECRET_KEYS else _redact_value(value)
+        for key, value in event_dict.items()
+    }
 
 
 def mask_email_address(email: str) -> str:
@@ -53,12 +92,15 @@ def mask_phone_number(phone: str) -> str:
 def configure_logging(log_level: str) -> None:
     """Configure standard logging and structlog to emit JSON."""
     logging.basicConfig(format="%(message)s", level=log_level, force=True)
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("httpcore").setLevel(logging.WARNING)
     structlog.configure(
         processors=[
             structlog.contextvars.merge_contextvars,
             structlog.processors.add_log_level,
             structlog.processors.TimeStamper(fmt="iso", utc=True),
             mask_phone_numbers,
+            redact_secrets,
             structlog.processors.JSONRenderer(),
         ],
         wrapper_class=structlog.make_filtering_bound_logger(

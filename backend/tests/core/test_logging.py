@@ -1,10 +1,18 @@
 """Tests for request correlation and log redaction."""
 
 import json
+import logging
 
+import structlog
 from fastapi.testclient import TestClient
 
-from app.core.logging import REQUEST_ID_HEADER, mask_email_address, mask_phone_numbers
+from app.core.logging import (
+    REQUEST_ID_HEADER,
+    configure_logging,
+    mask_email_address,
+    mask_phone_numbers,
+    redact_secrets,
+)
 from app.main import app
 
 
@@ -43,3 +51,24 @@ def test_phone_numbers_are_masked_recursively() -> None:
 def test_email_address_masks_local_part() -> None:
     assert mask_email_address("admin@tihbc.demo") == "a***@tihbc.demo"
     assert mask_email_address("not-an-email") == "***"
+
+
+def test_configured_secrets_never_appear_in_captured_logs() -> None:
+    secret = "configured-provider-secret"
+    with structlog.testing.capture_logs(processors=[redact_secrets]) as logs:
+        structlog.get_logger().warning(
+            "provider_warning",
+            url=f"https://provider.test/models?key={secret}&page=1",
+            api_key=secret,
+            Authorization=f"Bearer {secret}",
+            nested={"token": secret},
+        )
+
+    assert secret not in json.dumps(logs)
+
+
+def test_http_client_request_logging_is_suppressed() -> None:
+    configure_logging("DEBUG")
+
+    assert logging.getLogger("httpx").level == logging.WARNING
+    assert logging.getLogger("httpcore").level == logging.WARNING
