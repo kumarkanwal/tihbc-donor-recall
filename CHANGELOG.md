@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fixed donor-batch and content-series media uploads to send browser-managed multipart form data, and fixed WebSocket reconnection after an API restart.
 - Added query-computed dashboard metrics and delivery, response, campaign, decline-reason, and inactive-number reports with Karachi-local date filters and CSV exports.
 - Added the coordinator follow-up inbox API with filtered queues, summary counts, full donor-response context, auditable assignment and resolution actions, live updates, and CSV export.
 - Prevented LLM provider credentials from appearing in startup request logs through header-based Gemini authentication, quiet HTTP client logging, and structured secret redaction.

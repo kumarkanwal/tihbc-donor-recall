@@ -273,3 +273,10 @@
 - **Verification:** Ruff lint and format checks pass, strict mypy passes across 171 application files, and the local suite reports 286 passed with 39 opt-in skips. The PostgreSQL HTTP contract test passes overview values/rates, inclusive demo-date filtering, timeseries grouping, breakdowns, campaign rows, inactive summary/detail, and each CSV export. OpenAPI was exported.
 - **Next:** Implement Task 2.12 integration settings and guarded demo reset, then regenerate the frontend client and remove pending contracts.
 - **Blockers:** No implementation blocker. KI-008 now tracks only the frontend generated-client handoff.
+
+## S-041 — 2026-10-05 — [FE] Multipart uploads and WebSocket reconnect fix
+
+- **Done:** Fixed donor-batch preview and content-series media uploads by passing actual `FormData` with the required `file` entry through the generated client, leaving the multipart boundary to the browser. Fixed WebSocket reconnect scheduling by wrapping `window.setTimeout` and `window.clearTimeout` so the browser methods retain their receiver. Added regression coverage for both upload endpoints and reconnects using real browser timers.
+- **Verification:** `pnpm lint`, `pnpm typecheck`, all 74 Vitest tests across 29 files, and `pnpm build` pass. The focused multipart and realtime client suite passes all four tests. No backend implementation or generated OpenAPI changes were included in this frontend fix.
+- **Next:** Run the batch sample through `/batches/new`, upload image/video media in the series editor, then restart the API with realtime enabled to complete the manual browser acceptance.
+- **Blockers:** None. Existing live browser acceptance remains tracked under KI-006 and KI-011.

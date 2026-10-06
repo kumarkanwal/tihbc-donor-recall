@@ -12,6 +12,7 @@ import { apiClient } from "@/lib/api/client";
 import { ApiError } from "@/lib/api/errors";
 import { requireResponseData } from "@/lib/api/response";
 import type { components, operations } from "@/lib/api/schema";
+import { previewDonorBatchFile } from "@/lib/api/uploads";
 
 export type BatchPreview = components["schemas"]["BatchPreview"];
 export type DonorBatch = components["schemas"]["DonorBatchOut"];
@@ -87,16 +88,7 @@ export function usePreviewDonorBatch(): UseMutationResult<
   File
 > {
   return useMutation({
-    mutationFn: async (file) => {
-      const { data } = await apiClient.POST("/api/v1/donor-batches/preview", {
-        body: {
-          // FastAPI's OpenAPI export omits the binary format, but openapi-fetch
-          // still serializes the runtime File correctly as multipart data.
-          file: file as unknown as string,
-        },
-      });
-      return requireResponseData(data, "Batch preview");
-    },
+    mutationFn: previewDonorBatchFile,
   });
 }
 

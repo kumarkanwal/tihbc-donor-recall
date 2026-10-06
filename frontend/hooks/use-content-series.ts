@@ -12,6 +12,7 @@ import { apiClient } from "@/lib/api/client";
 import { ApiError } from "@/lib/api/errors";
 import { requireResponseData } from "@/lib/api/response";
 import type { components, operations } from "@/lib/api/schema";
+import { uploadSeriesMediaFile } from "@/lib/api/uploads";
 
 export type ContentSeries = components["schemas"]["ContentSeriesOut"];
 export type ContentSeriesDetail = components["schemas"]["ContentSeriesDetail"];
@@ -289,11 +290,6 @@ export function useUploadSeriesMedia(): UseMutationResult<
   File
 > {
   return useMutation({
-    mutationFn: async (file) => {
-      const { data } = await apiClient.POST("/api/v1/media", {
-        body: { file: file as unknown as string },
-      });
-      return requireResponseData(data, "Media upload");
-    },
+    mutationFn: uploadSeriesMediaFile,
   });
 }

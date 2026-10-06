@@ -52,6 +52,23 @@ describe("RealtimeClient", () => {
     client.disconnect();
   });
 
+  it("schedules reconnects with the real browser timer functions", async () => {
+    const sockets: FakeSocket[] = [];
+    const client = new RealtimeClient({
+      socketFactory: () => {
+        const socket = new FakeSocket();
+        sockets.push(socket);
+        return socket as unknown as WebSocket;
+      },
+    });
+
+    client.connect("access-token");
+    sockets[0]?.emit("close");
+
+    await vi.waitFor(() => expect(sockets).toHaveLength(2), { timeout: 1_500 });
+    client.disconnect();
+  });
+
   it("ignores unknown event types", () => {
     let socket: FakeSocket | undefined;
     const listener = vi.fn();

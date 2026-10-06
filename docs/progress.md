@@ -61,7 +61,7 @@ Update after every task. Add a note for Blocked items.
 | 4.1 | End-to-end Playwright flow | Not started | |
 | 4.2 | Agent test with real LLM (EN, UR, Roman Urdu) | Not started | |
 | 4.3 | Deploy to VPS | Not started | |
-| 4.4 | Bug fixes and polish | Not started | |
+| 4.4 | Bug fixes and polish | In progress | Fixed generated-client multipart bodies for batch/media uploads and browser timer binding for WebSocket reconnects; frontend quality gate passes. |
 
 ## Phase 5: Demo preparation (human)
 | # | Task | Status | Notes |

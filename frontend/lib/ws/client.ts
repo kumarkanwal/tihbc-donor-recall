@@ -8,30 +8,36 @@ const MAX_RECONNECT_MS = 30_000;
 type EventListener = (event: RealtimeEvent) => void;
 type ReconnectListener = () => void;
 type SocketFactory = (url: string) => WebSocket;
+type TimerHandle = number;
+type TimerSetter = (callback: () => void, delay: number) => TimerHandle;
+type TimerClearer = (timer: TimerHandle) => void;
 
 interface RealtimeClientOptions {
   socketFactory?: SocketFactory;
-  setTimer?: typeof setTimeout;
-  clearTimer?: typeof clearTimeout;
+  setTimer?: TimerSetter;
+  clearTimer?: TimerClearer;
 }
 
 /** One tab-scoped authenticated WebSocket with bounded reconnect behavior. */
 export class RealtimeClient {
   private socket: WebSocket | null = null;
-  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private reconnectTimer: TimerHandle | null = null;
   private reconnectDelay = INITIAL_RECONNECT_MS;
   private token: string | null = null;
   private hasOpened = false;
   private readonly listeners = new Set<EventListener>();
   private readonly reconnectListeners = new Set<ReconnectListener>();
   private readonly socketFactory: SocketFactory;
-  private readonly setTimer: typeof setTimeout;
-  private readonly clearTimer: typeof clearTimeout;
+  private readonly setTimer: TimerSetter;
+  private readonly clearTimer: TimerClearer;
 
   constructor(options: RealtimeClientOptions = {}) {
     this.socketFactory = options.socketFactory ?? ((url) => new WebSocket(url));
-    this.setTimer = options.setTimer ?? setTimeout;
-    this.clearTimer = options.clearTimer ?? clearTimeout;
+    this.setTimer =
+      options.setTimer ??
+      ((callback, delay) => window.setTimeout(callback, delay));
+    this.clearTimer =
+      options.clearTimer ?? ((timer) => window.clearTimeout(timer));
   }
 
   connect(token: string): void {
