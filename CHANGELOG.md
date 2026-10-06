@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added the coordinator follow-up inbox API with filtered queues, summary counts, full donor-response context, auditable assignment and resolution actions, live updates, and CSV export.
+- Prevented LLM provider credentials from appearing in startup request logs through header-based Gemini authentication, quiet HTTP client logging, and structured secret redaction.
 - Added multilingual LangGraph free-text reply handling with structured six-provider fallback routing, Redis circuit protection, safe unknown-intent escalation, PII-safe LangSmith traces, and a real-provider evaluation command.
 - Connected the donor-phone simulator to the live generated API with real campaign filters, older-message pagination, read receipts, optimistic replies, and polling when realtime is disabled; offline mock demos remain available.
 - Added deterministic bilingual donor reply flows for confirmation, capacity-safe rescheduling, decline reasons, questions, and coordinator escalation, with live typing and status updates.

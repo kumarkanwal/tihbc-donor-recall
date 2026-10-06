@@ -22,7 +22,7 @@
 
 - **Status:** Open
 - **Affects:** Frontend Tasks 3.9, 3.10, and 3.11
-- **Details:** Backend Tasks 2.10/2.11 are not implemented, so the documented follow-up, metrics, and reports shapes temporarily live in `frontend/lib/api/pending-contracts.ts`. These pages show “Available after backend update” for HTTP 404. Regenerate OpenAPI and remove the pending contract boundary when those backend APIs land.
+- **Details:** Backend Task 2.10 now exports the documented follow-up schemas. Task 2.11 metrics and reports are still pending, so the temporary contracts remain centralized in `frontend/lib/api/pending-contracts.ts`. After Task 2.11, regenerate the frontend client and remove the follow-up/metrics pending boundary together.
 
 ## KI-009 — Settings frontend contract pending generation
 

@@ -19,6 +19,7 @@ from app.repositories.content_series import ContentSeriesRepository
 from app.repositories.donor import DonorRepository, SegmentRepository
 from app.repositories.donor_batch import DonorBatchRepository
 from app.repositories.enrollment import EnrollmentRepository
+from app.repositories.follow_up import FollowUpRepository
 from app.repositories.user import UserRepository
 from app.scheduler.factory import build_scheduler_tick
 from app.scheduler.tick import SchedulerTick
@@ -36,6 +37,7 @@ from app.services.content_series.step_service import SeriesStepService
 from app.services.demo_clock import DemoClockService
 from app.services.events.base import EventPublisher
 from app.services.events.redis import RedisEventPublisher
+from app.services.follow_ups.service import FollowUpService
 from app.services.media_service import MediaService
 from app.services.user_service import UserService
 
@@ -143,6 +145,21 @@ def get_campaign_query_service(
 ) -> CampaignQueryService:
     """Build the request-scoped campaign query service."""
     return CampaignQueryService(CampaignRepository(db), EnrollmentRepository(db))
+
+
+def get_follow_up_service(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_clock: Annotated[Clock, Depends(get_clock)],
+    publisher: Annotated[EventPublisher, Depends(get_event_publisher)],
+) -> FollowUpService:
+    """Build the request-scoped coordinator inbox service."""
+    return FollowUpService(
+        db,
+        FollowUpRepository(db),
+        UserRepository(db),
+        current_clock,
+        publisher,
+    )
 
 
 def get_scheduler_tick(
