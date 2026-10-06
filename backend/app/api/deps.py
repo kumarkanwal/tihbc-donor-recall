@@ -16,12 +16,14 @@ from app.core.redis import get_redis
 from app.models.enums import UserRole
 from app.repositories.campaign import CampaignRepository
 from app.repositories.content_series import ContentSeriesRepository
+from app.repositories.demo_reset import DemoResetRepository
 from app.repositories.donor import DonorRepository, SegmentRepository
 from app.repositories.donor_batch import DonorBatchRepository
 from app.repositories.enrollment import EnrollmentRepository
 from app.repositories.follow_up import FollowUpRepository
 from app.repositories.inactive_report import InactiveReportRepository
 from app.repositories.metrics import MetricsRepository
+from app.repositories.settings import IntegrationSettingsRepository
 from app.repositories.user import UserRepository
 from app.scheduler.factory import build_scheduler_tick
 from app.scheduler.tick import SchedulerTick
@@ -37,11 +39,13 @@ from app.services.content_series.query_service import ContentSeriesQueryService
 from app.services.content_series.service import ContentSeriesService
 from app.services.content_series.step_service import SeriesStepService
 from app.services.demo_clock import DemoClockService
+from app.services.demo_reset import DemoResetService
 from app.services.events.base import EventPublisher
 from app.services.events.redis import RedisEventPublisher
 from app.services.follow_ups.service import FollowUpService
 from app.services.media_service import MediaService
 from app.services.metrics_service import MetricsService
+from app.services.settings_service import IntegrationSettingsService
 from app.services.user_service import UserService
 
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -175,6 +179,22 @@ def get_metrics_service(
         InactiveReportRepository(db),
         settings.timezone_display,
     )
+
+
+def get_integration_settings_service(
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> IntegrationSettingsService:
+    """Build the request-scoped mocked integration settings service."""
+    return IntegrationSettingsService(IntegrationSettingsRepository(db))
+
+
+def get_demo_reset_service(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    settings: Annotated[Settings, Depends(get_settings)],
+    current_clock: Annotated[Clock, Depends(get_clock)],
+) -> DemoResetService:
+    """Build the request-scoped guarded demo reset service."""
+    return DemoResetService(db, DemoResetRepository(db), settings, current_clock)
 
 
 def get_scheduler_tick(
