@@ -40,4 +40,4 @@
 
 - **Status:** Open
 - **Affects:** Full browser verification of the seeded demo story
-- **Details:** The serial Chromium suite is implemented and discovered, and frontend lint, strict typecheck, all 79 unit tests, and the production build pass. This host has no running Docker engine, PostgreSQL on `localhost:5433`, or Redis on `localhost:6380`, so the real `pnpm e2e` run awaits the documented local services and a fresh `uv run python -m app.seed`.
+- **Details:** A live attempt reached the server-rendered `Checking session` state but did not hydrate because Playwright targeted `127.0.0.1` while the verified frontend/API development origin is `localhost`. The Playwright base URL and readiness probe now use `http://localhost:3000`; failures print sanitized browser console, page, request, and HTTP diagnostics; and `pnpm e2e` first audits every literal demo-flow test ID against application source. Frontend lint, strict typecheck, all 79 unit tests, the production build, selector audit, and Playwright discovery pass. Rerun the seeded live flow to close this issue and mark Task 4.1 Done.

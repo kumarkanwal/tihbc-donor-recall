@@ -58,7 +58,7 @@ Update after every task. Add a note for Blocked items.
 ## Phase 4: Integration and deployment
 | # | Task | Status | Notes |
 |---|---|---|---|
-| 4.1 | End-to-end Playwright flow | In progress | One serial Chromium suite covers the complete seeded admin-to-donor-to-coordinator story with stable selectors and no fixed sleeps. Frontend checks and Playwright discovery pass; the live seeded run is pending local PostgreSQL/Redis availability under KI-014. |
+| 4.1 | End-to-end Playwright flow | In progress | One serial Chromium suite covers the complete seeded admin-to-donor-to-coordinator story with stable selectors and no fixed sleeps. Playwright now uses the canonical `localhost` frontend origin, audits every literal test ID before execution, and prints sanitized browser errors and failed requests on failure. Frontend checks and Playwright discovery pass; the live seeded rerun remains pending under KI-014. |
 | 4.2 | Agent test with real LLM (EN, UR, Roman Urdu) | Not started | |
 | 4.3 | Deploy to VPS | In progress | Production Compose, standalone web image, Caddy block, backup automation, environment template, and operations runbook are complete. Compose/static/standalone-build checks pass; Docker image builds and live VPS acceptance remain pending because the local Docker engine is unavailable. |
 | 4.4 | Bug fixes and polish | In progress | Fixed generated-client multipart bodies for batch/media uploads and browser timer binding for WebSocket reconnects; frontend quality gate passes. |

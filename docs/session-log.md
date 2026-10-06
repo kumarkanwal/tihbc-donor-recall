@@ -323,3 +323,10 @@
 - **Verification:** `pnpm lint`, `pnpm typecheck`, all 79 Vitest tests across 30 files, `pnpm build`, and `pnpm e2e -- --list` pass. The actual seeded browser run could not start because this host has no Docker engine and neither PostgreSQL `localhost:5433` nor Redis `localhost:6380` is available.
 - **Next:** Start PostgreSQL and Redis, run `uv run python -m app.seed`, start the API and frontend, then run `pnpm e2e`; close KI-014 and mark Task 4.1 Done when Chromium passes the live flow.
 - **Blockers:** Live Playwright acceptance requires the local services documented in README; implementation and all service-independent checks are complete.
+
+## S-048 — 2026-10-06 — [FE] Playwright origin and failure diagnostics
+
+- **Done:** Corrected the Playwright base URL and development-server readiness probe from `127.0.0.1` to the verified `http://localhost:3000` origin without changing auth behavior or Next.js development-origin policy. Added an automatic failure-only diagnostics fixture for browser console errors, uncaught page errors, failed requests, and HTTP error responses with query-safe URLs and retained failure traces. Added a dependency-free preflight that confirms every literal `getByTestId` selector in the full demo flow exists as a concrete or templated application source ID; refactored the KPI assertions so all selectors remain statically auditable. Recorded D-112 and refreshed KI-014.
+- **Verification:** `pnpm lint`, `pnpm typecheck`, all 79 Vitest tests across 30 files, and `pnpm build` pass. `pnpm e2e -- --list` runs the selector preflight successfully and discovers the single Chromium story. The live stateful suite was intentionally left for the requested seeded rerun.
+- **Next:** With PostgreSQL, Redis, API, scheduler, and frontend running against the documented local configuration, run a fresh `uv run python -m app.seed`, then rerun `pnpm e2e`. Close KI-014 and mark Task 4.1 Done after the Chromium story passes.
+- **Blockers:** No implementation blocker remains. Live seeded browser acceptance is still pending under KI-014.

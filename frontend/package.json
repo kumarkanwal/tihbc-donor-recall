@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "e2e": "playwright test",
+    "e2e": "pnpm check:e2e-testids && playwright test",
+    "check:e2e-testids": "node scripts/check-e2e-testids.mjs",
     "gen:api": "openapi-typescript openapi.json -o lib/api/schema.ts",
     "format": "prettier --write ."
   },

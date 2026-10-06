@@ -1,5 +1,7 @@
-import { expect, test, type Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import path from "node:path";
+
+import { expect, test } from "./fixtures";
 
 const ADMIN = {
   email: "admin@tihbc.demo",
@@ -112,13 +114,13 @@ async function verifyFollowUpInInbox(
 
 async function verifyDashboardKpis(page: Page): Promise<void> {
   await page.getByTestId("nav-dashboard").click();
-  for (const testId of [
-    "dashboard-kpi-donors-reached",
-    "dashboard-kpi-delivery-rate",
-    "dashboard-kpi-response-rate",
-    "dashboard-kpi-confirmed",
+  for (const metric of [
+    page.getByTestId("dashboard-kpi-donors-reached"),
+    page.getByTestId("dashboard-kpi-delivery-rate"),
+    page.getByTestId("dashboard-kpi-response-rate"),
+    page.getByTestId("dashboard-kpi-confirmed"),
   ]) {
-    await expect.poll(async () => metricValue(page, testId)).toBeGreaterThan(0);
+    await expect.poll(async () => metricValue(metric)).toBeGreaterThan(0);
   }
 }
 
@@ -156,8 +158,8 @@ async function login(
   await expect(page.getByTestId("nav-dashboard")).toBeVisible();
 }
 
-async function metricValue(page: Page, testId: string): Promise<number> {
-  const value = await page.getByTestId(testId).getAttribute("data-value");
+async function metricValue(metric: Locator): Promise<number> {
+  const value = await metric.getAttribute("data-value");
   return Number.parseFloat((value ?? "0").replace(/[,%]/g, ""));
 }
 

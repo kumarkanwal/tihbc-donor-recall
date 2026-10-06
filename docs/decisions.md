@@ -435,3 +435,11 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Decision:** Keep the full demo acceptance story in one serial Chromium Playwright test that consumes the committed seed workbook, uses per-run batch and campaign names, and locates durable business states through `data-testid` hooks. Seed and service startup remain explicit prerequisites instead of test-owned database resets. Exclude `frontend/e2e/` from Vitest, and refresh campaign, enrollment, follow-up, and metrics queries after an API-mode donor reply so the same UI behavior works with realtime either enabled or disabled.
 - **Reason:** The story is intentionally stateful and must prove continuity across administrator, donor-phone, dashboard, inbox, and coordinator views. A single seeded boundary avoids hidden fixture drift, while event-independent cache refresh makes the flow deterministic without fixed sleeps.
 - **Consequences:** Run `uv run python -m app.seed` before `pnpm e2e`; the suite uses one Playwright worker and must target disposable local demo data. New milestones in the demo story should extend its helpers and stable selectors rather than create overlapping stateful suites.
+
+## D-112 — Canonical local E2E origin and failure diagnostics
+
+- **Date:** 2026-10-06
+- **Status:** Accepted
+- **Decision:** Use `http://localhost:3000` as both Playwright's base URL and development-server readiness URL. Run a dependency-free static audit of every literal `getByTestId` selector before the browser suite, and use an automatic Playwright fixture to attach and print console errors, uncaught page errors, failed requests, and HTTP error responses only when a test fails. Strip query strings and fragments from captured request URLs.
+- **Reason:** The verified browser and configured API/CORS origin use `localhost`; mixing it with `127.0.0.1` can prevent development assets from hydrating while server-rendered fallback content remains visible. Failure-only diagnostics expose that class of problem immediately without adding noise or leaking query-string credentials on successful runs.
+- **Consequences:** `pnpm e2e` fails before browser startup if a literal selector no longer maps to a concrete or templated application test ID. Failed runs retain a Playwright trace and include a text diagnostics attachment plus terminal output; successful runs remain quiet.
