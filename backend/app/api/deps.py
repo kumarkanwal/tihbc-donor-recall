@@ -20,6 +20,8 @@ from app.repositories.donor import DonorRepository, SegmentRepository
 from app.repositories.donor_batch import DonorBatchRepository
 from app.repositories.enrollment import EnrollmentRepository
 from app.repositories.follow_up import FollowUpRepository
+from app.repositories.inactive_report import InactiveReportRepository
+from app.repositories.metrics import MetricsRepository
 from app.repositories.user import UserRepository
 from app.scheduler.factory import build_scheduler_tick
 from app.scheduler.tick import SchedulerTick
@@ -39,6 +41,7 @@ from app.services.events.base import EventPublisher
 from app.services.events.redis import RedisEventPublisher
 from app.services.follow_ups.service import FollowUpService
 from app.services.media_service import MediaService
+from app.services.metrics_service import MetricsService
 from app.services.user_service import UserService
 
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -159,6 +162,18 @@ def get_follow_up_service(
         UserRepository(db),
         current_clock,
         publisher,
+    )
+
+
+def get_metrics_service(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> MetricsService:
+    """Build the request-scoped query-only metrics service."""
+    return MetricsService(
+        MetricsRepository(db, settings.timezone_display),
+        InactiveReportRepository(db),
+        settings.timezone_display,
     )
 
 

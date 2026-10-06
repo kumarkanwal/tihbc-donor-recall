@@ -22,7 +22,7 @@
 
 - **Status:** Open
 - **Affects:** Frontend Tasks 3.9, 3.10, and 3.11
-- **Details:** Backend Task 2.10 now exports the documented follow-up schemas. Task 2.11 metrics and reports are still pending, so the temporary contracts remain centralized in `frontend/lib/api/pending-contracts.ts`. After Task 2.11, regenerate the frontend client and remove the follow-up/metrics pending boundary together.
+- **Details:** Backend Tasks 2.10 and 2.11 now export the documented follow-up, metrics, and report schemas. The frontend still uses `frontend/lib/api/pending-contracts.ts`; regenerate its client and replace these temporary types after the Session C backend commits are complete.
 
 ## KI-009 — Settings frontend contract pending generation
 

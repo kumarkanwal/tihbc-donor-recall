@@ -33,7 +33,7 @@ Update after every task. Add a note for Blocked items.
 | 2.8 | Reply service flows | Done (pending user verification) | Added deterministic button and fallback-text classification, enrollment transitions, bilingual acknowledgements, capacity-safe rescheduling, decline reasons, follow-up upserts, donor-response persistence, typing/live events, and final-status handling. Live PostgreSQL/simulator acceptance remains tracked in KI-011. |
 | 2.9 | LangGraph agent, fallback, LangSmith | Done (pending real-provider evaluation) | Added the multilingual structured-output graph, six-provider fallback routing, Redis circuit breaker, PII-safe LangSmith traces, reply-service integration, and a 31-case evaluation CLI. Mocked and full PostgreSQL/Redis suites pass; configured-provider evaluation remains tracked in KI-012. |
 | 2.10 | Follow-up inbox API | Done | Added filtered pagination, summary counts, donor/response/activity detail, audited coordinator actions, post-commit updates, and CSV export matching the frontend contract. |
-| 2.11 | Metrics and reports API | Not started | |
+| 2.11 | Metrics and reports API | Done | Added query-computed KPI, local-day timeseries, response/decline/campaign breakdowns, paginated invalid and undeliverable numbers, filters, and CSV exports matching the frontend contract. |
 | 2.12 | Settings and demo clock API | Not started | |
 | 2.13 | Seed data | Not started | |
 | 2.14 | Backend tests | Not started | |

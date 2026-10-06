@@ -266,3 +266,10 @@
 - **Verification:** The security commit passes Ruff, format, strict mypy, and 286 local tests. Task 2.10 passes the same complete local gate (286 passed, 38 opt-in skipped) plus its PostgreSQL HTTP workflow; OpenAPI was exported. Regression coverage proves configured provider secrets never appear in captured structured logs and Gemini discovery never places its key in the URL.
 - **Next:** Implement Task 2.11 query-computed metrics and reports, then regenerate the frontend client after Task 2.12 and remove the pending contracts.
 - **Blockers:** No implementation blocker. KI-008 remains open only for Task 2.11 and the frontend generated-type handoff.
+
+## S-040 — 2026-10-05 — [BE] Query-computed metrics and reports
+
+- **Done:** Completed Task 2.11 with source-query KPI totals and rates; Asia/Karachi daily sent/delivered/read/responded series; response counts by intent, segment, and language; decline reasons; per-campaign comparisons; combined upload-invalid and sending-undeliverable rows; campaign/date filters; pagination; and all three documented CSV exports. Split operational aggregates from inactive-number derivation and recorded D-049 for event-time date windows and deterministic rejected-row identities.
+- **Verification:** Ruff lint and format checks pass, strict mypy passes across 171 application files, and the local suite reports 286 passed with 39 opt-in skips. The PostgreSQL HTTP contract test passes overview values/rates, inclusive demo-date filtering, timeseries grouping, breakdowns, campaign rows, inactive summary/detail, and each CSV export. OpenAPI was exported.
+- **Next:** Implement Task 2.12 integration settings and guarded demo reset, then regenerate the frontend client and remove pending contracts.
+- **Blockers:** No implementation blocker. KI-008 now tracks only the frontend generated-client handoff.

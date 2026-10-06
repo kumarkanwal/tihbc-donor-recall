@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added query-computed dashboard metrics and delivery, response, campaign, decline-reason, and inactive-number reports with Karachi-local date filters and CSV exports.
 - Added the coordinator follow-up inbox API with filtered queues, summary counts, full donor-response context, auditable assignment and resolution actions, live updates, and CSV export.
 - Prevented LLM provider credentials from appearing in startup request logs through header-based Gemini authentication, quiet HTTP client logging, and structured secret redaction.
 - Added multilingual LangGraph free-text reply handling with structured six-provider fallback routing, Redis circuit protection, safe unknown-intent escalation, PII-safe LangSmith traces, and a real-provider evaluation command.

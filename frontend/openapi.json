@@ -333,6 +333,81 @@
         "title": "CampaignDetail",
         "type": "object"
       },
+      "CampaignMetricRow": {
+        "properties": {
+          "batch_name": {
+            "title": "Batch Name",
+            "type": "string"
+          },
+          "campaign_id": {
+            "format": "uuid",
+            "title": "Campaign Id",
+            "type": "string"
+          },
+          "campaign_name": {
+            "title": "Campaign Name",
+            "type": "string"
+          },
+          "delivered": {
+            "title": "Delivered",
+            "type": "integer"
+          },
+          "enrolled": {
+            "title": "Enrolled",
+            "type": "integer"
+          },
+          "read": {
+            "title": "Read",
+            "type": "integer"
+          },
+          "responded": {
+            "title": "Responded",
+            "type": "integer"
+          },
+          "response_rate": {
+            "title": "Response Rate",
+            "type": "number"
+          },
+          "sent": {
+            "title": "Sent",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "campaign_id",
+          "campaign_name",
+          "batch_name",
+          "status",
+          "enrolled",
+          "sent",
+          "delivered",
+          "read",
+          "responded",
+          "response_rate"
+        ],
+        "title": "CampaignMetricRow",
+        "type": "object"
+      },
+      "CampaignMetrics": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CampaignMetricRow"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "CampaignMetrics",
+        "type": "object"
+      },
       "CampaignOut": {
         "description": "Campaign list representation.",
         "properties": {
@@ -924,6 +999,40 @@
         ],
         "title": "DeclineReason",
         "type": "string"
+      },
+      "DeclineReasonMetric": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "decline_reason": {
+            "title": "Decline Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "decline_reason",
+          "count"
+        ],
+        "title": "DeclineReasonMetric",
+        "type": "object"
+      },
+      "DeclineReasonMetrics": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DeclineReasonMetric"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "DeclineReasonMetrics",
+        "type": "object"
       },
       "DemoClockAdvance": {
         "description": "Non-negative whole-hour demo-clock advance.",
@@ -2354,6 +2463,125 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "InactiveNumberPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/InactiveNumberRow"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/InactiveNumberSummary"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size",
+          "summary"
+        ],
+        "title": "InactiveNumberPage",
+        "type": "object"
+      },
+      "InactiveNumberRow": {
+        "properties": {
+          "batch_name": {
+            "title": "Batch Name",
+            "type": "string"
+          },
+          "campaign_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Campaign Name"
+          },
+          "donor_name": {
+            "title": "Donor Name",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "invalid",
+              "undeliverable"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "title": "Occurred At",
+            "type": "string"
+          },
+          "phone": {
+            "title": "Phone",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "donor_name",
+          "phone",
+          "kind",
+          "reason",
+          "batch_name",
+          "campaign_name",
+          "occurred_at"
+        ],
+        "title": "InactiveNumberRow",
+        "type": "object"
+      },
+      "InactiveNumberSummary": {
+        "properties": {
+          "invalid": {
+            "title": "Invalid",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "undeliverable": {
+            "title": "Undeliverable",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "invalid",
+          "undeliverable",
+          "total"
+        ],
+        "title": "InactiveNumberSummary",
+        "type": "object"
+      },
       "LanguageBreakdown": {
         "description": "Preview or batch count for one donor language.",
         "properties": {
@@ -2703,6 +2931,166 @@
           "read_at"
         ],
         "title": "MessageTimelineEntry",
+        "type": "object"
+      },
+      "MetricsOverview": {
+        "properties": {
+          "confirmed": {
+            "title": "Confirmed",
+            "type": "integer"
+          },
+          "declined": {
+            "title": "Declined",
+            "type": "integer"
+          },
+          "delivered": {
+            "title": "Delivered",
+            "type": "integer"
+          },
+          "delivery_rate": {
+            "title": "Delivery Rate",
+            "type": "number"
+          },
+          "donors": {
+            "title": "Donors",
+            "type": "integer"
+          },
+          "escalated": {
+            "title": "Escalated",
+            "type": "integer"
+          },
+          "invalid_numbers": {
+            "title": "Invalid Numbers",
+            "type": "integer"
+          },
+          "read": {
+            "title": "Read",
+            "type": "integer"
+          },
+          "read_rate": {
+            "title": "Read Rate",
+            "type": "number"
+          },
+          "rescheduled": {
+            "title": "Rescheduled",
+            "type": "integer"
+          },
+          "responded": {
+            "title": "Responded",
+            "type": "integer"
+          },
+          "response_rate": {
+            "title": "Response Rate",
+            "type": "number"
+          },
+          "sent": {
+            "title": "Sent",
+            "type": "integer"
+          },
+          "undeliverable": {
+            "title": "Undeliverable",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "donors",
+          "sent",
+          "delivered",
+          "read",
+          "responded",
+          "delivery_rate",
+          "read_rate",
+          "response_rate",
+          "confirmed",
+          "rescheduled",
+          "declined",
+          "escalated",
+          "invalid_numbers",
+          "undeliverable"
+        ],
+        "title": "MetricsOverview",
+        "type": "object"
+      },
+      "MetricsResponseBreakdown": {
+        "properties": {
+          "by_intent": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Intent",
+            "type": "object"
+          },
+          "by_language": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Language",
+            "type": "object"
+          },
+          "by_segment": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Segment",
+            "type": "object"
+          }
+        },
+        "required": [
+          "by_intent",
+          "by_segment",
+          "by_language"
+        ],
+        "title": "MetricsResponseBreakdown",
+        "type": "object"
+      },
+      "MetricsTimeseries": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MetricsTimeseriesItem"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "MetricsTimeseries",
+        "type": "object"
+      },
+      "MetricsTimeseriesItem": {
+        "properties": {
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "delivered": {
+            "title": "Delivered",
+            "type": "integer"
+          },
+          "read": {
+            "title": "Read",
+            "type": "integer"
+          },
+          "responded": {
+            "title": "Responded",
+            "type": "integer"
+          },
+          "sent": {
+            "title": "Sent",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "date",
+          "sent",
+          "delivered",
+          "read",
+          "responded"
+        ],
+        "title": "MetricsTimeseriesItem",
         "type": "object"
       },
       "NamedResource": {
@@ -6403,6 +6791,665 @@
         "summary": "Upload content-series media",
         "tags": [
           "Media"
+        ]
+      }
+    },
+    "/api/v1/metrics/campaigns": {
+      "get": {
+        "operationId": "campaign_metrics_api_v1_metrics_campaigns_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "campaign_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Campaign Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignMetrics"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Compare campaigns",
+        "tags": [
+          "Metrics"
+        ]
+      }
+    },
+    "/api/v1/metrics/decline-reasons": {
+      "get": {
+        "operationId": "decline_reasons_api_v1_metrics_decline_reasons_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "campaign_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Campaign Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeclineReasonMetrics"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get decline reasons",
+        "tags": [
+          "Metrics"
+        ]
+      }
+    },
+    "/api/v1/metrics/overview": {
+      "get": {
+        "operationId": "metrics_overview_api_v1_metrics_overview_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "campaign_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Campaign Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetricsOverview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get metrics overview",
+        "tags": [
+          "Metrics"
+        ]
+      }
+    },
+    "/api/v1/metrics/response-breakdown": {
+      "get": {
+        "operationId": "response_breakdown_api_v1_metrics_response_breakdown_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "campaign_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Campaign Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetricsResponseBreakdown"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get response breakdown",
+        "tags": [
+          "Metrics"
+        ]
+      }
+    },
+    "/api/v1/metrics/timeseries": {
+      "get": {
+        "operationId": "metrics_timeseries_api_v1_metrics_timeseries_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "campaign_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Campaign Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetricsTimeseries"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get daily metrics",
+        "tags": [
+          "Metrics"
+        ]
+      }
+    },
+    "/api/v1/reports/inactive-numbers": {
+      "get": {
+        "operationId": "inactive_numbers_api_v1_reports_inactive_numbers_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "campaign_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Campaign Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InactiveNumberPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List inactive numbers",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/reports/{report}/export": {
+      "get": {
+        "description": "Download one documented report using the active filters.",
+        "operationId": "export_report_api_v1_reports__report__export_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "report",
+            "required": true,
+            "schema": {
+              "enum": [
+                "inactive-numbers",
+                "response-breakdown",
+                "campaigns"
+              ],
+              "title": "Report",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "campaign_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Campaign Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Export a metrics report",
+        "tags": [
+          "Reports"
         ]
       }
     },
