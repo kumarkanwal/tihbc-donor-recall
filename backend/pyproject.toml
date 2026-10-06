@@ -19,6 +19,13 @@ dependencies = [
     "sqlalchemy[asyncio]>=2.0,<3",
     "structlog>=25,<26",
     "uvicorn[standard]>=0.35,<1",
+    "langgraph>=0.6,<2",
+    "langchain-core>=0.3,<2",
+    "langchain-openai>=0.3,<2",
+    "langchain-google-genai>=2,<5",
+    "langchain-mistralai>=0.2,<2",
+    "langsmith>=0.4,<1",
+    "httpx>=0.28,<1",
 ]
 
 [dependency-groups]

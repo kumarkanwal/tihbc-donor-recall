@@ -84,6 +84,6 @@ async def reply(
     current_user: Annotated[UserOut, Depends(staff_access)],
     service: Annotated[ReplyService, Depends(get_simulator_reply_service)],
 ) -> SimulatorMessage:
-    """Store, classify, and apply one deterministic donor reply."""
+    """Store, classify, and apply one donor reply."""
     del current_user
     return await service.reply(donor_id, request)

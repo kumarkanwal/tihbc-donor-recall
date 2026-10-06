@@ -1,4 +1,4 @@
-"""Transactional deterministic donor reply handling."""
+"""Transactional donor reply handling after deterministic or agent classification."""
 
 import asyncio
 from collections.abc import Awaitable, Callable
@@ -22,7 +22,8 @@ from app.schemas.simulator import ButtonReply, SimulatorMessage, SimulatorReply
 from app.services.events.base import EventPublisher
 from app.services.follow_ups.payloads import follow_up_created_payload
 from app.services.messaging.payloads import enrollment_payload, message_created_payload
-from app.services.replies.classification import Classification, classify_reply
+from app.services.replies.classification import Classification
+from app.services.replies.classifier import ReplyClassifier
 from app.services.replies.flow import FlowOutcome, ReplyFlow
 from app.services.replies.templates import render_reply
 from app.ws.events import EventType
@@ -45,7 +46,7 @@ class ReplyEventPayloads:
 
 
 class ReplyService:
-    """Classify one inbound reply and apply its complete deterministic flow."""
+    """Classify one inbound reply and apply its complete conversation flow."""
 
     def __init__(
         self,
@@ -53,6 +54,7 @@ class ReplyService:
         donors: DonorRepository,
         messages: SimulatorMessageRepository,
         enrollments: EnrollmentRepository,
+        classifier: ReplyClassifier,
         flow: ReplyFlow,
         provider: MessagingProvider,
         publisher: EventPublisher,
@@ -60,20 +62,19 @@ class ReplyService:
         timezone_display: str,
         *,
         typing_seconds: float,
-        confidence_threshold: float = 0.7,
         sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
     ) -> None:
         self._session = session
         self._donors = donors
         self._messages = messages
         self._enrollments = enrollments
+        self._classifier = classifier
         self._flow = flow
         self._provider = provider
         self._publisher = publisher
         self._clock = current_clock
         self._timezone_display = timezone_display
         self._typing_seconds = typing_seconds
-        self._confidence_threshold = confidence_threshold
         self._sleep = sleep
 
     async def reply(self, donor_id: UUID, request: SimulatorReply) -> SimulatorMessage:
@@ -90,13 +91,7 @@ class ReplyService:
         if enrollment is None:
             raise NotFoundError("Enrollment not found")
         body = await self._body(source, request)
-        classification = classify_reply(
-            request,
-            source,
-            donor,
-            today=self._clock.now().date(),
-            confidence_threshold=self._confidence_threshold,
-        )
+        classification = await self._classifier.classify(request, source, donor, enrollment)
         inbound = await self._store_inbound(enrollment, source, request, body)
         self._store_response(enrollment, inbound, classification)
         self._stop_outreach(enrollment)
@@ -182,6 +177,7 @@ class ReplyService:
                 requested_date=classification.requested_date,
                 decline_reason=classification.decline_reason,
                 confidence=classification.confidence,
+                trace_id=classification.trace_id,
             )
         )
 

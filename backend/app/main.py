@@ -7,6 +7,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from app.agents.graph import ReplyAgent
+from app.agents.llm.router import LLMRouter
 from app.api.health import router as health_router
 from app.api.v1.router import router as v1_router
 from app.api.websocket import router as websocket_router
@@ -29,6 +31,21 @@ def _lifespan(
         app.state.database = create_database_resources(settings.database_url)
         app.state.redis = create_redis_client(settings.redis_url)
         app.state.ws_manager = ConnectionManager()
+        app.state.llm_router = LLMRouter(settings, app.state.redis)
+        if settings.llm_enabled:
+            await app.state.llm_router.check_models()
+        app.state.reply_agent = ReplyAgent(
+            app.state.llm_router,
+            confidence_threshold=settings.agent_confidence_threshold,
+            tracing_enabled=settings.langsmith_tracing,
+            langsmith_api_key=(
+                settings.langsmith_api_key.get_secret_value()
+                if settings.langsmith_api_key is not None
+                else None
+            ),
+            langsmith_project=settings.langsmith_project,
+            langsmith_endpoint=settings.langsmith_endpoint,
+        )
         subscriber = RedisEventSubscriber(
             app.state.redis,
             EventDispatcher(app.state.ws_manager),

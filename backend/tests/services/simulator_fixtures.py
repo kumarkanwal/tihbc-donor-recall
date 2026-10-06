@@ -20,12 +20,14 @@ from app.models.enums import (
     SeriesKind,
 )
 from app.models.message import Message
+from app.repositories.appointment import AppointmentRepository
 from app.repositories.donor import DonorRepository
 from app.repositories.enrollment import EnrollmentRepository
 from app.repositories.follow_up import FollowUpRepository
 from app.repositories.response import DonorResponseRepository
 from app.repositories.simulator_messages import SimulatorMessageRepository
 from app.services.appointments.service import AppointmentService
+from app.services.replies.classifier import ReplyAgentRunner, ReplyClassifier
 from app.services.replies.flow import ReplyFlow
 from app.services.reply_service import ReplyService
 from tests.integration.messaging_fixtures import FixedClock, RecordingProvider
@@ -84,6 +86,7 @@ class ReplyFixture:
     donors: AsyncMock
     messages: AsyncMock
     enrollments: AsyncMock
+    appointment_slots: AsyncMock
     appointments: AsyncMock
     follow_ups: AsyncMock
     responses: AsyncMock
@@ -95,10 +98,13 @@ class ReplyFixture:
     enrollment: Enrollment
 
 
-def reply_service() -> ReplyFixture:
+def reply_service(
+    *, llm_enabled: bool = False, agent: ReplyAgentRunner | None = None
+) -> ReplyFixture:
     session = AsyncMock(spec=AsyncSession)
     donors, messages = AsyncMock(spec=DonorRepository), AsyncMock(spec=SimulatorMessageRepository)
     enrollments = AsyncMock(spec=EnrollmentRepository)
+    appointment_slots = AsyncMock(spec=AppointmentRepository)
     appointments = AsyncMock(spec=AppointmentService)
     follow_ups = AsyncMock(spec=FollowUpRepository)
     responses = AsyncMock(spec=DonorResponseRepository)
@@ -144,6 +150,14 @@ def reply_service() -> ReplyFixture:
         donors,
         messages,
         enrollments,
+        ReplyClassifier(
+            appointment_slots,
+            FixedClock(NOW),
+            llm_enabled=llm_enabled,
+            agent=agent,
+            environment="test",
+            confidence_threshold=0.7,
+        ),
         ReplyFlow(appointments, follow_ups, responses, "Asia/Karachi"),
         provider,
         publisher,
@@ -158,6 +172,7 @@ def reply_service() -> ReplyFixture:
         donors,
         messages,
         enrollments,
+        appointment_slots,
         appointments,
         follow_ups,
         responses,

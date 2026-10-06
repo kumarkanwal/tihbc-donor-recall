@@ -57,6 +57,16 @@ class AppointmentRepository(BaseRepository[AppointmentSlot]):
         """Return one appointment slot by identifier."""
         return await self.get(slot_id)
 
+    async def get_slots(self, slot_ids: tuple[UUID, ...]) -> tuple[AppointmentSlot, ...]:
+        """Return offered slots for safe agent context without locking them."""
+        if not slot_ids:
+            return ()
+        rows = await self._session.scalars(
+            select(AppointmentSlot).where(AppointmentSlot.id.in_(slot_ids))
+        )
+        by_id = {slot.id: slot for slot in rows}
+        return tuple(by_id[slot_id] for slot_id in slot_ids if slot_id in by_id)
+
     async def available(
         self, *, starts_at: datetime, before: datetime, limit: int
     ) -> tuple[AppointmentSlot, ...]:

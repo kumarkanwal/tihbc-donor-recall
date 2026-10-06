@@ -6,6 +6,7 @@ from uuid import uuid4
 
 import pytest
 
+from app.agents.state import AgentResult
 from app.core.errors import ConflictError, NotFoundError, ValidationError
 from app.models.campaign import AppointmentSlot
 from app.models.enums import (
@@ -192,6 +193,30 @@ async def test_question_and_unknown_create_high_priority_needs_call(text: str) -
     assert item.type == FollowUpType.NEEDS_CALL
     assert item.priority == FollowUpPriority.HIGH
     assert _messages(fixture)[1].body.startswith("شکریہ۔ ٹیم انڈس")
+
+
+@pytest.mark.asyncio
+async def test_llm_agent_classification_saves_trace_id_without_donor_pii() -> None:
+    agent = AsyncMock()
+    agent.run.return_value = AgentResult(
+        intent=ResponseIntent.CONFIRM,
+        confidence=0.96,
+        detected_language="roman_ur",
+        trace_id="trace-123",
+    )
+    fixture = reply_service(llm_enabled=True, agent=agent)
+
+    await fixture.service.reply(
+        fixture.person.id,
+        TextReply(type="text", text="Ji main aaunga"),
+    )
+
+    response = _response(fixture)
+    assert response.intent == ResponseIntent.CONFIRM
+    assert response.trace_id == "trace-123"
+    invocation = repr(agent.run.await_args.kwargs)
+    assert fixture.person.full_name not in invocation
+    assert fixture.person.phone_e164 not in invocation
 
 
 @pytest.mark.asyncio

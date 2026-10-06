@@ -36,8 +36,14 @@
 - **Affects:** Redis worker-to-browser fan-out and authenticated WebSocket acceptance
 - **Details:** The real Redis and PostgreSQL suite passes, and regression coverage proves a seven-day demo-clock advance does not expire HTTP or WebSocket tokens. A final manual `ws_listen` plus clock-advance check remains pending. Redis tests use unique channels and never flush Redis. KI-006 remains open until browser realtime is enabled and verified.
 
-## KI-011 — Tasks 2.7/2.8 simulator acceptance pending
+## KI-011 — Tasks 2.7–2.9 simulator acceptance pending
 
 - **Status:** Open
-- **Affects:** PostgreSQL simulator queries, read receipts, deterministic reply flows, appointment booking, follow-ups, and live events
-- **Details:** The complete PostgreSQL/Redis suite passes, including HTTP replies, scheduling suspension, outbound-only delivery progression, stable cursor pagination, capacity-safe slot booking, classified responses, bilingual acknowledgements, follow-up create/update payload snapshots, and ordered typing/message/status events. The Donor Phone walkthrough remains pending before closing this issue.
+- **Affects:** PostgreSQL simulator queries, read receipts, deterministic and agent reply flows, appointment booking, follow-ups, and live events
+- **Details:** The complete PostgreSQL/Redis suite passes, including HTTP replies, scheduling suspension, outbound-only delivery progression, stable cursor pagination, capacity-safe slot booking, classified responses, bilingual acknowledgements, follow-up create/update payload snapshots, and ordered typing/message/status events. The Donor Phone walkthrough with `LLM_ENABLED=true` remains pending before closing this issue.
+
+## KI-012 — Task 2.9 real-provider and LangSmith acceptance pending
+
+- **Status:** Open
+- **Affects:** Live multilingual LLM accuracy, provider fallback latency, and hosted trace inspection
+- **Details:** All documented agent examples, provider ordering, authentication handling, Redis circuit behavior, total timeout budget, low-confidence fallback, trace persistence, and PII boundaries pass with mocked LLMs. Real provider keys and LangSmith credentials are not available in this session; run `python -m app.agents.evaluate` with the configured environment and inspect a `donor_reply` trace before closing this issue.

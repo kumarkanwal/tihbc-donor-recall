@@ -1,10 +1,11 @@
 """Request-scoped composition for simulator query and write services."""
 
-from typing import Annotated
+from typing import Annotated, cast
 
-from fastapi import Depends
+from fastapi import Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.agents.graph import ReplyAgent
 from app.api.deps import get_event_publisher
 from app.core.clock import Clock, get_clock
 from app.core.config import Settings, get_settings
@@ -19,6 +20,7 @@ from app.repositories.simulator_conversations import ConversationRepository
 from app.repositories.simulator_messages import SimulatorMessageRepository
 from app.services.appointments.service import AppointmentService
 from app.services.events.base import EventPublisher
+from app.services.replies.classifier import ReplyClassifier
 from app.services.replies.flow import ReplyFlow
 from app.services.reply_service import ReplyService
 from app.services.simulator.query import SimulatorQueryService
@@ -46,20 +48,30 @@ def get_simulator_receipt_service(
 
 
 def get_simulator_reply_service(
+    request: Request,
     db: Annotated[AsyncSession, Depends(get_db)],
     publisher: Annotated[EventPublisher, Depends(get_event_publisher)],
     current_clock: Annotated[Clock, Depends(get_clock)],
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> ReplyService:
-    """Build deterministic transactional reply handling."""
+    """Build transactional reply handling with the configured classifier."""
+    appointment_repository = AppointmentRepository(db)
     appointments = AppointmentService(
-        AppointmentRepository(db), current_clock, settings.timezone_display
+        appointment_repository, current_clock, settings.timezone_display
     )
     return ReplyService(
         db,
         DonorRepository(db),
         SimulatorMessageRepository(db),
         EnrollmentRepository(db),
+        ReplyClassifier(
+            appointment_repository,
+            current_clock,
+            llm_enabled=settings.llm_enabled,
+            agent=cast(ReplyAgent | None, getattr(request.app.state, "reply_agent", None)),
+            environment=settings.app_env,
+            confidence_threshold=settings.agent_confidence_threshold,
+        ),
         ReplyFlow(
             appointments,
             FollowUpRepository(db),
@@ -71,5 +83,4 @@ def get_simulator_reply_service(
         current_clock,
         settings.timezone_display,
         typing_seconds=settings.sim_typing_seconds,
-        confidence_threshold=settings.agent_confidence_threshold or 0.7,
     )

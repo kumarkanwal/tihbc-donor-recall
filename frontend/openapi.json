@@ -5338,7 +5338,7 @@
     },
     "/api/v1/simulator/conversations/{donor_id}/replies": {
       "post": {
-        "description": "Store, classify, and apply one deterministic donor reply.",
+        "description": "Store, classify, and apply one donor reply.",
         "operationId": "reply_api_v1_simulator_conversations__donor_id__replies_post",
         "parameters": [
           {

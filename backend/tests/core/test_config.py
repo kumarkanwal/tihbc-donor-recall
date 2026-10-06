@@ -104,7 +104,10 @@ def test_later_integration_settings_are_optional(
 
     settings = Settings(_env_file=env_file)
 
-    assert settings.llm_provider_order is None
+    assert settings.llm_enabled is True
+    assert settings.llm_provider_order[0] == "groq"
+    assert settings.llm_timeout_seconds == 4
+    assert settings.agent_confidence_threshold == 0.7
     assert settings.groq_api_key is None
     assert settings.openrouter_api_key is None
     assert settings.langsmith_api_key is None

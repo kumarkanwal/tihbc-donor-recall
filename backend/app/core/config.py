@@ -51,13 +51,20 @@ class Settings(BaseSettings):
     sim_auto_read_rate: float = Field(default=0.6, ge=0, le=1)
     sim_auto_read_delay_seconds: float = Field(default=10, ge=0)
     sim_typing_seconds: float = Field(default=1.5, ge=0)
-    llm_enabled: bool | None = None
-    llm_provider_order: Annotated[tuple[str, ...], NoDecode] | None = None
-    llm_timeout_seconds: float | None = Field(default=None, gt=0)
-    llm_max_retries_per_provider: int | None = Field(default=None, ge=0)
-    llm_total_budget_seconds: float | None = Field(default=None, gt=0)
-    llm_circuit_failures: int | None = Field(default=None, gt=0)
-    llm_circuit_cooldown_seconds: float | None = Field(default=None, gt=0)
+    llm_enabled: bool = True
+    llm_provider_order: Annotated[tuple[str, ...], NoDecode] = (
+        "groq",
+        "cerebras",
+        "gemini",
+        "mistral",
+        "together",
+        "openrouter",
+    )
+    llm_timeout_seconds: float = Field(default=4, gt=0)
+    llm_max_retries_per_provider: int = Field(default=0, ge=0)
+    llm_total_budget_seconds: float = Field(default=12, gt=0)
+    llm_circuit_failures: int = Field(default=3, gt=0)
+    llm_circuit_cooldown_seconds: float = Field(default=120, gt=0)
     groq_api_key: SecretStr | None = None
     groq_model: str | None = None
     cerebras_api_key: SecretStr | None = None
@@ -70,11 +77,11 @@ class Settings(BaseSettings):
     together_model: str | None = None
     openrouter_api_key: SecretStr | None = None
     openrouter_model: str | None = None
-    agent_confidence_threshold: float | None = Field(default=None, ge=0, le=1)
-    langsmith_tracing: bool | None = None
+    agent_confidence_threshold: float = Field(default=0.7, ge=0, le=1)
+    langsmith_tracing: bool = False
     langsmith_api_key: SecretStr | None = None
-    langsmith_project: str | None = None
-    langsmith_endpoint: str | None = None
+    langsmith_project: str = "tihbc-donor-recall-demo"
+    langsmith_endpoint: str = "https://api.smith.langchain.com"
     seed_admin_email: str | None = None
     seed_admin_password: SecretStr | None = None
     seed_coordinator_email: str | None = None

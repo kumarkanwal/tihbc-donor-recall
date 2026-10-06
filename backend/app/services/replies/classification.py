@@ -6,6 +6,7 @@ from decimal import Decimal
 from uuid import UUID
 
 from app.agents.fallback import classify_fallback
+from app.agents.state import AgentResult, AwaitingContext
 from app.models.donor import Donor
 from app.models.enums import DeclineReason, ResponseIntent, ResponseSource
 from app.models.message import Message
@@ -46,10 +47,11 @@ class Classification:
     requested_date: date | None = None
     selected_slot_id: UUID | None = None
     decline_reason: DeclineReason | None = None
-    awaiting: str = "none"
+    awaiting: AwaitingContext = "none"
+    trace_id: str | None = None
 
 
-def classify_reply(
+def classify_fallback_reply(
     request: SimulatorReply,
     source_message: Message,
     donor: Donor,
@@ -59,9 +61,9 @@ def classify_reply(
 ) -> Classification:
     """Classify a validated reply without external services."""
     if isinstance(request, ButtonReply):
-        return _classify_button(request, source_message, donor)
-    offered_slots = _offered_slots(source_message)
-    awaiting = _awaiting(source_message)
+        return classify_button_reply(request, source_message, donor)
+    offered_slots = offered_slot_ids(source_message)
+    awaiting = awaiting_context(source_message)
     result = classify_fallback(
         request.text,
         today=today,
@@ -89,7 +91,25 @@ def classify_reply(
     )
 
 
-def _classify_button(request: ButtonReply, source_message: Message, donor: Donor) -> Classification:
+def classify_agent_result(result: AgentResult, awaiting: AwaitingContext) -> Classification:
+    """Convert the database-independent agent result for the reply flow."""
+    return Classification(
+        intent=result.intent,
+        source=ResponseSource.AGENT,
+        detected_language=result.detected_language,
+        confidence=Decimal(str(result.confidence)),
+        requested_date=result.requested_date,
+        selected_slot_id=result.selected_slot_id,
+        decline_reason=result.decline_reason,
+        awaiting=awaiting,
+        trace_id=result.trace_id,
+    )
+
+
+def classify_button_reply(
+    request: ButtonReply, source_message: Message, donor: Donor
+) -> Classification:
+    """Map a validated button identifier directly without an LLM."""
     reason = REASON_BUTTONS.get(request.button_id)
     selected_slot = _slot_id(request.button_id)
     intent = BUTTON_INTENTS.get(request.button_id)
@@ -112,7 +132,8 @@ def _classify_button(request: ButtonReply, source_message: Message, donor: Donor
     )
 
 
-def _awaiting(source_message: Message) -> str:
+def awaiting_context(source_message: Message) -> AwaitingContext:
+    """Infer the pending deterministic question from source buttons."""
     button_ids = {str(item.get("id")) for item in source_message.buttons or []}
     if any(button_id.startswith("slot_") for button_id in button_ids):
         return "slot_choice"
@@ -121,7 +142,8 @@ def _awaiting(source_message: Message) -> str:
     return "none"
 
 
-def _offered_slots(source_message: Message) -> tuple[UUID, ...]:
+def offered_slot_ids(source_message: Message) -> tuple[UUID, ...]:
+    """Return appointment IDs encoded in the source message buttons."""
     return tuple(
         slot_id
         for button in source_message.buttons or []

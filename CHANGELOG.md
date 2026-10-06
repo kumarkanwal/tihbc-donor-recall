@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added multilingual LangGraph free-text reply handling with structured six-provider fallback routing, Redis circuit protection, safe unknown-intent escalation, PII-safe LangSmith traces, and a real-provider evaluation command.
 - Connected the donor-phone simulator to the live generated API with real campaign filters, older-message pagination, read receipts, optimistic replies, and polling when realtime is disabled; offline mock demos remain available.
 - Added deterministic bilingual donor reply flows for confirmation, capacity-safe rescheduling, decline reasons, questions, and coordinator escalation, with live typing and status updates.
 - Corrected skipped-time message timestamps and automatically replaced past appointments before later campaign steps are rendered.

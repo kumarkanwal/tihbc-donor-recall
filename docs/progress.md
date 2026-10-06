@@ -31,7 +31,7 @@ Update after every task. Add a note for Blocked items.
 | 2.6 | WebSockets and Redis events | Done (pending user verification) | Authenticated WebSockets, Redis cross-process event delivery, public payload filtering, metrics coalescing, worker/CLI integration, and local tests are complete. Live acceptance remains pending under KI-010. |
 | 2.7 | Simulator API | Done (pending user verification) | Added conversation browsing, chronological UUID-cursor message pages, read receipts, and transactional inbound replies that stop scheduled outreach without intent handling. PostgreSQL/manual acceptance remains tracked in KI-011. |
 | 2.8 | Reply service flows | Done (pending user verification) | Added deterministic button and fallback-text classification, enrollment transitions, bilingual acknowledgements, capacity-safe rescheduling, decline reasons, follow-up upserts, donor-response persistence, typing/live events, and final-status handling. Live PostgreSQL/simulator acceptance remains tracked in KI-011. |
-| 2.9 | LangGraph agent, fallback, LangSmith | Not started | |
+| 2.9 | LangGraph agent, fallback, LangSmith | Done (pending real-provider evaluation) | Added the multilingual structured-output graph, six-provider fallback routing, Redis circuit breaker, PII-safe LangSmith traces, reply-service integration, and a 31-case evaluation CLI. Mocked and full PostgreSQL/Redis suites pass; configured-provider evaluation remains tracked in KI-012. |
 | 2.10 | Follow-up inbox API | Not started | |
 | 2.11 | Metrics and reports API | Not started | |
 | 2.12 | Settings and demo clock API | Not started | |
