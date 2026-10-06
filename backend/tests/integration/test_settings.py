@@ -14,9 +14,12 @@ from app.core.clock import get_clock
 from app.core.config import Settings, get_settings
 from app.core.db import get_db
 from app.main import app
-from app.models.campaign import AppointmentSlot
-from app.models.donor import DonorBatch
+from app.models.campaign import AppointmentSlot, Campaign
+from app.models.demo_clock import DemoClock
+from app.models.donor import Donor, DonorBatch
 from app.models.enums import (
+    CampaignStatus,
+    DeclineReason,
     LanguageCode,
     MediaType,
     MessageCategory,
@@ -24,6 +27,9 @@ from app.models.enums import (
     SeriesStatus,
     UserRole,
 )
+from app.models.follow_up import FollowUpItem
+from app.models.message import Message
+from app.models.response import DonorResponse
 from app.models.series import ContentSeries, SeriesStep
 from app.models.user import User
 from app.schemas.user import UserOut
@@ -44,6 +50,9 @@ async def test_settings_and_reset_match_frontend_contract(
         draft_series = _draft_series(fixture.user)
         draft_step = _step(draft_series, 1, MessageCategory.MARKETING)
         session.add_all((active_step, draft_series, draft_step))
+        demo_clock = await session.get(DemoClock, 1)
+        assert demo_clock is not None
+        demo_clock.offset_seconds = 259_200
         await session.commit()
 
         current_user = UserOut.model_validate(fixture.user)
@@ -86,9 +95,55 @@ async def test_settings_and_reset_match_frontend_contract(
                 assert reset.status_code == 204
                 assert reset.content == b""
 
-            assert await session.scalar(select(func.count()).select_from(DonorBatch)) == 0
-            assert await session.scalar(select(func.count()).select_from(ContentSeries)) == 0
-            assert await session.scalar(select(func.count()).select_from(AppointmentSlot)) > 0
+                second_reset = await client.post("/api/v1/demo/actions/reset-data")
+                assert second_reset.status_code == 204
+
+            assert await session.scalar(select(func.count()).select_from(DonorBatch)) == 3
+            assert await session.scalar(select(func.count()).select_from(Donor)) == 195
+            assert await session.scalar(select(func.count()).select_from(ContentSeries)) == 4
+            assert await session.scalar(select(func.count()).select_from(Campaign)) == 3
+            assert await session.scalar(select(func.count()).select_from(AppointmentSlot)) == 336
+            assert await session.scalar(select(func.count()).select_from(Message)) == 324
+            assert await session.scalar(select(func.count()).select_from(DonorResponse)) == 82
+            assert await session.scalar(select(func.count()).select_from(FollowUpItem)) == 100
+            assert (
+                await session.scalar(
+                    select(func.count()).select_from(Donor).where(Donor.language == LanguageCode.UR)
+                )
+                == 117
+            )
+            assert (
+                await session.scalar(
+                    select(func.count()).select_from(Donor).where(Donor.sim_reachable.is_(False))
+                )
+                == 10
+            )
+            assert (
+                await session.scalar(
+                    select(func.count())
+                    .select_from(Donor)
+                    .where(Donor.sim_read_receipts.is_(False))
+                )
+                == 49
+            )
+            campaign_statuses = list(await session.scalars(select(Campaign.status)))
+            assert campaign_statuses.count(CampaignStatus.RUNNING) == 2
+            assert campaign_statuses.count(CampaignStatus.DRAFT) == 1
+            decline_reasons = set(
+                await session.scalars(
+                    select(DonorResponse.decline_reason).where(
+                        DonorResponse.decline_reason.is_not(None)
+                    )
+                )
+            )
+            assert decline_reasons == {
+                DeclineReason.TRAVELLING,
+                DeclineReason.HEALTH,
+                DeclineReason.OTHER,
+            }
+            persisted_clock = await session.get(DemoClock, 1, populate_existing=True)
+            assert persisted_clock is not None
+            assert persisted_clock.offset_seconds == 259_200
             seeded_users = list(
                 await session.scalars(
                     select(User).where(

@@ -35,7 +35,7 @@ Update after every task. Add a note for Blocked items.
 | 2.10 | Follow-up inbox API | Done | Added filtered pagination, summary counts, donor/response/activity detail, audited coordinator actions, post-commit updates, and CSV export matching the frontend contract. |
 | 2.11 | Metrics and reports API | Done | Added query-computed KPI, local-day timeseries, response/decline/campaign breakdowns, paginated invalid and undeliverable numbers, filters, and CSV exports matching the frontend contract. |
 | 2.12 | Settings and demo clock API | Done | Added mocked verified integration settings sourced from active series steps plus an admin/demo-mode-only transactional reset that preserves staff users and demo-clock state, clears operational data, and restores configured users and slots. The complete 327-test PostgreSQL/Redis suite passes. |
-| 2.13 | Seed data | Not started | |
+| 2.13 | Seed data | Done | Added an idempotent transactional full seed with 195 realistic donors, the documented segment/language/simulator mixes, exact bilingual series, two running and one draft campaign, realistic messages/responses/follow-ups/appointments, and a 40-row sample workbook. Reset-data now runs the full seed; 330 PostgreSQL/Redis tests pass. |
 | 2.14 | Backend tests | Not started | |
 
 ## Phase 3: Frontend

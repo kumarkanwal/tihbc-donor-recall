@@ -1,5 +1,7 @@
 """Guarded transactional reset for the demo environment."""
 
+from dataclasses import asdict
+
 import structlog
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -7,8 +9,7 @@ from app.core.clock import Clock
 from app.core.config import Settings
 from app.core.errors import ForbiddenError
 from app.repositories.demo_reset import DemoResetRepository
-from app.seed.slots import seed_appointment_slots
-from app.seed.users import configured_seed_users, upsert_demo_users
+from app.seed.full import reset_and_seed_demo_data
 
 logger = structlog.get_logger(__name__)
 
@@ -34,15 +35,11 @@ class DemoResetService:
             raise ForbiddenError("Demo data reset is disabled")
 
         try:
-            await self._repository.truncate_demo_data()
-            users = await upsert_demo_users(
+            summary = await reset_and_seed_demo_data(
                 self._session,
-                configured_seed_users(self._settings),
-            )
-            slot_count = await seed_appointment_slots(
-                self._session,
+                self._settings,
                 self._clock,
-                self._settings.timezone_display,
+                self._repository,
             )
             await self._session.commit()
         except Exception:
@@ -51,6 +48,5 @@ class DemoResetService:
 
         logger.info(
             "demo_data_reset",
-            user_count=len(users),
-            appointment_slot_count=slot_count,
+            **asdict(summary),
         )

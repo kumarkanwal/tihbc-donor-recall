@@ -403,3 +403,11 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Decision:** Reset operational demo aggregates in one transaction by truncating the donor-batch, content-series, appointment-slot, segment, and tag roots with cascading dependents. Preserve the users and demo-clock tables, then idempotently restore the configured demo users and appointment slots using the current demo time.
 - **Reason:** The reset action must clear campaign-facing data without invalidating the administrator's active JWT or unexpectedly resetting a presentation's chosen demo time. Root-level cascading keeps the cleanup complete as dependent tables evolve.
 - **Consequences:** Task 2.13 can replace the foundational user/slot restoration with the full seed orchestration while retaining the same transaction boundary and preservation rules. New operational roots must be added to the reset repository.
+
+## D-051 — Deterministic full demo reconstruction
+
+- **Date:** 2026-10-06
+- **Status:** Accepted
+- **Decision:** Rebuild the entire operational demo dataset from deterministic code after the D-050 root truncation. Use three batches containing 195 valid donors in the documented approximate mix, seed fixed campaign outcome distributions and histories relative to the current demo clock, and derive the committed 40-row workbook from the same valid/invalid row definitions. Copy the optional recall video to configured media storage only when the repository asset exists; otherwise seed those steps as text-only.
+- **Reason:** Repeatable counts and content make demonstrations, automated assertions, and data-reset recovery reliable, while sharing workbook definitions prevents the downloadable/manual upload sample from drifting from the seeded batch report.
+- **Consequences:** `python -m app.seed` and the reset-data API now produce the same database state and preserve users and clock offset. Changing demo distributions or exact series content requires updating the seed regression expectations. The absent optional video does not block the seed.

@@ -5558,7 +5558,7 @@
     },
     "/api/v1/demo/actions/reset-data": {
       "post": {
-        "description": "Clear operational demo data and restore users and appointment slots.",
+        "description": "Clear operational demo data and rebuild the complete seeded dataset.",
         "operationId": "reset_demo_data_api_v1_demo_actions_reset_data_post",
         "responses": {
           "204": {

@@ -22,7 +22,7 @@ async def reset_demo_data(
     current_user: Annotated[UserOut, Depends(admin_access)],
     service: Annotated[DemoResetService, Depends(get_demo_reset_service)],
 ) -> Response:
-    """Clear operational demo data and restore users and appointment slots."""
+    """Clear operational demo data and rebuild the complete seeded dataset."""
     del current_user
     await service.reset()
     return Response(status_code=status.HTTP_204_NO_CONTENT)

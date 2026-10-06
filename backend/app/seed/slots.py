@@ -29,7 +29,8 @@ async def seed_appointment_slots(
 ) -> int:
     """Create missing demo slots without changing existing bookings."""
     timezone = ZoneInfo(timezone_display)
-    first_date = current_clock.now().astimezone(timezone).date()
+    now = current_clock.now()
+    first_date = now.astimezone(timezone).date()
     starts_at = _slot_time(first_date, 9, timezone)
     before = _slot_time(first_date + timedelta(days=SLOT_DAYS), 9, timezone)
     repository = AppointmentRepository(session)
@@ -40,6 +41,8 @@ async def seed_appointment_slots(
             starts_at=_slot_time(first_date + timedelta(days=day), hour, timezone),
             capacity=SLOT_CAPACITY,
             booked_count=(day + hour) % SLOT_CAPACITY,
+            created_at=now,
+            updated_at=now,
         )
         for day in range(SLOT_DAYS)
         for center in DEMO_CENTERS

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added a complete repeatable demo dataset with realistic donors, exact bilingual recall series, populated live campaigns and coordinator history, future appointments, inactive-number examples, and a validated sample upload workbook.
 - Added mocked verified messaging-integration settings and an administrator-only demo reset that preserves staff sessions and demo time while transactionally restoring foundational seed data.
 - Fixed donor-batch and content-series media uploads to send browser-managed multipart form data, and fixed WebSocket reconnection after an API restart.
 - Added query-computed dashboard metrics and delivery, response, campaign, decline-reason, and inactive-number reports with Karachi-local date filters and CSV exports.
