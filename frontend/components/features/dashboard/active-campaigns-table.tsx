@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { EmptyState } from "@/components/shared/empty-state";
 import { StatusBadge } from "@/components/shared/status-badge";
-import type { CampaignMetricRow } from "@/lib/api/pending-contracts";
+import type { CampaignMetricRow } from "@/lib/api/contracts";
 
 interface ActiveCampaignsTableProps {
   items?: CampaignMetricRow[];

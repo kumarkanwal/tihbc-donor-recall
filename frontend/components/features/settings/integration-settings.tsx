@@ -2,7 +2,6 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useIntegrationSettings } from "@/hooks/use-settings";
-import { isPendingBackendUpdate } from "@/lib/api/pending-contracts";
 
 function displayValue(value: string | number): string {
   return typeof value === "number" ? value.toLocaleString() : value;
@@ -12,14 +11,6 @@ function displayValue(value: string | number): string {
 export function IntegrationSettings(): React.JSX.Element {
   const query = useIntegrationSettings();
 
-  if (isPendingBackendUpdate(query.error)) {
-    return (
-      <EmptyState
-        title="Available after backend update"
-        description="Integration settings will be connected after backend Task 2.12."
-      />
-    );
-  }
   if (query.error) {
     return (
       <ErrorState

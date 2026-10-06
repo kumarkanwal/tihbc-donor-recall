@@ -3,8 +3,8 @@ import type {
   FollowUpStatus,
   FollowUpSummary,
   FollowUpType,
-  NamedPendingResource,
-} from "@/lib/api/pending-contracts";
+  NamedResource,
+} from "@/lib/api/contracts";
 import { cn } from "@/lib/utils/class-names";
 
 export type InboxTypeFilter = FollowUpType | "all";
@@ -24,7 +24,7 @@ interface InboxFiltersProps {
   campaignId: string;
   search: string;
   summary?: FollowUpSummary;
-  campaigns: NamedPendingResource[];
+  campaigns: NamedResource[];
   onTypeChange: (value: InboxTypeFilter) => void;
   onStatusChange: (value: FollowUpStatus) => void;
   onAssignedChange: (value: boolean) => void;

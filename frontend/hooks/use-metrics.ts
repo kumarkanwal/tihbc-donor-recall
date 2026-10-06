@@ -7,15 +7,15 @@ import {
 } from "@tanstack/react-query";
 
 import {
-  pendingApiClient,
-  type CampaignMetricRow,
-  type DeclineReasonMetric,
+  type CampaignMetrics,
+  type DeclineReasonMetrics,
   type MetricsFilters,
   type MetricsOverview,
   type MetricsResponseBreakdown,
-  type MetricsTimeseriesItem,
+  type MetricsTimeseries,
   type InactiveNumberPage,
-} from "@/lib/api/pending-contracts";
+} from "@/lib/api/contracts";
+import { apiClient } from "@/lib/api/client";
 import { requireResponseData } from "@/lib/api/response";
 import { downloadBlob } from "@/lib/utils/download";
 
@@ -42,7 +42,7 @@ export function useMetricsOverview(
   return useQuery({
     queryKey: metricsKeys.overview(filters),
     queryFn: async () => {
-      const { data } = await pendingApiClient.GET("/api/v1/metrics/overview", {
+      const { data } = await apiClient.GET("/api/v1/metrics/overview", {
         params: { query: filters },
       });
       return requireResponseData(data, "Metrics overview");
@@ -52,16 +52,13 @@ export function useMetricsOverview(
 
 export function useMetricsTimeseries(
   filters: MetricsFilters,
-): UseQueryResult<{ items: MetricsTimeseriesItem[] }> {
+): UseQueryResult<MetricsTimeseries> {
   return useQuery({
     queryKey: metricsKeys.timeseries(filters),
     queryFn: async () => {
-      const { data } = await pendingApiClient.GET(
-        "/api/v1/metrics/timeseries",
-        {
-          params: { query: filters },
-        },
-      );
+      const { data } = await apiClient.GET("/api/v1/metrics/timeseries", {
+        params: { query: filters },
+      });
       return requireResponseData(data, "Metrics timeseries");
     },
   });
@@ -73,7 +70,7 @@ export function useMetricsResponseBreakdown(
   return useQuery({
     queryKey: metricsKeys.responseBreakdown(filters),
     queryFn: async () => {
-      const { data } = await pendingApiClient.GET(
+      const { data } = await apiClient.GET(
         "/api/v1/metrics/response-breakdown",
         { params: { query: filters } },
       );
@@ -84,14 +81,13 @@ export function useMetricsResponseBreakdown(
 
 export function useDeclineReasons(
   filters: MetricsFilters,
-): UseQueryResult<{ items: DeclineReasonMetric[] }> {
+): UseQueryResult<DeclineReasonMetrics> {
   return useQuery({
     queryKey: metricsKeys.declineReasons(filters),
     queryFn: async () => {
-      const { data } = await pendingApiClient.GET(
-        "/api/v1/metrics/decline-reasons",
-        { params: { query: filters } },
-      );
+      const { data } = await apiClient.GET("/api/v1/metrics/decline-reasons", {
+        params: { query: filters },
+      });
       return requireResponseData(data, "Decline reasons");
     },
   });
@@ -99,11 +95,11 @@ export function useDeclineReasons(
 
 export function useCampaignMetrics(
   filters: MetricsFilters,
-): UseQueryResult<{ items: CampaignMetricRow[] }> {
+): UseQueryResult<CampaignMetrics> {
   return useQuery({
     queryKey: metricsKeys.campaigns(filters),
     queryFn: async () => {
-      const { data } = await pendingApiClient.GET("/api/v1/metrics/campaigns", {
+      const { data } = await apiClient.GET("/api/v1/metrics/campaigns", {
         params: { query: filters },
       });
       return requireResponseData(data, "Campaign metrics");
@@ -117,10 +113,9 @@ export function useInactiveNumbers(
   return useQuery({
     queryKey: metricsKeys.inactiveNumbers(filters),
     queryFn: async () => {
-      const { data } = await pendingApiClient.GET(
-        "/api/v1/reports/inactive-numbers",
-        { params: { query: filters } },
-      );
+      const { data } = await apiClient.GET("/api/v1/reports/inactive-numbers", {
+        params: { query: filters },
+      });
       return requireResponseData(data, "Inactive number report");
     },
   });
@@ -132,13 +127,10 @@ export type ReportExport =
 export function useExportReport(report: ReportExport, filters: MetricsFilters) {
   return useMutation({
     mutationFn: async () => {
-      const { data } = await pendingApiClient.GET(
-        "/api/v1/reports/{report}/export",
-        {
-          params: { path: { report }, query: filters },
-          parseAs: "blob",
-        },
-      );
+      const { data } = await apiClient.GET("/api/v1/reports/{report}/export", {
+        params: { path: { report }, query: filters },
+        parseAs: "blob",
+      });
       return requireResponseData(data, "Report export");
     },
     onSuccess: (blob) => downloadBlob(blob, `tihbc-${report}.csv`),

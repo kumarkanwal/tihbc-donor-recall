@@ -1,11 +1,11 @@
 import { Input } from "@/components/ui/input";
-import type { NamedPendingResource } from "@/lib/api/pending-contracts";
+import type { NamedResource } from "@/lib/api/contracts";
 
 interface MetricsFiltersProps {
   campaignId: string;
   from: string;
   to: string;
-  campaigns: NamedPendingResource[];
+  campaigns: NamedResource[];
   onCampaignChange: (value: string) => void;
   onFromChange: (value: string) => void;
   onToChange: (value: string) => void;

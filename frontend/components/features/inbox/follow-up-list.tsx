@@ -5,14 +5,11 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
-import type {
-  FollowUpListItem,
-  PendingPage,
-} from "@/lib/api/pending-contracts";
+import type { FollowUpPage } from "@/lib/api/contracts";
 import { cn } from "@/lib/utils/class-names";
 
 interface FollowUpListProps {
-  data?: PendingPage<FollowUpListItem>;
+  data?: FollowUpPage;
   selectedId: string | null;
   isLoading: boolean;
   error?: string;

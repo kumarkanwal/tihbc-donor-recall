@@ -1,5 +1,5 @@
 import { KpiCard } from "@/components/shared/kpi-card";
-import type { MetricsOverview } from "@/lib/api/pending-contracts";
+import type { MetricsOverview } from "@/lib/api/contracts";
 
 interface DashboardKpisProps {
   metrics: MetricsOverview;

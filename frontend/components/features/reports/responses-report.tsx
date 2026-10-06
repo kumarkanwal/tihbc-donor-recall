@@ -4,10 +4,7 @@ import {
   useDeclineReasons,
   useMetricsResponseBreakdown,
 } from "@/hooks/use-metrics";
-import {
-  isPendingBackendUpdate,
-  type MetricsFilters,
-} from "@/lib/api/pending-contracts";
+import { type MetricsFilters } from "@/lib/api/contracts";
 
 import { BreakdownChart } from "./breakdown-chart";
 
@@ -29,18 +26,6 @@ export function ResponsesReport({
 }: ResponsesReportProps): React.JSX.Element {
   const breakdown = useMetricsResponseBreakdown(filters);
   const declineReasons = useDeclineReasons(filters);
-  const unavailable = [breakdown.error, declineReasons.error].some(
-    isPendingBackendUpdate,
-  );
-
-  if (unavailable) {
-    return (
-      <EmptyState
-        title="Available after backend update"
-        description="Response reports will be connected after backend Task 2.11."
-      />
-    );
-  }
   if (breakdown.error || declineReasons.error) {
     return (
       <ErrorState

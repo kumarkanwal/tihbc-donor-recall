@@ -2,10 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type {
-  FollowUpDetail,
-  FollowUpListItem,
-} from "@/lib/api/pending-contracts";
+import type { FollowUpDetail, FollowUpListItem } from "@/lib/api/contracts";
 
 import { InboxScreen } from "./inbox-screen";
 
@@ -14,7 +11,6 @@ const mocks = vi.hoisted(() => ({
   useSummary: vi.fn(),
   useDetail: vi.fn(),
   openChat: vi.fn(),
-  backend404: new Error("backend-404"),
 }));
 
 const mutation = { mutate: vi.fn(), isPending: false, error: null };
@@ -26,7 +22,6 @@ vi.mock("@/hooks/use-current-user", () => ({
   useCurrentUser: () => ({ data: { id: "user-1" } }),
 }));
 vi.mock("@/hooks/use-follow-ups", () => ({
-  isPendingBackendUpdate: (error: unknown) => error === mocks.backend404,
   useFollowUps: mocks.useFollowUps,
   useFollowUpSummary: mocks.useSummary,
   useFollowUp: mocks.useDetail,
@@ -94,15 +89,17 @@ describe("InboxScreen", () => {
     });
   });
 
-  it("shows the backend-update state for a missing endpoint", () => {
+  it("shows a retryable error when the inbox cannot load", () => {
     mocks.useFollowUps.mockReturnValue({
       data: undefined,
       isPending: false,
-      error: mocks.backend404,
+      error: new Error("network unavailable"),
       refetch: vi.fn(),
     });
     render(<InboxScreen />);
-    expect(screen.getByText("Available after backend update")).toBeVisible();
+    expect(
+      screen.getByText("The follow-up queue could not be loaded."),
+    ).toBeVisible();
   });
 
   it("applies the selected follow-up type tab", async () => {

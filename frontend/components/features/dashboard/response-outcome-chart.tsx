@@ -11,7 +11,7 @@ import {
 } from "recharts";
 
 import { ChartCard } from "@/components/shared/chart-card";
-import type { MetricsOverview } from "@/lib/api/pending-contracts";
+import type { MetricsOverview } from "@/lib/api/contracts";
 
 interface ResponseOutcomeChartProps {
   metrics?: MetricsOverview;

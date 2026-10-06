@@ -5,14 +5,12 @@ import { useMemo, useState } from "react";
 import { DataTable } from "@/components/shared/data-table";
 import { createDataTableColumnHelper } from "@/components/shared/data-table-types";
 import { KpiCard } from "@/components/shared/kpi-card";
-import { EmptyState } from "@/components/shared/empty-state";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useInactiveNumbers } from "@/hooks/use-metrics";
 import {
-  isPendingBackendUpdate,
   type InactiveNumberRow,
   type MetricsFilters,
-} from "@/lib/api/pending-contracts";
+} from "@/lib/api/contracts";
 
 interface InactiveNumbersReportProps {
   filters: MetricsFilters;
@@ -79,15 +77,6 @@ export function InactiveNumbersReport({
       ]),
     [],
   );
-
-  if (isPendingBackendUpdate(query.error)) {
-    return (
-      <EmptyState
-        title="Available after backend update"
-        description="Inactive-number reports will be connected after backend Task 2.11."
-      />
-    );
-  }
 
   return (
     <div className="space-y-6" role="tabpanel">

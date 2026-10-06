@@ -12,18 +12,6 @@
 - **Affects:** Scheduler dispatch, escalation, campaign completion, and demo-clock acceptance
 - **Details:** The combined PostgreSQL/Redis suite now passes after correcting demo-clock message timestamps and stale appointment rebooking. Manual scheduler lifecycle re-verification remains pending so the user can confirm skipped steps show the advanced demo time and a future appointment (or the documented fallback).
 
-## KI-008 — Follow-up and metrics frontend contracts pending generation
-
-- **Status:** Open
-- **Affects:** Frontend Tasks 3.9, 3.10, and 3.11
-- **Details:** Backend Tasks 2.10 and 2.11 now export the documented follow-up, metrics, and report schemas without shape differences from the temporary frontend contracts. The frontend still uses `frontend/lib/api/pending-contracts.ts`; regenerate its client and replace those types with the generated contract.
-
-## KI-009 — Settings frontend contract pending generation
-
-- **Status:** Open
-- **Affects:** Frontend Task 3.12 integration status and demo-data reset
-- **Details:** Backend Task 2.12 now exports `/settings/integration` with the temporary contract's exact response fields and `/demo/actions/reset-data` as a compatible 204 response with no body. Regenerate the frontend client, remove the remaining settings compatibility types/calls, and verify reset behavior in the browser.
-
 ## KI-010 — Task 2.6 live transport acceptance pending
 
 - **Status:** Open

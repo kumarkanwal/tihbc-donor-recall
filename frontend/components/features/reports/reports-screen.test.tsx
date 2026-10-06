@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { MetricsOverview } from "@/lib/api/pending-contracts";
+import type { MetricsOverview } from "@/lib/api/contracts";
 
 import { ReportsScreen } from "./reports-screen";
 
@@ -14,7 +14,6 @@ const mocks = vi.hoisted(() => ({
   inactive: vi.fn(),
   exportReport: vi.fn(),
   exportAction: vi.fn(),
-  backend404: new Error("backend-404"),
 }));
 
 vi.mock("recharts", () => ({
@@ -40,10 +39,6 @@ vi.mock("@/hooks/use-metrics", () => ({
   useInactiveNumbers: mocks.inactive,
   useExportReport: mocks.exportReport,
 }));
-vi.mock("@/lib/api/pending-contracts", () => ({
-  isPendingBackendUpdate: (error: unknown) => error === mocks.backend404,
-}));
-
 const overview: MetricsOverview = {
   donors: 10,
   sent: 10,
@@ -116,9 +111,16 @@ describe("ReportsScreen", () => {
     );
   });
 
-  it("shows the backend-update state for missing report endpoints", () => {
-    mocks.overview.mockReturnValue({ ...query(), error: mocks.backend404 });
+  it("shows a retryable error when report endpoints fail", () => {
+    mocks.overview.mockReturnValue({
+      ...query(),
+      error: new Error("network unavailable"),
+    });
     render(<ReportsScreen />);
-    expect(screen.getByText("Available after backend update")).toBeVisible();
+    expect(
+      screen.getByText(
+        "The delivery and engagement report could not be loaded.",
+      ),
+    ).toBeVisible();
   });
 });

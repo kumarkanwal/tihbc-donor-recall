@@ -11,14 +11,10 @@ const mocks = vi.hoisted(() => ({
   resetData: vi.fn(),
   advance: vi.fn(),
   resetClock: vi.fn(),
-  backend404: new Error("backend-404"),
 }));
 
 vi.mock("@/hooks/use-can", () => ({ useCan: () => mocks.isAdmin }));
 vi.mock("@/lib/env", () => ({ env: { NEXT_PUBLIC_DEMO_MODE: true } }));
-vi.mock("@/lib/api/pending-contracts", () => ({
-  isPendingBackendUpdate: (error: unknown) => error === mocks.backend404,
-}));
 vi.mock("@/hooks/use-settings", () => ({
   useIntegrationSettings: mocks.integration,
   useStaffUsers: mocks.users,
@@ -30,7 +26,6 @@ vi.mock("@/hooks/use-settings", () => ({
 }));
 vi.mock("@/hooks/use-demo-clock", () => ({
   formatDemoClock: () => "5 Oct 2026, 2:00 PM",
-  isDemoClockUnavailable: (error: unknown) => error === mocks.backend404,
   useDemoClock: () => ({
     data: { now: "2026-10-05T09:00:00Z", offset_seconds: 0 },
     isPending: false,
@@ -100,14 +95,16 @@ describe("SettingsScreen", () => {
     expect(mocks.resetData).toHaveBeenCalledOnce();
   });
 
-  it("shows the backend-update state when integration settings are absent", () => {
+  it("shows a retryable error when integration settings cannot load", () => {
     mocks.integration.mockReturnValue({
       data: undefined,
       isPending: false,
-      error: mocks.backend404,
+      error: new Error("network unavailable"),
       refetch: vi.fn(),
     });
     render(<SettingsScreen />);
-    expect(screen.getByText("Available after backend update")).toBeVisible();
+    expect(
+      screen.getByText("Integration settings could not be loaded."),
+    ).toBeVisible();
   });
 });

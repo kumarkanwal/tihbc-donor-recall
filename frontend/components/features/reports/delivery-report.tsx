@@ -5,10 +5,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useCampaignMetrics, useMetricsOverview } from "@/hooks/use-metrics";
-import {
-  isPendingBackendUpdate,
-  type MetricsFilters,
-} from "@/lib/api/pending-contracts";
+import { type MetricsFilters } from "@/lib/api/contracts";
 
 interface DeliveryReportProps {
   filters: MetricsFilters;
@@ -20,18 +17,6 @@ export function DeliveryReport({
 }: DeliveryReportProps): React.JSX.Element {
   const overview = useMetricsOverview(filters);
   const campaigns = useCampaignMetrics(filters);
-  const unavailable = [overview.error, campaigns.error].some(
-    isPendingBackendUpdate,
-  );
-
-  if (unavailable) {
-    return (
-      <EmptyState
-        title="Available after backend update"
-        description="Delivery reports will be connected after backend Task 2.11."
-      />
-    );
-  }
   if (overview.error || campaigns.error) {
     return (
       <ErrorState

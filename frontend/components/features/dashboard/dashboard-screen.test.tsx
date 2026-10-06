@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { MetricsOverview } from "@/lib/api/pending-contracts";
+import type { MetricsOverview } from "@/lib/api/contracts";
 
 import { DashboardScreen } from "./dashboard-screen";
 
@@ -12,7 +12,6 @@ const mocks = vi.hoisted(() => ({
   declineReasons: vi.fn(),
   campaignMetrics: vi.fn(),
   followUps: vi.fn(),
-  backend404: new Error("backend-404"),
 }));
 
 vi.mock("recharts", () => ({
@@ -43,10 +42,6 @@ vi.mock("@/hooks/use-metrics", () => ({
   useDeclineReasons: mocks.declineReasons,
   useCampaignMetrics: mocks.campaignMetrics,
 }));
-vi.mock("@/lib/api/pending-contracts", () => ({
-  isPendingBackendUpdate: (error: unknown) => error === mocks.backend404,
-}));
-
 const overview: MetricsOverview = {
   donors: 200,
   sent: 200,
@@ -97,12 +92,14 @@ describe("DashboardScreen", () => {
     expect(screen.getByText("Needs call")).toBeVisible();
   });
 
-  it("shows the backend-update state for missing metrics endpoints", () => {
+  it("shows a retryable error when metrics cannot load", () => {
     mocks.overview.mockReturnValue({
       ...query(),
-      error: mocks.backend404,
+      error: new Error("network unavailable"),
     });
     render(<DashboardScreen />);
-    expect(screen.getByText("Available after backend update")).toBeVisible();
+    expect(
+      screen.getByText("Dashboard metrics could not be loaded."),
+    ).toBeVisible();
   });
 });

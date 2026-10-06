@@ -8,10 +8,7 @@ import {
 } from "@tanstack/react-query";
 
 import { apiClient } from "@/lib/api/client";
-import {
-  pendingApiClient,
-  type IntegrationSettings,
-} from "@/lib/api/pending-contracts";
+import type { IntegrationSettings } from "@/lib/api/contracts";
 import { requireResponseData } from "@/lib/api/response";
 import type { components } from "@/lib/api/schema";
 import { showToast } from "@/lib/toast/store";
@@ -31,9 +28,7 @@ export function useIntegrationSettings(): UseQueryResult<IntegrationSettings> {
   return useQuery({
     queryKey: settingsKeys.integration,
     queryFn: async () => {
-      const { data } = await pendingApiClient.GET(
-        "/api/v1/settings/integration",
-      );
+      const { data } = await apiClient.GET("/api/v1/settings/integration");
       return requireResponseData(data, "Integration settings");
     },
   });
@@ -60,7 +55,7 @@ export function useResetDemoData() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async () => {
-      await pendingApiClient.POST("/api/v1/demo/actions/reset-data");
+      await apiClient.POST("/api/v1/demo/actions/reset-data");
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries();

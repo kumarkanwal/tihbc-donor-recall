@@ -1,7 +1,7 @@
 import type {
   DeclineReasonMetric,
   MetricsResponseBreakdown,
-} from "@/lib/api/pending-contracts";
+} from "@/lib/api/contracts";
 
 interface DashboardInsightProps {
   breakdown?: MetricsResponseBreakdown;

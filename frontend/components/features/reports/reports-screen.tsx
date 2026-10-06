@@ -8,7 +8,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { useCampaignCatalog } from "@/hooks/use-campaigns";
 import { useExportReport, type ReportExport } from "@/hooks/use-metrics";
-import type { MetricsFilters as MetricsFilterValues } from "@/lib/api/pending-contracts";
+import type { MetricsFilters as MetricsFilterValues } from "@/lib/api/contracts";
 
 import { DeliveryReport } from "./delivery-report";
 import { InactiveNumbersReport } from "./inactive-numbers-report";

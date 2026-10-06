@@ -364,6 +364,26 @@ export interface paths {
         patch: operations["update_series_step_api_v1_content_series__series_id__steps__step_id__patch"];
         trace?: never;
     };
+    "/api/v1/demo/actions/reset-data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reset demo data
+         * @description Clear operational demo data and rebuild the complete seeded dataset.
+         */
+        post: operations["reset_demo_data_api_v1_demo_actions_reset_data_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/demo/clock": {
         parameters: {
             query?: never;
@@ -568,6 +588,130 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/follow-ups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List follow-ups
+         * @description Return a filtered coordinator work queue.
+         */
+        get: operations["list_follow_ups_api_v1_follow_ups_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/follow-ups/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export follow-ups
+         * @description Download matching work items as CSV.
+         */
+        get: operations["export_follow_ups_api_v1_follow_ups_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/follow-ups/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Summarize follow-ups
+         * @description Return type and status counts under the supplied filters.
+         */
+        get: operations["summarize_follow_ups_api_v1_follow_ups_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/follow-ups/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get follow-up details
+         * @description Return donor, response, appointment, and activity context.
+         */
+        get: operations["get_follow_up_api_v1_follow_ups__item_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update a follow-up
+         * @description Change status, assignee, or priority with audit activities.
+         */
+        patch: operations["update_follow_up_api_v1_follow_ups__item_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/follow-ups/{item_id}/actions/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resolve a follow-up
+         * @description Complete one item with an outcome and optional note.
+         */
+        post: operations["resolve_follow_up_api_v1_follow_ups__item_id__actions_resolve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/follow-ups/{item_id}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add a follow-up note
+         * @description Append one coordinator note.
+         */
+        post: operations["add_follow_up_note_api_v1_follow_ups__item_id__notes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media": {
         parameters: {
             query?: never;
@@ -582,6 +726,148 @@ export interface paths {
          * @description Validate media bytes and store the asset under a random filename.
          */
         post: operations["upload_media_api_v1_media_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metrics/campaigns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Compare campaigns */
+        get: operations["campaign_metrics_api_v1_metrics_campaigns_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metrics/decline-reasons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get decline reasons */
+        get: operations["decline_reasons_api_v1_metrics_decline_reasons_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metrics/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get metrics overview */
+        get: operations["metrics_overview_api_v1_metrics_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metrics/response-breakdown": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get response breakdown */
+        get: operations["response_breakdown_api_v1_metrics_response_breakdown_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metrics/timeseries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get daily metrics */
+        get: operations["metrics_timeseries_api_v1_metrics_timeseries_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/inactive-numbers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List inactive numbers */
+        get: operations["inactive_numbers_api_v1_reports_inactive_numbers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/{report}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export a metrics report
+         * @description Download one documented report using the active filters.
+         */
+        get: operations["export_report_api_v1_reports__report__export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/settings/integration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get mocked messaging integration settings
+         * @description Return provider status and templates derived from active series steps.
+         */
+        get: operations["get_integration_settings_api_v1_settings_integration_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -659,7 +945,7 @@ export interface paths {
         put?: never;
         /**
          * Store simulator donor reply
-         * @description Store, classify, and apply one deterministic donor reply.
+         * @description Store, classify, and apply one donor reply.
          */
         post: operations["reply_api_v1_simulator_conversations__donor_id__replies_post"];
         delete?: never;
@@ -895,6 +1181,37 @@ export interface components {
              */
             updated_at: string;
         };
+        /** CampaignMetricRow */
+        CampaignMetricRow: {
+            /** Batch Name */
+            batch_name: string;
+            /**
+             * Campaign Id
+             * Format: uuid
+             */
+            campaign_id: string;
+            /** Campaign Name */
+            campaign_name: string;
+            /** Delivered */
+            delivered: number;
+            /** Enrolled */
+            enrolled: number;
+            /** Read */
+            read: number;
+            /** Responded */
+            responded: number;
+            /** Response Rate */
+            response_rate: number;
+            /** Sent */
+            sent: number;
+            /** Status */
+            status: string;
+        };
+        /** CampaignMetrics */
+        CampaignMetrics: {
+            /** Items */
+            items: components["schemas"]["CampaignMetricRow"][];
+        };
         /**
          * CampaignOut
          * @description Campaign list representation.
@@ -1117,6 +1434,18 @@ export interface components {
          * @enum {string}
          */
         DeclineReason: "travelling" | "health" | "recently_donated" | "not_interested" | "other";
+        /** DeclineReasonMetric */
+        DeclineReasonMetric: {
+            /** Count */
+            count: number;
+            /** Decline Reason */
+            decline_reason: string;
+        };
+        /** DeclineReasonMetrics */
+        DeclineReasonMetrics: {
+            /** Items */
+            items: components["schemas"]["DeclineReasonMetric"][];
+        };
         /**
          * DemoClockAdvance
          * @description Non-negative whole-hour demo-clock advance.
@@ -1441,11 +1770,199 @@ export interface components {
             /** Row */
             row: number;
         };
+        /** FollowUpActivityOut */
+        FollowUpActivityOut: {
+            /** Action */
+            action: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Note */
+            note: string | null;
+            /** User Name */
+            user_name: string | null;
+        };
+        /** FollowUpAppointment */
+        FollowUpAppointment: {
+            /** Center Name */
+            center_name: string;
+            /**
+             * Slot Start
+             * Format: date-time
+             */
+            slot_start: string;
+        };
+        /** FollowUpAssignee */
+        FollowUpAssignee: {
+            /** Full Name */
+            full_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+        };
+        /** FollowUpDetail */
+        FollowUpDetail: {
+            /** Activities */
+            activities: components["schemas"]["FollowUpActivityOut"][];
+            appointment: components["schemas"]["FollowUpAppointment"] | null;
+            assigned_to: components["schemas"]["FollowUpAssignee"] | null;
+            campaign: components["schemas"]["NamedResource"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            donor: components["schemas"]["FollowUpDonorDetail"];
+            enrollment: components["schemas"]["FollowUpEnrollment"];
+            /**
+             * Enrollment Id
+             * Format: uuid
+             */
+            enrollment_id: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            latest_reply: components["schemas"]["LatestReply"] | null;
+            latest_response: components["schemas"]["LatestResponse"] | null;
+            priority: components["schemas"]["FollowUpPriority"];
+            status: components["schemas"]["FollowUpStatus"];
+            type: components["schemas"]["FollowUpType"];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** FollowUpDonorDetail */
+        FollowUpDonorDetail: {
+            /** Blood Group */
+            blood_group: string | null;
+            /** City */
+            city: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            language: components["schemas"]["LanguageCode"];
+            /** Last Donation Date */
+            last_donation_date: string | null;
+            /** Name */
+            name: string;
+            /** Phone */
+            phone: string;
+            /** Segment */
+            segment: string;
+        };
+        /** FollowUpDonorList */
+        FollowUpDonorList: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Phone */
+            phone: string;
+        };
+        /** FollowUpEnrollment */
+        FollowUpEnrollment: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Status */
+            status: string;
+        };
+        /** FollowUpInboxSummary */
+        FollowUpInboxSummary: {
+            /** By Status */
+            by_status: {
+                [key: string]: number;
+            };
+            /** By Type */
+            by_type: {
+                [key: string]: number;
+            };
+            /** Total */
+            total: number;
+        };
+        /** FollowUpListItem */
+        FollowUpListItem: {
+            assigned_to: components["schemas"]["FollowUpAssignee"] | null;
+            campaign: components["schemas"]["NamedResource"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            donor: components["schemas"]["FollowUpDonorList"];
+            /**
+             * Enrollment Id
+             * Format: uuid
+             */
+            enrollment_id: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            latest_reply: components["schemas"]["LatestReply"] | null;
+            priority: components["schemas"]["FollowUpPriority"];
+            status: components["schemas"]["FollowUpStatus"];
+            type: components["schemas"]["FollowUpType"];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** FollowUpNoteCreate */
+        FollowUpNoteCreate: {
+            /** Note */
+            note: string;
+        };
+        /** FollowUpPage */
+        FollowUpPage: {
+            /** Items */
+            items: components["schemas"]["FollowUpListItem"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
         /**
          * FollowUpPriority
          * @enum {string}
          */
         FollowUpPriority: "normal" | "high";
+        /** FollowUpResolve */
+        FollowUpResolve: {
+            /** Note */
+            note?: string | null;
+            outcome: components["schemas"]["FollowUpResolveOutcome"];
+        };
+        /**
+         * FollowUpResolveOutcome
+         * @description Client-visible resolution outcomes for the MVP inbox.
+         * @enum {string}
+         */
+        FollowUpResolveOutcome: "attended" | "rebooked" | "not_reachable";
         /**
          * FollowUpStatus
          * @enum {string}
@@ -1482,10 +1999,95 @@ export interface components {
          * @enum {string}
          */
         FollowUpType: "confirmed" | "reschedule" | "declined" | "needs_call";
+        /** FollowUpUpdate */
+        FollowUpUpdate: {
+            /** Assigned To Id */
+            assigned_to_id?: string | null;
+            priority?: components["schemas"]["FollowUpPriority"] | null;
+            status?: components["schemas"]["FollowUpStatus"] | null;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** InactiveNumberPage */
+        InactiveNumberPage: {
+            /** Items */
+            items: components["schemas"]["InactiveNumberRow"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            summary: components["schemas"]["InactiveNumberSummary"];
+            /** Total */
+            total: number;
+        };
+        /** InactiveNumberRow */
+        InactiveNumberRow: {
+            /** Batch Name */
+            batch_name: string;
+            /** Campaign Name */
+            campaign_name: string | null;
+            /** Donor Name */
+            donor_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "invalid" | "undeliverable";
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /** Phone */
+            phone: string;
+            /** Reason */
+            reason: string;
+        };
+        /** InactiveNumberSummary */
+        InactiveNumberSummary: {
+            /** Invalid */
+            invalid: number;
+            /** Total */
+            total: number;
+            /** Undeliverable */
+            undeliverable: number;
+        };
+        /**
+         * IntegrationSettingsOut
+         * @description Mocked WhatsApp integration status for the demo settings screen.
+         */
+        IntegrationSettingsOut: {
+            /** Business Verified */
+            business_verified: boolean;
+            /** Display Name */
+            display_name: string;
+            /** Messaging Limit */
+            messaging_limit: number;
+            /** Phone Number */
+            phone_number: string;
+            /** Quality Rating */
+            quality_rating: string;
+            /** Templates */
+            templates: components["schemas"]["IntegrationTemplateOut"][];
+        };
+        /**
+         * IntegrationTemplateOut
+         * @description One mocked provider template sourced from an active series step.
+         */
+        IntegrationTemplateOut: {
+            category: components["schemas"]["MessageCategory"];
+            /** Name */
+            name: string;
+            /** Status */
+            status: string;
         };
         /**
          * LanguageBreakdown
@@ -1501,6 +2103,34 @@ export interface components {
          * @enum {string}
          */
         LanguageCode: "en" | "ur";
+        /** LatestReply */
+        LatestReply: {
+            /** Body */
+            body: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** LatestResponse */
+        LatestResponse: {
+            /** Confidence */
+            confidence: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Decline Reason */
+            decline_reason: string | null;
+            /** Intent */
+            intent: string;
+            /** Raw Text */
+            raw_text: string;
+            /** Requested Date */
+            requested_date: string | null;
+        };
         /**
          * LiveResponse
          * @description Liveness probe payload.
@@ -1605,6 +2235,83 @@ export interface components {
             /** Sent At */
             sent_at: string | null;
             status: components["schemas"]["MessageStatus"];
+        };
+        /** MetricsOverview */
+        MetricsOverview: {
+            /** Confirmed */
+            confirmed: number;
+            /** Declined */
+            declined: number;
+            /** Delivered */
+            delivered: number;
+            /** Delivery Rate */
+            delivery_rate: number;
+            /** Donors */
+            donors: number;
+            /** Escalated */
+            escalated: number;
+            /** Invalid Numbers */
+            invalid_numbers: number;
+            /** Read */
+            read: number;
+            /** Read Rate */
+            read_rate: number;
+            /** Rescheduled */
+            rescheduled: number;
+            /** Responded */
+            responded: number;
+            /** Response Rate */
+            response_rate: number;
+            /** Sent */
+            sent: number;
+            /** Undeliverable */
+            undeliverable: number;
+        };
+        /** MetricsResponseBreakdown */
+        MetricsResponseBreakdown: {
+            /** By Intent */
+            by_intent: {
+                [key: string]: number;
+            };
+            /** By Language */
+            by_language: {
+                [key: string]: number;
+            };
+            /** By Segment */
+            by_segment: {
+                [key: string]: number;
+            };
+        };
+        /** MetricsTimeseries */
+        MetricsTimeseries: {
+            /** Items */
+            items: components["schemas"]["MetricsTimeseriesItem"][];
+        };
+        /** MetricsTimeseriesItem */
+        MetricsTimeseriesItem: {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Delivered */
+            delivered: number;
+            /** Read */
+            read: number;
+            /** Responded */
+            responded: number;
+            /** Sent */
+            sent: number;
+        };
+        /** NamedResource */
+        NamedResource: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
         };
         /**
          * NamedResourceSummary
@@ -2775,6 +3482,24 @@ export interface operations {
             };
         };
     };
+    reset_demo_data_api_v1_demo_actions_reset_data_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     get_demo_clock_api_v1_demo_clock_get: {
         parameters: {
             query?: never;
@@ -3097,6 +3822,252 @@ export interface operations {
             };
         };
     };
+    list_follow_ups_api_v1_follow_ups_get: {
+        parameters: {
+            query?: {
+                type?: components["schemas"]["FollowUpType"] | null;
+                status?: components["schemas"]["FollowUpStatus"] | null;
+                priority?: components["schemas"]["FollowUpPriority"] | null;
+                campaign_id?: string | null;
+                assigned_to?: "me" | null;
+                search?: string | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowUpPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_follow_ups_api_v1_follow_ups_export_get: {
+        parameters: {
+            query?: {
+                type?: components["schemas"]["FollowUpType"] | null;
+                status?: components["schemas"]["FollowUpStatus"] | null;
+                priority?: components["schemas"]["FollowUpPriority"] | null;
+                campaign_id?: string | null;
+                assigned_to?: "me" | null;
+                search?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    summarize_follow_ups_api_v1_follow_ups_summary_get: {
+        parameters: {
+            query?: {
+                type?: components["schemas"]["FollowUpType"] | null;
+                status?: components["schemas"]["FollowUpStatus"] | null;
+                priority?: components["schemas"]["FollowUpPriority"] | null;
+                campaign_id?: string | null;
+                assigned_to?: "me" | null;
+                search?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowUpInboxSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_follow_up_api_v1_follow_ups__item_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowUpDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_follow_up_api_v1_follow_ups__item_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FollowUpUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowUpDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resolve_follow_up_api_v1_follow_ups__item_id__actions_resolve_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FollowUpResolve"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowUpDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_follow_up_note_api_v1_follow_ups__item_id__notes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FollowUpNoteCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowUpDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     upload_media_api_v1_media_post: {
         parameters: {
             query?: never;
@@ -3126,6 +4097,261 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    campaign_metrics_api_v1_metrics_campaigns_get: {
+        parameters: {
+            query?: {
+                campaign_id?: string | null;
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CampaignMetrics"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decline_reasons_api_v1_metrics_decline_reasons_get: {
+        parameters: {
+            query?: {
+                campaign_id?: string | null;
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeclineReasonMetrics"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    metrics_overview_api_v1_metrics_overview_get: {
+        parameters: {
+            query?: {
+                campaign_id?: string | null;
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricsOverview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    response_breakdown_api_v1_metrics_response_breakdown_get: {
+        parameters: {
+            query?: {
+                campaign_id?: string | null;
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricsResponseBreakdown"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    metrics_timeseries_api_v1_metrics_timeseries_get: {
+        parameters: {
+            query?: {
+                campaign_id?: string | null;
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricsTimeseries"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    inactive_numbers_api_v1_reports_inactive_numbers_get: {
+        parameters: {
+            query?: {
+                campaign_id?: string | null;
+                from?: string | null;
+                to?: string | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InactiveNumberPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_report_api_v1_reports__report__export_get: {
+        parameters: {
+            query?: {
+                campaign_id?: string | null;
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path: {
+                report: "inactive-numbers" | "response-breakdown" | "campaigns";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_integration_settings_api_v1_settings_integration_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IntegrationSettingsOut"];
                 };
             };
         };

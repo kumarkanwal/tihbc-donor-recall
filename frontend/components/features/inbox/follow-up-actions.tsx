@@ -9,10 +9,7 @@ import {
   useResolveFollowUp,
   useUpdateFollowUp,
 } from "@/hooks/use-follow-ups";
-import type {
-  FollowUpDetail,
-  FollowUpOutcome,
-} from "@/lib/api/pending-contracts";
+import type { FollowUpDetail, FollowUpOutcome } from "@/lib/api/contracts";
 import { openSimulatorChat } from "@/lib/simulator/open-chat";
 
 /** Assignment, progress, note, resolution, and chat actions for one item. */

@@ -16,7 +16,6 @@ vi.mock("@/lib/env", () => ({
 }));
 vi.mock("@/hooks/use-demo-clock", () => ({
   formatDemoClock: () => "5 Oct 2026, 3:00 pm",
-  isDemoClockUnavailable: () => false,
   useDemoClock: () => ({
     data: { now: "2026-10-05T10:00:00Z", offset_seconds: 0 },
     error: null,

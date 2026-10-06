@@ -3,11 +3,9 @@
 import { RotateCcw } from "lucide-react";
 
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
-import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import {
   formatDemoClock,
-  isDemoClockUnavailable,
   useAdvanceDemoClock,
   useDemoClock,
   useResetDemoClock,
@@ -28,15 +26,6 @@ export function DemoSettings(): React.JSX.Element {
   const resetClock = useResetDemoClock();
   const resetData = useResetDemoData();
   const clockPending = advance.isPending || resetClock.isPending;
-
-  if (isDemoClockUnavailable(clock.error)) {
-    return (
-      <EmptyState
-        title="Available after backend update"
-        description="Demo controls will be connected after backend Task 2.12."
-      />
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -77,7 +66,7 @@ export function DemoSettings(): React.JSX.Element {
             Reset clock
           </Button>
         </div>
-        {clock.error && !isDemoClockUnavailable(clock.error) ? (
+        {clock.error ? (
           <p role="alert" className="text-danger mt-3 text-sm">
             The demo clock could not be loaded.
           </p>
@@ -104,8 +93,7 @@ export function DemoSettings(): React.JSX.Element {
         />
         {resetData.error ? (
           <p role="alert" className="text-danger mt-3 text-sm">
-            Demo data could not be reset. The backend update may not be
-            available yet.
+            Demo data could not be reset. Please try again.
           </p>
         ) : null}
       </section>

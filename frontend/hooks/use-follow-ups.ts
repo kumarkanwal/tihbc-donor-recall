@@ -9,16 +9,14 @@ import {
 } from "@tanstack/react-query";
 
 import {
-  isPendingBackendUpdate,
-  pendingApiClient,
   type FollowUpDetail,
   type FollowUpFilters,
   type FollowUpOutcome,
+  type FollowUpPage,
   type FollowUpStatus,
   type FollowUpSummary,
-  type PendingPage,
-  type FollowUpListItem,
-} from "@/lib/api/pending-contracts";
+} from "@/lib/api/contracts";
+import { apiClient } from "@/lib/api/client";
 import { requireResponseData } from "@/lib/api/response";
 import { downloadBlob } from "@/lib/utils/download";
 
@@ -30,15 +28,13 @@ export const followUpKeys = {
   detail: (id: string) => ["follow-ups", "detail", id] as const,
 };
 
-export { isPendingBackendUpdate };
-
 export function useFollowUps(
   filters: FollowUpFilters,
-): UseQueryResult<PendingPage<FollowUpListItem>> {
+): UseQueryResult<FollowUpPage> {
   return useQuery({
     queryKey: followUpKeys.list(filters),
     queryFn: async () => {
-      const { data } = await pendingApiClient.GET("/api/v1/follow-ups", {
+      const { data } = await apiClient.GET("/api/v1/follow-ups", {
         params: { query: filters },
       });
       return requireResponseData(data, "Follow-up list");
@@ -52,10 +48,9 @@ export function useFollowUpSummary(
   return useQuery({
     queryKey: followUpKeys.summary(filters),
     queryFn: async () => {
-      const { data } = await pendingApiClient.GET(
-        "/api/v1/follow-ups/summary",
-        { params: { query: filters } },
-      );
+      const { data } = await apiClient.GET("/api/v1/follow-ups/summary", {
+        params: { query: filters },
+      });
       return requireResponseData(data, "Follow-up summary");
     },
   });
@@ -65,8 +60,8 @@ export function useFollowUp(id: string | null): UseQueryResult<FollowUpDetail> {
   return useQuery({
     queryKey: followUpKeys.detail(id ?? ""),
     queryFn: async () => {
-      const { data } = await pendingApiClient.GET("/api/v1/follow-ups/{id}", {
-        params: { path: { id: id ?? "" } },
+      const { data } = await apiClient.GET("/api/v1/follow-ups/{item_id}", {
+        params: { path: { item_id: id ?? "" } },
       });
       return requireResponseData(data, "Follow-up detail");
     },
@@ -86,8 +81,8 @@ export function useUpdateFollowUp(
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (body) => {
-      const { data } = await pendingApiClient.PATCH("/api/v1/follow-ups/{id}", {
-        params: { path: { id } },
+      const { data } = await apiClient.PATCH("/api/v1/follow-ups/{item_id}", {
+        params: { path: { item_id: id } },
         body,
       });
       return requireResponseData(data, "Updated follow-up");
@@ -103,9 +98,9 @@ export function useAddFollowUpNote(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (note: string) => {
-      const { data } = await pendingApiClient.POST(
-        "/api/v1/follow-ups/{id}/notes",
-        { params: { path: { id } }, body: { note } },
+      const { data } = await apiClient.POST(
+        "/api/v1/follow-ups/{item_id}/notes",
+        { params: { path: { item_id: id } }, body: { note } },
       );
       return requireResponseData(data, "Follow-up note");
     },
@@ -120,9 +115,9 @@ export function useResolveFollowUp(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (input: { outcome: FollowUpOutcome; note?: string }) => {
-      const { data } = await pendingApiClient.POST(
-        "/api/v1/follow-ups/{id}/actions/resolve",
-        { params: { path: { id } }, body: input },
+      const { data } = await apiClient.POST(
+        "/api/v1/follow-ups/{item_id}/actions/resolve",
+        { params: { path: { item_id: id } }, body: input },
       );
       return requireResponseData(data, "Resolved follow-up");
     },
@@ -136,7 +131,7 @@ export function useResolveFollowUp(id: string) {
 export function useExportFollowUps(filters: FollowUpFilters) {
   return useMutation({
     mutationFn: async () => {
-      const { data } = await pendingApiClient.GET("/api/v1/follow-ups/export", {
+      const { data } = await apiClient.GET("/api/v1/follow-ups/export", {
         params: { query: filters },
         parseAs: "blob",
       });

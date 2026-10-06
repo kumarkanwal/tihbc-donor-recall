@@ -8,38 +8,10 @@ import {
 } from "@tanstack/react-query";
 
 import { apiClient } from "@/lib/api/client";
-import { ApiError } from "@/lib/api/errors";
+import type { DemoClock, DemoClockAdvance } from "@/lib/api/contracts";
 import { requireResponseData } from "@/lib/api/response";
 import { showToast } from "@/lib/toast/store";
 import { clockQueryKey } from "@/lib/ws/event-router";
-
-export interface DemoClock {
-  now: string;
-  offset_seconds: number;
-}
-
-export interface DemoClockAdvance {
-  days: number;
-  hours: number;
-}
-
-type ClockResult = Promise<{ data?: DemoClock; error?: unknown }>;
-
-interface DemoClockApiClient {
-  GET(path: "/api/v1/demo/clock"): ClockResult;
-  POST(
-    path: "/api/v1/demo/clock/actions/advance",
-    options: { body: DemoClockAdvance },
-  ): ClockResult;
-  POST(path: "/api/v1/demo/clock/actions/reset"): ClockResult;
-}
-
-// Remove this compatibility bridge once the backend demo routes are committed.
-const demoClockClient = apiClient as unknown as DemoClockApiClient;
-
-export function isDemoClockUnavailable(error: unknown): boolean {
-  return error instanceof ApiError && error.status === 404;
-}
 
 export async function invalidateAfterClockChange(
   queryClient: QueryClient,
@@ -55,17 +27,14 @@ export async function invalidateAfterClockChange(
 export async function advanceDemoClock(
   input: DemoClockAdvance,
 ): Promise<DemoClock> {
-  const { data } = await demoClockClient.POST(
-    "/api/v1/demo/clock/actions/advance",
-    { body: input },
-  );
+  const { data } = await apiClient.POST("/api/v1/demo/clock/actions/advance", {
+    body: input,
+  });
   return requireResponseData(data, "Advanced demo clock");
 }
 
 export async function resetDemoClock(): Promise<DemoClock> {
-  const { data } = await demoClockClient.POST(
-    "/api/v1/demo/clock/actions/reset",
-  );
+  const { data } = await apiClient.POST("/api/v1/demo/clock/actions/reset");
   return requireResponseData(data, "Reset demo clock");
 }
 
@@ -88,7 +57,7 @@ export function useDemoClock(enabled = true) {
   return useQuery({
     queryKey: clockQueryKey,
     queryFn: async () => {
-      const { data } = await demoClockClient.GET("/api/v1/demo/clock");
+      const { data } = await apiClient.GET("/api/v1/demo/clock");
       return requireResponseData(data, "Demo clock");
     },
     enabled,

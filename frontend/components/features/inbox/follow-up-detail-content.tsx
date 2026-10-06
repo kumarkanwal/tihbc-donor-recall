@@ -3,7 +3,7 @@ import { Copy } from "lucide-react";
 import { DateTime } from "@/components/shared/date-time";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
-import type { FollowUpDetail } from "@/lib/api/pending-contracts";
+import type { FollowUpDetail } from "@/lib/api/contracts";
 import { showToast } from "@/lib/toast/store";
 
 function valueOrDash(value: string | null | undefined): string {

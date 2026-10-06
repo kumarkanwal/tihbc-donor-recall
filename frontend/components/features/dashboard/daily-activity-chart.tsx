@@ -12,7 +12,7 @@ import {
 } from "recharts";
 
 import { ChartCard } from "@/components/shared/chart-card";
-import type { MetricsTimeseriesItem } from "@/lib/api/pending-contracts";
+import type { MetricsTimeseriesItem } from "@/lib/api/contracts";
 
 interface DailyActivityChartProps {
   items?: MetricsTimeseriesItem[];

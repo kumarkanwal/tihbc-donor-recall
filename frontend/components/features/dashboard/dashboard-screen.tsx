@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 
-import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
 import { MetricsFilters } from "@/components/shared/metrics-filters";
 import { PageHeader } from "@/components/shared/page-header";
@@ -15,10 +14,7 @@ import {
   useMetricsResponseBreakdown,
   useMetricsTimeseries,
 } from "@/hooks/use-metrics";
-import {
-  isPendingBackendUpdate,
-  type MetricsFilters as MetricsFilterValues,
-} from "@/lib/api/pending-contracts";
+import type { MetricsFilters as MetricsFilterValues } from "@/lib/api/contracts";
 
 import { ActiveCampaignsTable } from "./active-campaigns-table";
 import { DailyActivityChart } from "./daily-activity-chart";
@@ -60,9 +56,6 @@ export function DashboardScreen(): React.JSX.Element {
     campaignMetrics,
     followUps,
   ];
-  const unavailable = queries.some((query) =>
-    isPendingBackendUpdate(query.error),
-  );
 
   function retryAll(): void {
     for (const query of queries) void query.refetch();
@@ -85,12 +78,7 @@ export function DashboardScreen(): React.JSX.Element {
         onFromChange={setFrom}
         onToChange={setTo}
       />
-      {unavailable ? (
-        <EmptyState
-          title="Available after backend update"
-          description="Dashboard metrics will be connected after backend Task 2.11."
-        />
-      ) : overview.error ? (
+      {overview.error ? (
         <ErrorState
           description="Dashboard metrics could not be loaded."
           onRetry={retryAll}

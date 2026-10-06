@@ -12,7 +12,6 @@ import {
 import { useCan } from "@/hooks/use-can";
 import {
   formatDemoClock,
-  isDemoClockUnavailable,
   useAdvanceDemoClock,
   useDemoClock,
   useResetDemoClock,
@@ -33,11 +32,7 @@ export function DemoClockControl(): React.JSX.Element | null {
   const advance = useAdvanceDemoClock();
   const reset = useResetDemoClock();
 
-  if (
-    !env.NEXT_PUBLIC_DEMO_MODE ||
-    !isAdmin ||
-    isDemoClockUnavailable(clock.error)
-  ) {
+  if (!env.NEXT_PUBLIC_DEMO_MODE || !isAdmin) {
     return null;
   }
 

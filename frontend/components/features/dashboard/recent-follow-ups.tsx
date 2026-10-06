@@ -3,7 +3,7 @@ import Link from "next/link";
 import { DateTime } from "@/components/shared/date-time";
 import { EmptyState } from "@/components/shared/empty-state";
 import { StatusBadge } from "@/components/shared/status-badge";
-import type { FollowUpListItem } from "@/lib/api/pending-contracts";
+import type { FollowUpListItem } from "@/lib/api/contracts";
 
 interface RecentFollowUpsProps {
   items?: FollowUpListItem[];
