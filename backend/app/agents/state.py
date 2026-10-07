@@ -11,6 +11,21 @@ from app.models.enums import DeclineReason, ResponseIntent
 
 DetectedLanguage = Literal["en", "ur", "roman_ur"]
 AwaitingContext = Literal["none", "slot_choice", "decline_reason"]
+ProviderAttemptStatus = Literal[
+    "answered",
+    "budget_exhausted",
+    "circuit_open",
+    "client_error",
+    "connection_error",
+    "credentials_unavailable",
+    "invalid_output",
+    "payment_required",
+    "rate_limited",
+    "server_error",
+    "timeout",
+    "unknown_error",
+]
+AgentFailure = Literal["routing_unavailable", "agent_error"]
 
 
 class OfferedSlot(BaseModel):
@@ -64,6 +79,16 @@ class AgentMetadata:
 
 
 @dataclass(frozen=True)
+class ProviderAttempt:
+    """One non-secret provider outcome recorded during an agent run."""
+
+    provider: str
+    model: str
+    status: ProviderAttemptStatus
+    http_status: int | None = None
+
+
+@dataclass(frozen=True)
 class AgentExecution:
     """Agent result plus provider diagnostics used by evaluation."""
 
@@ -71,3 +96,5 @@ class AgentExecution:
     provider: str | None
     model: str | None
     fallback_count: int
+    attempts: tuple[ProviderAttempt, ...]
+    failure: AgentFailure | None

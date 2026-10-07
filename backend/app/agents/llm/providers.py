@@ -12,6 +12,9 @@ from pydantic import SecretStr
 from app.core.config import Settings
 
 ClientType = Literal["openai", "gemini", "mistral"]
+GROQ_STRICT_JSON_SCHEMA_MODELS = frozenset(
+    {"openai/gpt-oss-20b", "openai/gpt-oss-120b", "qwen/qwen3.8-27b"}
+)
 
 
 @dataclass(frozen=True)
@@ -130,3 +133,10 @@ def create_chat_model(provider: EnabledProvider, settings: Settings) -> BaseChat
         timeout=settings.llm_timeout_seconds,
         max_retries=settings.llm_max_retries_per_provider,
     )
+
+
+def structured_output_strict(provider: EnabledProvider) -> bool | None:
+    """Use Groq constrained decoding when its configured model supports it."""
+    if provider.definition.name == "groq" and provider.model in GROQ_STRICT_JSON_SCHEMA_MODELS:
+        return True
+    return None

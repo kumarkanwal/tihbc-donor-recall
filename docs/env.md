@@ -39,7 +39,7 @@ All variables are read only through `backend/app/core/config.py` (pydantic-setti
 | `LLM_MAX_RETRIES_PER_PROVIDER` | no | `0` | Retries on the same provider before falling back |
 | `LLM_TOTAL_BUDGET_SECONDS` | no | `12` | Max total time across all providers, then fallback to `unknown` |
 | `LLM_CIRCUIT_FAILURES` | no | `3` | Consecutive failures before a provider is skipped |
-| `LLM_CIRCUIT_COOLDOWN_SECONDS` | no | `120` | How long a tripped provider is skipped |
+| `LLM_CIRCUIT_COOLDOWN_SECONDS` | no | `120` | Base provider cooldown; credential/payment failures use ten times this duration |
 | `GROQ_API_KEY` | optional | `gsk_...` | |
 | `GROQ_MODEL` | no | `<model id>` | Overrides the default model in `agents/llm/providers.py` |
 | `CEREBRAS_API_KEY` | optional | `csk-...` | |

@@ -47,6 +47,12 @@ class CircuitBreaker:
         await self._redis.set(_open_key(provider), "1", ex=self._cooldown)
         await self._redis.delete(failure_key)
 
+    async def open(self, provider: str, *, cooldown_seconds: float | None = None) -> None:
+        """Open a provider circuit immediately for the requested cooldown."""
+        cooldown = self._cooldown if cooldown_seconds is None else max(1, int(cooldown_seconds))
+        await self._redis.set(_open_key(provider), "1", ex=cooldown)
+        await self._redis.delete(_failure_key(provider))
+
     async def reset(self, provider: str) -> None:
         """Clear shared failure and cooldown state after success."""
         await self._redis.delete(_failure_key(provider), _open_key(provider))

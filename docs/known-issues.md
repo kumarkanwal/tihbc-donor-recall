@@ -41,3 +41,9 @@
 - **Status:** Open
 - **Affects:** Full browser verification of the seeded demo story
 - **Details:** A live attempt reached the server-rendered `Checking session` state but did not hydrate because Playwright targeted `127.0.0.1` while the verified frontend/API development origin is `localhost`. The Playwright base URL and readiness probe now use `http://localhost:3000`; failures print sanitized browser console, page, request, and HTTP diagnostics; and `pnpm e2e` first audits every literal demo-flow test ID against application source. Frontend lint, strict typecheck, all 79 unit tests, the production build, selector audit, and Playwright discovery pass. Rerun the seeded live flow to close this issue and mark Task 4.1 Done.
+
+## KI-015 — Task 4.2 real-provider re-evaluation pending
+
+- **Status:** Open
+- **Affects:** Live multilingual agent accuracy, fallback routing, and hosted trace inspection
+- **Details:** The initial configured-provider run scored 6/31 after Groq throttling and a Cerebras 402 terminated the old chain. Provider-local fallback, strict Groq output, pacing, and diagnostics are fixed; rerun all 31 cases and inspect a `donor_reply` LangSmith trace before marking Task 4.2 done.

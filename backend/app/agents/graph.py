@@ -19,6 +19,7 @@ from app.agents.nodes.extract_details import extract_details
 from app.agents.privacy import sanitize_reply_text
 from app.agents.state import (
     AgentExecution,
+    AgentFailure,
     AgentMetadata,
     AgentResult,
     AwaitingContext,
@@ -138,27 +139,37 @@ class ReplyAgent:
                 client=self._client,
             ) as run,
         ):
-            result, failed = await self._safe_invoke(state)
+            result, failure = await self._safe_invoke(state)
+            if failure is not None:
+                route.provider = None
+                route.model = None
             run.add_metadata(_trace_metadata(metadata, route))
             run.add_tags(
                 [
                     f"intent:{result.intent.value}",
                     "source:agent",
-                    f"fallback:{str(failed or route.fallback_count > 0).lower()}",
+                    f"fallback:{str(failure is not None or route.fallback_count > 0).lower()}",
                 ]
             )
             run.end(outputs={"intent": result.intent.value, "confidence": result.confidence})
             trace_id = str(run.trace_id) if self._tracing_enabled else None
         traced_result = result.model_copy(update={"trace_id": trace_id})
-        return AgentExecution(traced_result, route.provider, route.model, route.fallback_count)
+        return AgentExecution(
+            result=traced_result,
+            provider=route.provider,
+            model=route.model,
+            fallback_count=route.fallback_count,
+            attempts=tuple(route.attempts),
+            failure=failure,
+        )
 
-    async def _safe_invoke(self, state: ReplyState) -> tuple[AgentResult, bool]:
+    async def _safe_invoke(self, state: ReplyState) -> tuple[AgentResult, AgentFailure | None]:
         try:
             raw = await self._graph.ainvoke(state)
             result = cast(Mapping[str, object], raw).get("result")
             if not isinstance(result, AgentResult):
                 raise RoutingUnavailable("Agent graph returned no result")
-            return result, False
+            return result, None
         except Exception as error:
             logger.warning("reply_agent_fallback", error_type=type(error).__name__)
             fallback = classify_fallback(
@@ -173,7 +184,7 @@ class ReplyAgent:
                     confidence=0,
                     detected_language=fallback.detected_language,
                 ),
-                True,
+                ("routing_unavailable" if isinstance(error, RoutingUnavailable) else "agent_error"),
             )
 
 

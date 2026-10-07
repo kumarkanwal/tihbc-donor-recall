@@ -89,6 +89,11 @@ def mask_phone_number(phone: str) -> str:
     return PHONE_PATTERN.sub(r"\1*****\2", phone)
 
 
+def sanitize_log_value(value: object) -> object:
+    """Return a recursively phone-masked and credential-redacted log value."""
+    return _redact_value(_mask_value(value))
+
+
 def configure_logging(log_level: str) -> None:
     """Configure standard logging and structlog to emit JSON."""
     logging.basicConfig(format="%(message)s", level=log_level, force=True)

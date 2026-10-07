@@ -13,6 +13,7 @@ class CircuitStore:
 
     def __init__(self) -> None:
         self.values: dict[str, int | str] = {}
+        self.expirations: dict[str, int] = {}
 
     async def exists(self, key: str) -> int:
         return int(key in self.values)
@@ -23,18 +24,19 @@ class CircuitStore:
         return value
 
     async def expire(self, key: str, seconds: int) -> bool:
-        del seconds
+        self.expirations[key] = seconds
         return key in self.values
 
     async def set(self, key: str, value: str, *, ex: int) -> object:
-        del ex
         self.values[key] = value
+        self.expirations[key] = ex
         return True
 
     async def delete(self, *keys: str) -> int:
         deleted = 0
         for key in keys:
             deleted += int(self.values.pop(key, None) is not None)
+            self.expirations.pop(key, None)
         return deleted
 
 

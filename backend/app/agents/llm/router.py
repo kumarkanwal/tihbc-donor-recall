@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from time import monotonic
 
 import httpx
@@ -18,18 +19,23 @@ from redis.asyncio import Redis
 
 from app.agents.llm.circuit import CircuitBreaker, CircuitStore
 from app.agents.llm.discovery import model_available
-from app.agents.llm.providers import EnabledProvider, create_chat_model, enabled_providers
+from app.agents.llm.providers import (
+    EnabledProvider,
+    create_chat_model,
+    enabled_providers,
+    structured_output_strict,
+)
+from app.agents.state import ProviderAttempt, ProviderAttemptStatus
 from app.core.config import Settings
+from app.core.logging import sanitize_log_value
 
 logger = structlog.get_logger(__name__)
+UNAVAILABLE_PROVIDER_COOLDOWN_MULTIPLIER = 10
+MAX_ERROR_BODY_CHARACTERS = 2000
 
 
 class RetryableProviderError(RuntimeError):
     """A provider failure eligible for the next configured fallback."""
-
-
-class TerminalProviderError(RuntimeError):
-    """A provider failure that must stop the fallback chain."""
 
 
 class RoutingUnavailable(RuntimeError):
@@ -43,6 +49,7 @@ class RouteStats:
     provider: str | None = None
     model: str | None = None
     fallback_count: int = 0
+    attempts: list[ProviderAttempt] = field(default_factory=list)
 
 
 ProviderInvoker = Callable[[EnabledProvider, type[BaseModel], str], Awaitable[BaseModel]]
@@ -126,8 +133,6 @@ class LLMRouter:
                 return await chain.ainvoke(prompt)
         except (TimeoutError, RetryableProviderError) as error:
             raise RoutingUnavailable("LLM routing budget or providers exhausted") from error
-        except TerminalProviderError as error:
-            raise RoutingUnavailable("LLM provider rejected the request") from error
 
     def _provider_runnable(
         self,
@@ -150,9 +155,12 @@ class LLMRouter:
         name = provider.definition.name
         if await self._circuit.is_open(name):
             self._stats().fallback_count += 1
+            self._record_attempt(provider, "circuit_open")
             raise RetryableProviderError(f"Provider circuit is open: {name}")
         remaining = deadline - monotonic()
         if remaining <= 0:
+            self._stats().fallback_count += 1
+            self._record_attempt(provider, "budget_exhausted")
             raise RetryableProviderError("LLM total budget exhausted")
         try:
             async with asyncio.timeout(min(self._settings.llm_timeout_seconds, remaining)):
@@ -164,31 +172,66 @@ class LLMRouter:
         await self._circuit.reset(name)
         stats = self._stats()
         stats.provider, stats.model = name, provider.model
+        self._record_attempt(provider, "answered")
         return validated
 
     async def _handle_failure(self, provider: EnabledProvider, error: Exception) -> None:
         name = provider.definition.name
         status = _status_code(error)
-        if status in {401, 403}:
-            self._unavailable.add(name)
-            logger.error("llm_provider_auth_failed", provider=name)
-            raise TerminalProviderError(f"Provider authentication failed: {name}") from error
-        if _retryable(error, status):
-            self._stats().fallback_count += 1
+        attempt_status = _attempt_status(error, status)
+        self._stats().fallback_count += 1
+        self._record_attempt(provider, attempt_status, status)
+        if status in {400, 401, 402, 403}:
+            multiplier = (
+                UNAVAILABLE_PROVIDER_COOLDOWN_MULTIPLIER if status in {401, 402, 403} else 1
+            )
+            await self._circuit.open(
+                name,
+                cooldown_seconds=self._settings.llm_circuit_cooldown_seconds * multiplier,
+            )
+            log = logger.warning if status == 400 else logger.error
+            log(
+                "llm_provider_unavailable",
+                provider=name,
+                status=status,
+                error_body=_safe_error_body(error, provider.api_key.get_secret_value()),
+            )
+        else:
             await self._circuit.record_failure(name)
-            logger.warning("llm_provider_fallback", provider=name, status=status)
-            raise RetryableProviderError(f"Provider failed: {name}") from error
-        logger.error("llm_provider_terminal_failure", provider=name, status=status)
-        raise TerminalProviderError(f"Provider request failed: {name}") from error
+            logger.warning(
+                "llm_provider_fallback",
+                provider=name,
+                status=status,
+                failure=attempt_status,
+            )
+        raise RetryableProviderError(f"Provider failed: {name}") from error
 
     async def _invoke_langchain(
         self, provider: EnabledProvider, schema: type[BaseModel], prompt: str
     ) -> BaseModel:
         model = create_chat_model(provider, self._settings)
-        method = "json_schema"
-        structured = model.with_structured_output(schema, method=method)
+        structured = model.with_structured_output(
+            schema,
+            method="json_schema",
+            strict=structured_output_strict(provider),
+        )
         result = await structured.ainvoke(prompt)
         return schema.model_validate(result)
+
+    def _record_attempt(
+        self,
+        provider: EnabledProvider,
+        status: ProviderAttemptStatus,
+        http_status: int | None = None,
+    ) -> None:
+        self._stats().attempts.append(
+            ProviderAttempt(
+                provider=provider.definition.name,
+                model=provider.model,
+                status=status,
+                http_status=http_status,
+            )
+        )
 
     @staticmethod
     def _stats() -> RouteStats:
@@ -221,24 +264,24 @@ async def routing_context(router: LLMRouter) -> AsyncIterator[RouteStats]:
         _active_router.reset(router_token)
 
 
-def _retryable(error: Exception, status: int | None) -> bool:
-    return (
-        status == 429
-        or status is not None
-        and status >= 500
-        or isinstance(
-            error,
-            (
-                TimeoutError,
-                ConnectionError,
-                httpx.TimeoutException,
-                httpx.NetworkError,
-                OutputParserException,
-                ValidationError,
-                ValueError,
-            ),
-        )
-    )
+def _attempt_status(error: Exception, status: int | None) -> ProviderAttemptStatus:
+    if status == 400:
+        return "client_error"
+    if status in {401, 403}:
+        return "credentials_unavailable"
+    if status == 402:
+        return "payment_required"
+    if status == 429:
+        return "rate_limited"
+    if status is not None and status >= 500:
+        return "server_error"
+    if isinstance(error, (TimeoutError, httpx.TimeoutException)):
+        return "timeout"
+    if isinstance(error, (ConnectionError, httpx.NetworkError)):
+        return "connection_error"
+    if isinstance(error, (OutputParserException, ValidationError, ValueError)):
+        return "invalid_output"
+    return "unknown_error"
 
 
 def _status_code(error: Exception) -> int | None:
@@ -248,3 +291,17 @@ def _status_code(error: Exception) -> int | None:
     response = getattr(error, "response", None)
     response_status = getattr(response, "status_code", None)
     return response_status if isinstance(response_status, int) else None
+
+
+def _safe_error_body(error: Exception, api_key: str) -> str | None:
+    body = getattr(error, "body", None)
+    response = getattr(error, "response", None)
+    if body is None and response is not None:
+        try:
+            body = response.json()
+        except (AttributeError, ValueError):
+            body = getattr(response, "text", None)
+    if body is None:
+        return None
+    rendered = json.dumps(sanitize_log_value(body), ensure_ascii=False, default=str)
+    return rendered.replace(api_key, "***")[:MAX_ERROR_BODY_CHARACTERS]

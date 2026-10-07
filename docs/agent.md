@@ -120,20 +120,32 @@ class AgentResult(BaseModel):
 - `router.py`: builds the chain in `LLM_PROVIDER_ORDER`, skipping providers without a key. Implemented with
   LangChain `with_fallbacks`, plus:
   - per-provider timeout (`LLM_TIMEOUT_SECONDS`) and total budget (`LLM_TOTAL_BUDGET_SECONDS`);
-  - fall back on timeout, rate limit (429), server errors (5xx), connection errors, and invalid
-    structured output;
-  - do not fall back on authentication errors (401/403): log an error and mark the provider unavailable;
+  - fall back to the next provider for every provider-local failure, including timeout, invalid structured
+    output, connection errors, 4xx responses, rate limits (429), and server errors (5xx);
+  - open the failing provider's shared circuit immediately for 400/401/402/403 responses. Use the normal
+    cooldown for 400 and ten times the normal cooldown for 401/402/403 before that provider is retried;
+  - log sanitized 400 response bodies to expose request/schema problems without credentials or full phone
+    numbers. Groq GPT-OSS models use strict JSON Schema mode to avoid best-effort schema-generation 400s;
   - circuit breaker in Redis: after `LLM_CIRCUIT_FAILURES` consecutive failures a provider is skipped for
     `LLM_CIRCUIT_COOLDOWN_SECONDS` (shared across workers).
 - Nodes call only `get_structured_llm(schema)` from the router; they never know which provider answered.
 - Each result records the provider and model used (saved in LangSmith metadata and logs).
 - Startup logs which providers are active (names only, never keys).
+- `RoutingUnavailable` is raised only after every available provider is exhausted or the total routing
+  budget is spent.
 
 ### 3.5 Fallback
 - If confidence < `AGENT_CONFIDENCE_THRESHOLD` (default 0.7), or **all** providers fail or the total
   budget runs out → return intent `unknown`. The flow in 2.4 applies. The demo never breaks because of the LLM.
 - If `LLM_ENABLED=false`, a keyword classifier is used (`agents/fallback.py`) with a small keyword list
   per intent in English and Roman Urdu.
+
+### 3.6 Real-provider evaluation
+- `uv run python -m app.agents.evaluate` runs all evaluation cases with a 1500 ms delay between cases.
+- `--delay-ms N` changes the inter-case delay; `--provider NAME` restricts the run to one configured
+  provider.
+- Each case prints expected and actual intent/date/reason/slot values plus every provider attempt and its
+  status. The summary separates wrong answers, provider exhaustion, and unexpected agent errors.
 
 ## 4. Observability (LangSmith)
 - Tracing enabled via env. Run name: `donor_reply`.

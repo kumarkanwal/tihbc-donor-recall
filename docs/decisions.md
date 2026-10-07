@@ -383,7 +383,7 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 ## D-048 — Lifecycle-owned structured LLM router and PII-safe agent traces
 
 - **Date:** 2026-10-05
-- **Status:** Accepted
+- **Status:** Superseded by D-053
 - **Decision:** Own one `LLMRouter` per API process and bind it to each LangGraph execution through an async context. Build every node call through `get_structured_llm(schema)`, use LangChain `with_fallbacks` over the configured provider order, and share failure/cooldown state in provider-namespaced Redis keys. Validate configured model IDs at startup and skip missing or unreachable models without failing application startup. Trace only sanitized reply text, offered-slot context, non-personal campaign/enrollment identifiers, and provider diagnostics; save the root LangSmith trace ID on the donor response.
 - **Reason:** Central lifecycle ownership avoids per-node provider policy drift, Redis makes circuit state consistent across API workers, startup discovery catches stale free-model defaults safely, and an explicit sanitized trace boundary prevents donor names or phone numbers from entering provider or observability payloads.
 - **Consequences:** Provider defaults remain replaceable through `<PROVIDER>_MODEL`; model catalog changes produce a warning and temporarily remove that provider until restart. `LLM_ENABLED=false` retains the deterministic keyword fallback, while enabled-provider exhaustion or low confidence returns `unknown` and the normal needs-call flow.
@@ -443,3 +443,12 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Decision:** Use `http://localhost:3000` as both Playwright's base URL and development-server readiness URL. Run a dependency-free static audit of every literal `getByTestId` selector before the browser suite, and use an automatic Playwright fixture to attach and print console errors, uncaught page errors, failed requests, and HTTP error responses only when a test fails. Strip query strings and fragments from captured request URLs.
 - **Reason:** The verified browser and configured API/CORS origin use `localhost`; mixing it with `127.0.0.1` can prevent development assets from hydrating while server-rendered fallback content remains visible. Failure-only diagnostics expose that class of problem immediately without adding noise or leaking query-string credentials on successful runs.
 - **Consequences:** `pnpm e2e` fails before browser startup if a literal selector no longer maps to a concrete or templated application test ID. Failed runs retain a Playwright trace and include a text diagnostics attachment plus terminal output; successful runs remain quiet.
+
+## D-053 — Provider-local LLM failure isolation
+
+- **Date:** 2026-10-07
+- **Status:** Accepted
+- **Supersedes:** D-048 provider-terminal failure behavior only; its lifecycle, routing order, and PII-safe tracing choices remain accepted.
+- **Decision:** Treat every provider failure as fallback-eligible until all configured providers or the total budget are exhausted. Open the shared circuit immediately for 400/401/402/403 responses, using the base cooldown for 400 and ten times that cooldown for credential, permission, or payment failures. Record each provider attempt without secrets, log sanitized 400 bodies, and use strict JSON Schema mode for Groq models that officially support it.
+- **Reason:** A provider-specific payment or credential problem must not disable healthy downstream providers, while immediate shared cooldowns prevent repeated known-bad calls. Groq best-effort structured output can return 400 when generated JSON misses the schema; strict mode removes that avoidable request behavior on supported GPT-OSS models.
+- **Consequences:** `RoutingUnavailable` now means the complete chain or time budget was exhausted. Evaluations can distinguish provider exhaustion from semantic model errors and operators can diagnose safe 400 details without exposing keys or full phone numbers.

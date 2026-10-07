@@ -5,7 +5,12 @@ import pytest
 from pydantic import SecretStr
 
 from app.agents.llm.discovery import model_available
-from app.agents.llm.providers import PROVIDERS, EnabledProvider, enabled_providers
+from app.agents.llm.providers import (
+    PROVIDERS,
+    EnabledProvider,
+    enabled_providers,
+    structured_output_strict,
+)
 from tests.agents.fakes import router_settings
 
 
@@ -33,6 +38,16 @@ def test_only_keys_enable_providers_and_model_override_wins() -> None:
 
     assert [provider.definition.name for provider in providers] == ["groq", "gemini"]
     assert providers[0].model == "custom-structured-model"
+
+
+def test_groq_gpt_oss_uses_strict_json_schema_mode() -> None:
+    strict_provider = EnabledProvider(
+        PROVIDERS["groq"], SecretStr("groq-secret"), "openai/gpt-oss-20b"
+    )
+    custom_provider = EnabledProvider(PROVIDERS["groq"], SecretStr("groq-secret"), "custom-model")
+
+    assert structured_output_strict(strict_provider) is True
+    assert structured_output_strict(custom_provider) is None
 
 
 @pytest.mark.asyncio

@@ -3,7 +3,9 @@
 import asyncio
 
 import pytest
-from pydantic import BaseModel
+import structlog
+from langchain_core.runnables import RunnableLambda
+from pydantic import BaseModel, SecretStr
 
 from app.agents.llm.providers import EnabledProvider
 from app.agents.llm.router import LLMRouter, RoutingUnavailable, routing_context
@@ -19,9 +21,10 @@ class ProbeResult(BaseModel):
 class ProviderHttpError(RuntimeError):
     """Provider-like error carrying an HTTP status."""
 
-    def __init__(self, status_code: int) -> None:
+    def __init__(self, status_code: int, body: object | None = None) -> None:
         super().__init__(f"status {status_code}")
         self.status_code = status_code
+        self.body = body
 
 
 @pytest.mark.asyncio
@@ -64,24 +67,130 @@ async def test_invalid_structured_output_uses_next_provider() -> None:
 
 
 @pytest.mark.asyncio
-async def test_auth_failure_stops_fallback_and_marks_provider_unavailable() -> None:
+@pytest.mark.parametrize("status_code", [401, 403])
+async def test_provider_credential_failure_continues_to_next_provider(
+    status_code: int,
+) -> None:
     calls: list[str] = []
 
     async def invoke(provider: EnabledProvider, schema: type[BaseModel], prompt: str) -> BaseModel:
         del prompt
         calls.append(provider.definition.name)
         if provider.definition.name == "groq":
-            raise ProviderHttpError(401)
+            raise ProviderHttpError(status_code)
         return schema.model_validate({"value": "second call"})
 
     router = LLMRouter(router_settings(), CircuitStore(), provider_invoker=invoke)
-    with pytest.raises(RoutingUnavailable):
-        await router.invoke(ProbeResult, "safe input")
-    assert calls == ["groq"]
-
-    result = await router.invoke(ProbeResult, "safe input")
+    async with routing_context(router) as stats:
+        result = await router.invoke(ProbeResult, "safe input")
     assert result == ProbeResult(value="second call")
     assert calls == ["groq", "cerebras"]
+    assert [attempt.status for attempt in stats.attempts] == [
+        "credentials_unavailable",
+        "answered",
+    ]
+
+
+@pytest.mark.asyncio
+async def test_rate_limit_then_payment_failure_reaches_gemini() -> None:
+    calls: list[str] = []
+
+    async def invoke(provider: EnabledProvider, schema: type[BaseModel], prompt: str) -> BaseModel:
+        del prompt
+        calls.append(provider.definition.name)
+        if provider.definition.name == "groq":
+            raise ProviderHttpError(429)
+        if provider.definition.name == "cerebras":
+            raise ProviderHttpError(402)
+        return schema.model_validate({"value": "gemini answered"})
+
+    settings = router_settings(
+        llm_provider_order=("groq", "cerebras", "gemini"),
+        gemini_api_key=SecretStr("gemini-secret"),
+    )
+    store = CircuitStore()
+    router = LLMRouter(settings, store, provider_invoker=invoke)
+    async with routing_context(router) as stats:
+        result = await router.invoke(ProbeResult, "safe input")
+
+    assert result == ProbeResult(value="gemini answered")
+    assert calls == ["groq", "cerebras", "gemini"]
+    assert [attempt.status for attempt in stats.attempts] == [
+        "rate_limited",
+        "payment_required",
+        "answered",
+    ]
+    assert store.expirations["llm:circuit:cerebras:open"] == 300
+
+
+@pytest.mark.asyncio
+async def test_bad_request_logs_sanitized_body_and_uses_next_provider() -> None:
+    secret = "groq-secret"
+
+    async def invoke(provider: EnabledProvider, schema: type[BaseModel], prompt: str) -> BaseModel:
+        del prompt
+        if provider.definition.name == "groq":
+            raise ProviderHttpError(
+                400,
+                {
+                    "error": {
+                        "message": f"invalid schema key={secret} for +923001234567",
+                        "failed_generation": {"token": secret},
+                    }
+                },
+            )
+        return schema.model_validate({"value": "ok"})
+
+    store = CircuitStore()
+    with structlog.testing.capture_logs() as logs:
+        result = await LLMRouter(router_settings(), store, provider_invoker=invoke).invoke(
+            ProbeResult, "safe input"
+        )
+
+    rendered = repr(logs)
+    assert result == ProbeResult(value="ok")
+    assert secret not in rendered
+    assert "+923001234567" not in rendered
+    assert "+92300*****67" in rendered
+    assert "failed_generation" in rendered
+    assert store.expirations["llm:circuit:groq:open"] == 30
+
+
+@pytest.mark.asyncio
+async def test_groq_request_uses_strict_json_schema_mode(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    request_options: dict[str, object] = {}
+
+    class FakeChatModel:
+        def with_structured_output(
+            self,
+            schema: type[BaseModel],
+            *,
+            method: str,
+            strict: bool | None,
+        ) -> RunnableLambda[str, BaseModel]:
+            request_options.update(method=method, strict=strict)
+
+            async def answer(prompt: str) -> BaseModel:
+                del prompt
+                return schema.model_validate({"value": "ok"})
+
+            return RunnableLambda(answer)
+
+    monkeypatch.setattr(
+        "app.agents.llm.router.create_chat_model",
+        lambda provider, settings: FakeChatModel(),
+    )
+    router = LLMRouter(
+        router_settings(llm_provider_order=("groq",)),
+        CircuitStore(),
+    )
+
+    result = await router.invoke(ProbeResult, "safe input")
+
+    assert result == ProbeResult(value="ok")
+    assert request_options == {"method": "json_schema", "strict": True}
 
 
 @pytest.mark.asyncio

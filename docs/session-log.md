@@ -330,3 +330,9 @@
 - **Verification:** `pnpm lint`, `pnpm typecheck`, all 79 Vitest tests across 30 files, and `pnpm build` pass. `pnpm e2e -- --list` runs the selector preflight successfully and discovers the single Chromium story. The live stateful suite was intentionally left for the requested seeded rerun.
 - **Next:** With PostgreSQL, Redis, API, scheduler, and frontend running against the documented local configuration, run a fresh `uv run python -m app.seed`, then rerun `pnpm e2e`. Close KI-014 and mark Task 4.1 Done after the Chromium story passes.
 - **Blockers:** No implementation blocker remains. Live seeded browser acceptance is still pending under KI-014.
+
+## S-049 | 2026-10-07 | Agent routing and evaluation repair
+Done: Fixed provider-local fallback, shared cooldowns, strict Groq output, safe 400 diagnostics, evaluation pacing/filtering, field-level attempt output, and relative-date examples; recorded D-053.
+Verification: Ruff lint/format and strict mypy pass; 300 backend tests pass with 40 expected opt-in skips.
+Next: Rerun `uv run python -m app.agents.evaluate --delay-ms 1500` and inspect the LangSmith trace.
+Blockers: Real-provider evaluation and hosted trace verification remain pending under KI-015.
