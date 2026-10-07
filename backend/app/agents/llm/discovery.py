@@ -41,7 +41,12 @@ async def model_available(client: httpx.AsyncClient, provider: EnabledProvider) 
         logger.warning("llm_model_check_failed", provider=name, error_type=type(error).__name__)
         return False
     if provider.model not in models:
-        logger.warning("llm_model_missing", provider=name, model=provider.model)
+        logger.warning(
+            "llm_configured_model_missing",
+            provider=name,
+            configured_model=provider.model,
+            available_models=sorted(models),
+        )
         return False
     return True
 

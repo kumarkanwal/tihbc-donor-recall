@@ -1,6 +1,7 @@
 """Provider failure classification and safe diagnostic rendering."""
 
 import json
+from collections.abc import Mapping
 
 import httpx
 from langchain_core.exceptions import OutputParserException
@@ -10,10 +11,17 @@ from app.agents.state import ProviderAttemptStatus
 from app.core.logging import sanitize_log_value
 
 MAX_ERROR_DETAIL_CHARACTERS = 2000
+OUTPUT_PARSE_FAILED = "output_parse_failed"
 
 
-def provider_attempt_status(error: Exception, status: int | None) -> ProviderAttemptStatus:
+def provider_attempt_status(
+    error: Exception,
+    status: int | None,
+    error_code: str | None = None,
+) -> ProviderAttemptStatus:
     """Map an exception to the stable evaluation status vocabulary."""
+    if error_code == OUTPUT_PARSE_FAILED:
+        return "invalid_output"
     if status == 400:
         return "client_error"
     if status in {401, 403}:
@@ -31,6 +39,27 @@ def provider_attempt_status(error: Exception, status: int | None) -> ProviderAtt
     if isinstance(error, (OutputParserException, ValidationError, ValueError)):
         return "invalid_output"
     return "unknown_error"
+
+
+def provider_error_code(error: Exception) -> str | None:
+    """Read a stable provider code from common nested error-body shapes."""
+    body = getattr(error, "body", None)
+    response = getattr(error, "response", None)
+    if body is None and response is not None:
+        try:
+            body = response.json()
+        except (AttributeError, ValueError):
+            return None
+    if not isinstance(body, Mapping):
+        return None
+    nested = body.get("error")
+    for candidate in (body, nested):
+        if not isinstance(candidate, Mapping):
+            continue
+        code = candidate.get("code")
+        if isinstance(code, str):
+            return code
+    return None
 
 
 def provider_status_code(error: Exception) -> int | None:

@@ -2,12 +2,14 @@
 
 import httpx
 import pytest
+import structlog
 from pydantic import SecretStr
 
 from app.agents.llm.discovery import model_available
 from app.agents.llm.providers import (
     PROVIDERS,
     EnabledProvider,
+    create_chat_model,
     enabled_providers,
     structured_output_strict,
 )
@@ -24,6 +26,7 @@ def test_registry_contains_every_documented_provider() -> None:
         "openrouter",
     )
     assert all(provider.default_model for provider in PROVIDERS.values())
+    assert PROVIDERS["gemini"].default_model == "gemini-3.5-flash-lite"
 
 
 def test_only_keys_enable_providers_and_model_override_wins() -> None:
@@ -50,6 +53,17 @@ def test_groq_gpt_oss_uses_strict_json_schema_mode() -> None:
     assert structured_output_strict(custom_provider) is None
 
 
+def test_gemini_adapter_honors_minimum_sdk_deadline() -> None:
+    provider = EnabledProvider(
+        PROVIDERS["gemini"], SecretStr("gemini-secret"), "gemini-3.5-flash-lite"
+    )
+
+    model = create_chat_model(provider, router_settings(llm_timeout_seconds=4.0))
+
+    assert model.timeout == 10.0
+    assert model.temperature is None
+
+
 @pytest.mark.asyncio
 async def test_gemini_discovery_sends_key_only_in_header() -> None:
     secret = "gemini-configured-secret"
@@ -67,3 +81,32 @@ async def test_gemini_discovery_sends_key_only_in_header() -> None:
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(respond)) as client:
         assert await model_available(client, provider) is True
+
+
+@pytest.mark.asyncio
+async def test_missing_configured_model_logs_catalog_clearly() -> None:
+    provider = EnabledProvider(
+        PROVIDERS["gemini"], SecretStr("gemini-secret"), "retired-gemini-model"
+    )
+
+    async def respond(request: httpx.Request) -> httpx.Response:
+        del request
+        return httpx.Response(
+            200,
+            json={"models": [{"name": "models/gemini-3.5-flash-lite"}]},
+        )
+
+    with structlog.testing.capture_logs() as logs:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(respond)) as client:
+            available = await model_available(client, provider)
+
+    assert available is False
+    assert logs == [
+        {
+            "provider": "gemini",
+            "configured_model": "retired-gemini-model",
+            "available_models": ["gemini-3.5-flash-lite"],
+            "event": "llm_configured_model_missing",
+            "log_level": "warning",
+        }
+    ]

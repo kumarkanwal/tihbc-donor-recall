@@ -163,7 +163,40 @@ async def test_bad_request_logs_sanitized_body_and_uses_next_provider() -> None:
     assert "+923001234567" not in rendered
     assert "+92300*****67" in rendered
     assert "failed_generation" in rendered
+    assert store.expirations["llm:circuit:groq:open"] == 300
+
+
+@pytest.mark.asyncio
+async def test_output_parse_failure_uses_short_cooldown_and_fallback() -> None:
+    calls: list[str] = []
+
+    async def invoke(provider: EnabledProvider, schema: type[BaseModel], prompt: str) -> BaseModel:
+        del prompt
+        calls.append(provider.definition.name)
+        if provider.definition.name == "groq":
+            raise ProviderHttpError(
+                400,
+                {
+                    "error": {
+                        "code": "output_parse_failed",
+                        "message": "Model emitted reasoning instead of JSON",
+                    }
+                },
+            )
+        return schema.model_validate({"value": "ok"})
+
+    store = CircuitStore()
+    router = LLMRouter(router_settings(), store, provider_invoker=invoke)
+    with structlog.testing.capture_logs() as logs:
+        async with routing_context(router) as stats:
+            result = await router.invoke(ProbeResult, "asdfgh")
+
+    assert result == ProbeResult(value="ok")
+    assert calls == ["groq", "cerebras"]
+    assert [attempt.status for attempt in stats.attempts] == ["invalid_output", "answered"]
     assert store.expirations["llm:circuit:groq:open"] == 30
+    assert any(log["event"] == "llm_provider_fallback" for log in logs)
+    assert all(log["event"] != "llm_provider_unavailable" for log in logs)
 
 
 @pytest.mark.asyncio

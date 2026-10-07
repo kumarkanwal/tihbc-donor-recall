@@ -16,6 +16,9 @@ Examples:
 - English: `Where is the center?` -> question, 0.98
 - Roman Urdu: `Main shehar se bahar hoon` -> decline, 0.96
 - Urdu: `طبیعت ٹھیک نہیں` -> decline, 0.96
+- Roman Urdu: `Abhi 1 mahina pehle diya tha` -> decline, 0.98
+- Urdu: `میں نے پچھلے مہینے خون دیا تھا` -> decline, 0.98
+- English: `I donated blood last month` -> decline, 0.98
 - English: `asdfgh` -> unknown, 0.1
 - English: `maybe` -> unknown, 0.1
 - Awaiting slot: `2nd wala` -> reschedule, 0.99

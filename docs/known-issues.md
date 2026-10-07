@@ -24,11 +24,11 @@
 - **Affects:** PostgreSQL simulator queries, read receipts, deterministic and agent reply flows, appointment booking, follow-ups, and live events
 - **Details:** The complete PostgreSQL/Redis suite passes, including HTTP replies, scheduling suspension, outbound-only delivery progression, stable cursor pagination, capacity-safe slot booking, classified responses, bilingual acknowledgements, follow-up create/update payload snapshots, and ordered typing/message/status events. The Donor Phone walkthrough with `LLM_ENABLED=true` remains pending before closing this issue.
 
-## KI-012 — Task 2.9 real-provider and LangSmith acceptance pending
+## KI-012 — Task 2.9 LangSmith acceptance pending
 
 - **Status:** Open
-- **Affects:** Live multilingual LLM accuracy, provider fallback latency, and hosted trace inspection
-- **Details:** All documented agent examples, provider ordering, authentication handling, Redis circuit behavior, total timeout budget, low-confidence fallback, trace persistence, and PII boundaries pass with mocked LLMs. Real provider keys and LangSmith credentials are not available in this session; run `python -m app.agents.evaluate` with the configured environment and inspect a `donor_reply` trace before closing this issue.
+- **Affects:** Hosted trace inspection
+- **Details:** The configured-provider evaluation passes 31/31 cases (100%) with no wrong answers, provider-exhaustion failures, or agent errors. Provider ordering, authentication handling, Redis circuit behavior, total timeout budget, low-confidence fallback, trace persistence, and PII boundaries pass automated tests. Inspect a hosted `donor_reply` LangSmith trace before closing this issue.
 
 ## KI-013 — Production image and VPS acceptance pending
 
@@ -44,6 +44,6 @@
 
 ## KI-015 — Task 4.2 real-provider re-evaluation pending
 
-- **Status:** Open
-- **Affects:** Live multilingual agent accuracy, fallback routing, and hosted trace inspection
-- **Details:** The first routing repair raised the configured-provider run to 27/31 (87.1%) with no provider-exhaustion failures. The remaining strict-schema Groq decline failure, Gemini AFC/request configuration, deterministic multilingual date and offered-slot resolution, and prompt edge cases are fixed. Rerun all 31 cases, confirm at least 90% accuracy with Groq answering most cases, and inspect a `donor_reply` LangSmith trace before marking Task 4.2 done.
+- **Status:** Resolved
+- **Affects:** Live multilingual agent accuracy and fallback routing
+- **Details:** The final configured-provider evaluation passes 31/31 cases (100%) with `wrong_answer=0`, `no_provider_answered=0`, and `agent_error=0`. Groq answered the normal path and its observed `output_parse_failed` response fell through as transient invalid output on the short cooldown; downstream providers completed the run. Hosted trace inspection remains tracked separately under KI-012.

@@ -110,15 +110,17 @@ class AgentResult(BaseModel):
 - Every LLM call uses a closed, all-fields-required structured output bound to a Pydantic model. Optional
   wire values use explicit sentinel enum/string values instead of nullable unions; application code maps
   sentinels back to domain `None`. No regex parsing of LLM text.
-- Temperature 0. Prompts are files in `agents/prompts/`: `classify_intent.md`, `extract_date.md`,
+- Temperature 0 where the provider model supports explicit sampling controls; fixed-sampling Gemini models
+  use their native default. Prompts are files in `agents/prompts/`: `classify_intent.md`, `extract_date.md`,
   `extract_decline_reason.md`, `detect_language.md`, with few-shot examples in English, Urdu, and Roman Urdu.
 
 **Routing (`agents/llm/`)**
 - `providers.py`: one registry entry per provider (name, base URL, key setting, client type, and a
   **default free model** that supports structured output). `<PROVIDER>_MODEL` in env overrides the default.
-  Only the API key is required to enable a provider.
+  Only the API key is required to enable a provider. Gemini defaults to the stable
+  `gemini-3.5-flash-lite` model.
 - Startup check: list each enabled provider's models; if the configured model is missing, log a warning
-  and skip that provider (never crash).
+  containing the configured model and returned catalog, then skip that provider (never crash).
   Groq, Cerebras, Together, and OpenRouter use the OpenAI-compatible chat client with their base URL;
   Gemini and Mistral use their LangChain integrations. Adding a provider means adding one registry entry.
 - `router.py`: builds the chain in `LLM_PROVIDER_ORDER`, skipping providers without a key. Implemented with
@@ -126,11 +128,13 @@ class AgentResult(BaseModel):
   - per-provider timeout (`LLM_TIMEOUT_SECONDS`) and total budget (`LLM_TOTAL_BUDGET_SECONDS`);
   - fall back to the next provider for every provider-local failure, including timeout, invalid structured
     output, connection errors, 4xx responses, rate limits (429), and server errors (5xx);
-  - open the failing provider's shared circuit immediately for 400/401/402/403 responses. Use the normal
-    cooldown for 400 and ten times the normal cooldown for 401/402/403 before that provider is retried;
+  - open the failing provider's shared circuit immediately for 400/401/402/403 responses. Groq
+    `output_parse_failed` responses are transient invalid output and use the normal cooldown; true 400
+    schema/request errors and 401/402/403 responses use ten times the normal cooldown;
   - log sanitized error details for all provider failures without credentials or full phone numbers. Groq
     GPT-OSS models use strict JSON Schema mode with compatible closed schemas;
-  - use Gemini native JSON Schema structured output and explicitly disable SDK automatic function calling;
+  - use Gemini native JSON Schema structured output, explicitly disable SDK automatic function calling,
+    and advertise the SDK's 10-second minimum request deadline while retaining the router's shorter outer timeout;
   - circuit breaker in Redis: after `LLM_CIRCUIT_FAILURES` consecutive failures a provider is skipped for
     `LLM_CIRCUIT_COOLDOWN_SECONDS` (shared across workers).
 - Nodes call only `get_structured_llm(schema)` from the router; they never know which provider answered.

@@ -6,6 +6,8 @@ Examples:
 - Urdu: `میں شہر سے باہر ہوں` -> travelling
 - Roman Urdu: `Tabiyat theek nahi` -> health
 - Roman Urdu: `Abhi 1 mahina pehle diya tha` -> recently_donated
+- Urdu: `میں نے پچھلے مہینے خون دیا تھا` -> recently_donated
+- English: `I donated blood last month` -> recently_donated
 - English: `Not interested` -> not_interested
 - Urdu: `کوئی اور وجہ` -> other
 

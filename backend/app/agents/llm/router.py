@@ -18,7 +18,9 @@ from redis.asyncio import Redis
 
 from app.agents.llm.circuit import CircuitBreaker, CircuitStore
 from app.agents.llm.diagnostics import (
+    OUTPUT_PARSE_FAILED,
     provider_attempt_status,
+    provider_error_code,
     provider_status_code,
     safe_provider_error_detail,
 )
@@ -181,22 +183,28 @@ class LLMRouter:
     async def _handle_failure(self, provider: EnabledProvider, error: Exception) -> None:
         name = provider.definition.name
         status = provider_status_code(error)
-        attempt_status = provider_attempt_status(error, status)
+        error_code = provider_error_code(error)
+        attempt_status = provider_attempt_status(error, status, error_code)
         self._stats().fallback_count += 1
         self._record_attempt(provider, attempt_status, status)
         if status in {400, 401, 402, 403}:
-            multiplier = (
-                UNAVAILABLE_PROVIDER_COOLDOWN_MULTIPLIER if status in {401, 402, 403} else 1
-            )
+            transient_parse_failure = error_code == OUTPUT_PARSE_FAILED
+            long_cooldown = status in {401, 402, 403} or not transient_parse_failure
+            multiplier = UNAVAILABLE_PROVIDER_COOLDOWN_MULTIPLIER if long_cooldown else 1
             await self._circuit.open(
                 name,
                 cooldown_seconds=self._settings.llm_circuit_cooldown_seconds * multiplier,
             )
+            event = (
+                "llm_provider_fallback" if transient_parse_failure else "llm_provider_unavailable"
+            )
             log = logger.warning if status == 400 else logger.error
             log(
-                "llm_provider_unavailable",
+                event,
                 provider=name,
                 status=status,
+                failure=attempt_status,
+                error_code=error_code,
                 error_detail=safe_provider_error_detail(error, provider.api_key.get_secret_value()),
                 error_type=type(error).__name__,
             )

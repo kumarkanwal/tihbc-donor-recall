@@ -348,3 +348,9 @@ Blockers: Real-provider evaluation and hosted trace verification remain pending 
 S-050 final verification correction: The final focused agent set contains 48 passing tests, and the final full backend suite contains 324 passing tests with 40 expected opt-in skips. These final counts supersede the earlier S-050 verification counts above.
 
 S-050 final verification addendum 2: After adding the next-week precedence regression case, the complete backend suite passes with 325 tests and 40 expected opt-in skips. This is the final suite count for S-050.
+
+## S-051 | 2026-10-07 | Gemini compatibility, Groq parse retries, and recent-donation coverage
+Done: Updated the Gemini default to `gemini-3.5-flash-lite`, added explicit startup diagnostics when the configured model is absent from discovery, and made the Gemini SDK request deadline compatible while preserving the router's shorter failover budget. Classified Groq `output_parse_failed` 400 responses as transient invalid output with the base cooldown while retaining the long cooldown for authentication, payment, permission, and true schema/request failures. Added English, Urdu, and Roman Urdu recent-donation examples and recorded D-055 and D-056.
+Verification: Ruff lint and format checks pass, strict mypy passes across 190 source files, and the complete isolated backend suite passes with 329 tests and 40 expected opt-in skips. The configured-provider evaluation passes 31/31 cases (100%) with no wrong answers, provider-exhaustion failures, or agent errors; its observed Groq parse failure correctly fell through to another provider. The evaluation used Python UTF-8 mode because this Windows console cannot otherwise print Urdu output.
+Next: Inspect a hosted `donor_reply` LangSmith trace under KI-012 and continue the separate live simulator/browser acceptance work.
+Blockers: No implementation blocker remains for Task 4.2.

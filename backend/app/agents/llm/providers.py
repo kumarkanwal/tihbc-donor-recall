@@ -15,6 +15,7 @@ ClientType = Literal["openai", "gemini", "mistral"]
 GROQ_STRICT_JSON_SCHEMA_MODELS = frozenset(
     {"openai/gpt-oss-20b", "openai/gpt-oss-120b", "qwen/qwen3.8-27b"}
 )
+GEMINI_MIN_REQUEST_TIMEOUT_SECONDS = 10.0
 
 
 @dataclass(frozen=True)
@@ -52,7 +53,7 @@ PROVIDERS = {
         "gemini_api_key",
         "gemini_model",
         "gemini",
-        "gemini-2.5-flash-lite",
+        "gemini-3.5-flash-lite",
     ),
     "mistral": ProviderDefinition(
         "mistral",
@@ -109,14 +110,17 @@ def enabled_providers(settings: Settings) -> tuple[EnabledProvider, ...]:
 def create_chat_model(provider: EnabledProvider, settings: Settings) -> BaseChatModel:
     """Build the provider-specific LangChain chat client at temperature zero."""
     definition = provider.definition
-    common = {"temperature": 0, "model": provider.model}
     if definition.client_type == "gemini":
         return ChatGoogleGenerativeAI(
-            **common,
+            model=provider.model,
             api_key=provider.api_key,
-            request_timeout=settings.llm_timeout_seconds,
+            request_timeout=max(
+                settings.llm_timeout_seconds,
+                GEMINI_MIN_REQUEST_TIMEOUT_SECONDS,
+            ),
             retries=settings.llm_max_retries_per_provider,
         )
+    common = {"temperature": 0, "model": provider.model}
     if definition.client_type == "mistral":
         return ChatMistralAI(
             model_name=provider.model,

@@ -460,3 +460,20 @@ the checked-in OpenAPI file from drifting behind backend route changes.
 - **Decision:** Keep provider-bound output schemas closed, fully required, and free of nullable unions by using explicit sentinel values for missing details. Let the LLM extract only an unresolved reschedule expression; resolve supported English, Urdu, and Roman Urdu relative dates, weekday names, and offered-slot ordinals/weekdays in application code against demo-clock `today` and the supplied slots. Use Gemini native JSON Schema output with SDK automatic function calling disabled, and sanitize diagnostic details for every provider failure.
 - **Reason:** Groq strict decoding rejects ambiguous nullable unions, provider date arithmetic produced incorrect weekdays, slot choices must never escape the offered set, and Gemini's SDK enables automatic function calling unless explicitly disabled. Deterministic domain resolution makes identical replies produce identical dates and slot IDs across providers.
 - **Consequences:** Known reschedule expressions and slot choices can complete without an LLM call. Provider schemas use `none` only at the wire boundary and map it back to domain `None`; unsupported expressions still use structured extraction followed by the same deterministic resolver. Adding another relative-date or ordinal phrase requires resolver tests rather than prompt-only behavior.
+
+## D-055 — Provider error-code cooldown classification
+
+- **Date:** 2026-10-07
+- **Status:** Accepted
+- **Supersedes:** D-053 cooldown behavior for HTTP 400 responses only; its provider isolation, tracing, and other failure rules remain accepted.
+- **Decision:** Classify provider failures using both HTTP status and the provider's stable error code. Treat Groq `output_parse_failed` as transient invalid output, immediately fall back, and open only the normal circuit cooldown. Treat other HTTP 400 schema/request errors and 401/402/403 responses as persistent provider configuration failures with ten times the normal cooldown. Default Gemini to the stable `gemini-3.5-flash-lite`, while preserving environment overrides and logging the configured model plus returned catalog when startup discovery confirms it is missing.
+- **Reason:** A one-off model generation that fails parsing should not suppress a fast provider as long as a malformed schema, retired model, credential, permission, or payment problem. The previous Gemini default is no longer available to new API users.
+- **Consequences:** Evaluation diagnostics report Groq parse failures as `invalid_output`, healthy downstream providers answer that request, and Groq becomes eligible again after the base cooldown. Persistent request/configuration errors avoid repeated calls for the longer window, and new Gemini installations start on an available structured-output model.
+
+## D-056 — Gemini SDK deadline compatibility
+
+- **Date:** 2026-10-07
+- **Status:** Accepted
+- **Decision:** Configure Gemini SDK requests with a minimum ten-second request deadline and omit an explicit temperature for the fixed-sampling Gemini 3.5 Flash-Lite model. Keep the router's shorter per-provider timeout and total routing budget authoritative around the SDK call.
+- **Reason:** Gemini rejects manually configured deadlines below ten seconds with `INVALID_ARGUMENT` and warns that explicit sampling parameters are ignored for this model. The router still needs to abandon a slow provider promptly so another ready provider can answer within the total budget.
+- **Consequences:** Gemini requests use a provider-compatible wire configuration without extending the agent's effective routing budget. A slow Gemini call is still cancelled by the router and falls through using the normal transient-failure cooldown.

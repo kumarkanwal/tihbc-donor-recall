@@ -12,12 +12,21 @@ from pydantic import BaseModel
 from app.agents.graph import ReplyAgent
 from app.agents.llm.providers import EnabledProvider
 from app.agents.llm.router import LLMRouter
+from app.agents.prompts import load_prompt
 from app.agents.state import AgentMetadata, AwaitingContext, OfferedSlot
 from app.models.enums import DeclineReason, ResponseIntent
 from tests.agents.fakes import CircuitStore, router_settings
 
 TODAY = date(2026, 10, 5)
 SLOT_IDS = (uuid4(), uuid4(), uuid4())
+
+
+def test_recent_donation_few_shots_cover_all_supported_languages() -> None:
+    prompts = load_prompt("classify_intent.md") + load_prompt("extract_decline_reason.md")
+
+    assert "Abhi 1 mahina pehle diya tha" in prompts
+    assert "میں نے پچھلے مہینے خون دیا تھا" in prompts
+    assert "I donated blood last month" in prompts
 
 
 class SmartInvoker:
