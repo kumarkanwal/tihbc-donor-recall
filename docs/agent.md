@@ -79,13 +79,15 @@ class ReplyState(TypedDict):
 ```
 
 ### 3.2 Nodes (`nodes/`, one file each)
-1. `detect_language` → `en`, `ur` (Urdu script), or `roman_ur`. Rule-based first (Urdu Unicode range),
-   LLM only to separate English from Roman Urdu when unclear.
+1. `detect_language` → `en`, `ur` (Urdu script), or `roman_ur`. Rule-based first (Urdu Unicode range
+   and deterministic reschedule phrases), LLM only to separate English from Roman Urdu when unclear.
 2. `classify_intent` → `confirm`, `reschedule`, `decline`, `question`, `unknown` with confidence.
-   When `awaiting` is set, classify against that context first (e.g. a date or number → slot choice).
+   Before an LLM call, known relative dates and weekdays classify as reschedules, offered-slot ordinals
+   and weekday names resolve against the supplied slots, and deliberately ambiguous replies remain unknown.
 3. `extract_details` (conditional):
-   - reschedule → `requested_date` resolved relative to `today` ("kal" = tomorrow, "next Friday",
-     "15 tareekh") or `selected_slot_id` from `offered_slots`.
+   - reschedule → the LLM can extract only the original date/slot expression. Application code resolves
+     weekday names, today/tomorrow/day-after-tomorrow, next-week phrases, and their Urdu/Roman Urdu
+     equivalents against demo-clock `today`; slot choices resolve only against `offered_slots`.
    - decline → `decline_reason` mapped to the enum.
 4. `build_result` → returns `AgentResult`.
 
@@ -105,7 +107,9 @@ class AgentResult(BaseModel):
 ```
 
 ### 3.4 LLM Usage and Provider Routing
-- Every LLM call uses structured output bound to a Pydantic model. No regex parsing of LLM text.
+- Every LLM call uses a closed, all-fields-required structured output bound to a Pydantic model. Optional
+  wire values use explicit sentinel enum/string values instead of nullable unions; application code maps
+  sentinels back to domain `None`. No regex parsing of LLM text.
 - Temperature 0. Prompts are files in `agents/prompts/`: `classify_intent.md`, `extract_date.md`,
   `extract_decline_reason.md`, `detect_language.md`, with few-shot examples in English, Urdu, and Roman Urdu.
 
@@ -124,8 +128,9 @@ class AgentResult(BaseModel):
     output, connection errors, 4xx responses, rate limits (429), and server errors (5xx);
   - open the failing provider's shared circuit immediately for 400/401/402/403 responses. Use the normal
     cooldown for 400 and ten times the normal cooldown for 401/402/403 before that provider is retried;
-  - log sanitized 400 response bodies to expose request/schema problems without credentials or full phone
-    numbers. Groq GPT-OSS models use strict JSON Schema mode to avoid best-effort schema-generation 400s;
+  - log sanitized error details for all provider failures without credentials or full phone numbers. Groq
+    GPT-OSS models use strict JSON Schema mode with compatible closed schemas;
+  - use Gemini native JSON Schema structured output and explicitly disable SDK automatic function calling;
   - circuit breaker in Redis: after `LLM_CIRCUIT_FAILURES` consecutive failures a provider is skipped for
     `LLM_CIRCUIT_COOLDOWN_SECONDS` (shared across workers).
 - Nodes call only `get_structured_llm(schema)` from the router; they never know which provider answered.

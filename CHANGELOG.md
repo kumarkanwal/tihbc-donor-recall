@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fixed strict structured-output compatibility across LLM providers, repaired Gemini JSON-schema requests, and made multilingual reschedule dates and offered-slot choices deterministic against demo time.
 - Fixed multi-provider agent routing so one provider's client, credential, payment, rate-limit, server, or timeout failure continues to healthy fallbacks; expanded real-provider evaluation diagnostics and relative-date examples.
 - Added a full Playwright demo-flow regression covering administrator setup, donor confirmation, live campaign and inbox updates, dashboard metrics, logout, and coordinator role restrictions.
 - Added production deployment files for the single-domain VPS stack, including private data-service networking, standalone frontend and backend images, Caddy routing, persistent storage, health checks, backups, and an operations runbook.

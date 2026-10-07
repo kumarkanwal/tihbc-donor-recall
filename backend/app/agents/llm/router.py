@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import json
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
@@ -12,12 +11,17 @@ from time import monotonic
 
 import httpx
 import structlog
-from langchain_core.exceptions import OutputParserException
+from google.genai.types import AutomaticFunctionCallingConfig
 from langchain_core.runnables import Runnable, RunnableLambda
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 from redis.asyncio import Redis
 
 from app.agents.llm.circuit import CircuitBreaker, CircuitStore
+from app.agents.llm.diagnostics import (
+    provider_attempt_status,
+    provider_status_code,
+    safe_provider_error_detail,
+)
 from app.agents.llm.discovery import model_available
 from app.agents.llm.providers import (
     EnabledProvider,
@@ -27,11 +31,10 @@ from app.agents.llm.providers import (
 )
 from app.agents.state import ProviderAttempt, ProviderAttemptStatus
 from app.core.config import Settings
-from app.core.logging import sanitize_log_value
 
 logger = structlog.get_logger(__name__)
 UNAVAILABLE_PROVIDER_COOLDOWN_MULTIPLIER = 10
-MAX_ERROR_BODY_CHARACTERS = 2000
+GEMINI_AFC_DISABLED = AutomaticFunctionCallingConfig(disable=True)
 
 
 class RetryableProviderError(RuntimeError):
@@ -177,8 +180,8 @@ class LLMRouter:
 
     async def _handle_failure(self, provider: EnabledProvider, error: Exception) -> None:
         name = provider.definition.name
-        status = _status_code(error)
-        attempt_status = _attempt_status(error, status)
+        status = provider_status_code(error)
+        attempt_status = provider_attempt_status(error, status)
         self._stats().fallback_count += 1
         self._record_attempt(provider, attempt_status, status)
         if status in {400, 401, 402, 403}:
@@ -194,7 +197,8 @@ class LLMRouter:
                 "llm_provider_unavailable",
                 provider=name,
                 status=status,
-                error_body=_safe_error_body(error, provider.api_key.get_secret_value()),
+                error_detail=safe_provider_error_detail(error, provider.api_key.get_secret_value()),
+                error_type=type(error).__name__,
             )
         else:
             await self._circuit.record_failure(name)
@@ -203,6 +207,8 @@ class LLMRouter:
                 provider=name,
                 status=status,
                 failure=attempt_status,
+                error_detail=safe_provider_error_detail(error, provider.api_key.get_secret_value()),
+                error_type=type(error).__name__,
             )
         raise RetryableProviderError(f"Provider failed: {name}") from error
 
@@ -215,6 +221,8 @@ class LLMRouter:
             method="json_schema",
             strict=structured_output_strict(provider),
         )
+        if provider.definition.client_type == "gemini":
+            structured = structured.bind(automatic_function_calling=GEMINI_AFC_DISABLED)
         result = await structured.ainvoke(prompt)
         return schema.model_validate(result)
 
@@ -262,46 +270,3 @@ async def routing_context(router: LLMRouter) -> AsyncIterator[RouteStats]:
     finally:
         _route_stats.reset(stats_token)
         _active_router.reset(router_token)
-
-
-def _attempt_status(error: Exception, status: int | None) -> ProviderAttemptStatus:
-    if status == 400:
-        return "client_error"
-    if status in {401, 403}:
-        return "credentials_unavailable"
-    if status == 402:
-        return "payment_required"
-    if status == 429:
-        return "rate_limited"
-    if status is not None and status >= 500:
-        return "server_error"
-    if isinstance(error, (TimeoutError, httpx.TimeoutException)):
-        return "timeout"
-    if isinstance(error, (ConnectionError, httpx.NetworkError)):
-        return "connection_error"
-    if isinstance(error, (OutputParserException, ValidationError, ValueError)):
-        return "invalid_output"
-    return "unknown_error"
-
-
-def _status_code(error: Exception) -> int | None:
-    status = getattr(error, "status_code", None)
-    if isinstance(status, int):
-        return status
-    response = getattr(error, "response", None)
-    response_status = getattr(response, "status_code", None)
-    return response_status if isinstance(response_status, int) else None
-
-
-def _safe_error_body(error: Exception, api_key: str) -> str | None:
-    body = getattr(error, "body", None)
-    response = getattr(error, "response", None)
-    if body is None and response is not None:
-        try:
-            body = response.json()
-        except (AttributeError, ValueError):
-            body = getattr(response, "text", None)
-    if body is None:
-        return None
-    rendered = json.dumps(sanitize_log_value(body), ensure_ascii=False, default=str)
-    return rendered.replace(api_key, "***")[:MAX_ERROR_BODY_CHARACTERS]

@@ -44,7 +44,7 @@ class SmartInvoker:
             return {"detected_language": "roman_ur" if roman else "en"}
         if schema_name == "IntentOutput":
             return {"intent": self._intent(prompt), "confidence": 0.98}
-        if schema_name == "RescheduleDetails":
+        if schema_name == "RescheduleExpression":
             return self._reschedule(prompt)
         return {"decline_reason": self._decline_reason(prompt)}
 
@@ -63,10 +63,10 @@ class SmartInvoker:
     @staticmethod
     def _reschedule(prompt: str) -> dict[str, object]:
         if "2nd wala" in prompt:
-            return {"requested_date": None, "selected_slot_id": str(SLOT_IDS[1])}
+            return {"expression": "2nd wala"}
         if "next week" in prompt or "monday ko" in prompt:
-            return {"requested_date": "2026-10-12", "selected_slot_id": None}
-        return {"requested_date": None, "selected_slot_id": None}
+            return {"expression": "next week"}
+        return {"expression": "none"}
 
     @staticmethod
     def _decline_reason(prompt: str) -> str:
@@ -241,6 +241,56 @@ async def test_low_confidence_is_forced_to_unknown() -> None:
 
     assert result.intent == ResponseIntent.UNKNOWN
     assert result.confidence == 0.4
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("text", "awaiting", "requested_date", "slot_id"),
+    [
+        ("Parson aa sakta hoon", "none", date(2026, 10, 7), None),
+        ("Friday", "none", date(2026, 10, 9), None),
+        ("first one", "slot_choice", None, SLOT_IDS[0]),
+        ("2nd wala", "slot_choice", None, SLOT_IDS[1]),
+    ],
+)
+async def test_deterministic_reschedules_do_not_call_a_provider(
+    text: str,
+    awaiting: AwaitingContext,
+    requested_date: date | None,
+    slot_id: UUID | None,
+) -> None:
+    invoker = SmartInvoker()
+
+    result = await _agent(invoker).run(
+        text=text,
+        donor_language="en",
+        awaiting=awaiting,
+        offered_slots=_slots(),
+        today=TODAY,
+        metadata=_metadata(awaiting),
+    )
+
+    assert result.intent == ResponseIntent.RESCHEDULE
+    assert result.requested_date == requested_date
+    assert result.selected_slot_id == slot_id
+    assert invoker.prompts == []
+
+
+@pytest.mark.asyncio
+async def test_maybe_is_unknown_without_intent_model_call() -> None:
+    invoker = SmartInvoker()
+
+    result = await _agent(invoker).run(
+        text="maybe",
+        donor_language="en",
+        awaiting="none",
+        offered_slots=[],
+        today=TODAY,
+        metadata=_metadata(),
+    )
+
+    assert result.intent == ResponseIntent.UNKNOWN
+    assert len(invoker.prompts) == 1
 
 
 class CapturedRun(AbstractContextManager["CapturedRun"]):

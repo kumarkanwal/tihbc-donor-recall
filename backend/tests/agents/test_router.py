@@ -1,9 +1,11 @@
 """Provider fallback, terminal auth, budget, and circuit behavior."""
 
 import asyncio
+from typing import Self
 
 import pytest
 import structlog
+from google.genai.types import AutomaticFunctionCallingConfig
 from langchain_core.runnables import RunnableLambda
 from pydantic import BaseModel, SecretStr
 
@@ -25,6 +27,14 @@ class ProviderHttpError(RuntimeError):
         super().__init__(f"status {status_code}")
         self.status_code = status_code
         self.body = body
+
+
+class GeminiHttpError(RuntimeError):
+    """Google GenAI-like error carrying its HTTP status as code."""
+
+    def __init__(self, code: int) -> None:
+        super().__init__(f"Gemini request failed with {code}")
+        self.code = code
 
 
 @pytest.mark.asyncio
@@ -191,6 +201,101 @@ async def test_groq_request_uses_strict_json_schema_mode(
 
     assert result == ProbeResult(value="ok")
     assert request_options == {"method": "json_schema", "strict": True}
+
+
+@pytest.mark.asyncio
+async def test_gemini_uses_native_json_schema_with_afc_disabled(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    request_options: dict[str, object] = {}
+
+    class FakeStructuredModel:
+        def __init__(self, schema: type[BaseModel]) -> None:
+            self.schema = schema
+
+        def bind(self, **kwargs: object) -> Self:
+            request_options.update(kwargs)
+            return self
+
+        async def ainvoke(self, prompt: str) -> BaseModel:
+            del prompt
+            return self.schema.model_validate({"value": "ok"})
+
+    class FakeChatModel:
+        def with_structured_output(
+            self,
+            schema: type[BaseModel],
+            *,
+            method: str,
+            strict: bool | None,
+        ) -> FakeStructuredModel:
+            request_options.update(method=method, strict=strict)
+            return FakeStructuredModel(schema)
+
+    monkeypatch.setattr(
+        "app.agents.llm.router.create_chat_model",
+        lambda provider, settings: FakeChatModel(),
+    )
+    settings = router_settings(
+        llm_provider_order=("gemini",),
+        gemini_api_key=SecretStr("gemini-secret"),
+    )
+
+    result = await LLMRouter(settings, CircuitStore()).invoke(ProbeResult, "safe input")
+
+    afc = request_options["automatic_function_calling"]
+    assert result == ProbeResult(value="ok")
+    assert request_options["method"] == "json_schema"
+    assert request_options["strict"] is None
+    assert isinstance(afc, AutomaticFunctionCallingConfig)
+    assert afc.disable is True
+
+
+@pytest.mark.asyncio
+async def test_gemini_code_status_is_classified_and_falls_back() -> None:
+    calls: list[str] = []
+
+    async def invoke(provider: EnabledProvider, schema: type[BaseModel], prompt: str) -> BaseModel:
+        del prompt
+        calls.append(provider.definition.name)
+        if provider.definition.name == "gemini":
+            raise GeminiHttpError(429)
+        return schema.model_validate({"value": "ok"})
+
+    settings = router_settings(
+        llm_provider_order=("gemini", "groq"),
+        gemini_api_key=SecretStr("gemini-secret"),
+    )
+    router = LLMRouter(settings, CircuitStore(), provider_invoker=invoke)
+    async with routing_context(router) as stats:
+        result = await router.invoke(ProbeResult, "safe input")
+
+    assert result == ProbeResult(value="ok")
+    assert calls == ["gemini", "groq"]
+    assert stats.attempts[0].status == "rate_limited"
+
+
+@pytest.mark.asyncio
+async def test_unknown_provider_error_logs_sanitized_detail() -> None:
+    secret = "groq-secret"
+
+    async def invoke(provider: EnabledProvider, schema: type[BaseModel], prompt: str) -> BaseModel:
+        del prompt
+        if provider.definition.name == "groq":
+            raise RuntimeError(f"SDK failed key={secret} donor=+923001234567")
+        return schema.model_validate({"value": "ok"})
+
+    with structlog.testing.capture_logs() as logs:
+        result = await LLMRouter(router_settings(), CircuitStore(), provider_invoker=invoke).invoke(
+            ProbeResult, "safe input"
+        )
+
+    rendered = repr(logs)
+    assert result == ProbeResult(value="ok")
+    assert secret not in rendered
+    assert "+923001234567" not in rendered
+    assert "+92300*****67" in rendered
+    assert "SDK failed" in rendered
 
 
 @pytest.mark.asyncio

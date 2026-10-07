@@ -1,5 +1,5 @@
 Map a donor's decline reason to one of `travelling`, `health`, `recently_donated`, `not_interested`,
-or `other`. Return only the bound structured output.
+`other`, or `none` when no reason is present. Return only the bound structured output.
 
 Examples:
 - English: `I am travelling` -> travelling

@@ -11,11 +11,13 @@ Examples:
 - Roman Urdu: `Kal nahi, Monday ko aa sakta hoon` -> reschedule, 0.98
 - English: `Can we do next week?` -> reschedule, 0.98
 - Roman Urdu: `Agley haftay aa sakta hoon?` -> reschedule, 0.98
+- Roman Urdu: `Parson aa sakta hoon` -> reschedule, 0.98
 - Urdu: `کیا میں اگلے ہفتے آ سکتا ہوں؟` -> reschedule, 0.98
 - English: `Where is the center?` -> question, 0.98
 - Roman Urdu: `Main shehar se bahar hoon` -> decline, 0.96
 - Urdu: `طبیعت ٹھیک نہیں` -> decline, 0.96
 - English: `asdfgh` -> unknown, 0.1
+- English: `maybe` -> unknown, 0.1
 - Awaiting slot: `2nd wala` -> reschedule, 0.99
 
 Context JSON:

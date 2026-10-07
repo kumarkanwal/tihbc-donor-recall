@@ -46,4 +46,4 @@
 
 - **Status:** Open
 - **Affects:** Live multilingual agent accuracy, fallback routing, and hosted trace inspection
-- **Details:** The initial configured-provider run scored 6/31 after Groq throttling and a Cerebras 402 terminated the old chain. Provider-local fallback, strict Groq output, pacing, and diagnostics are fixed; rerun all 31 cases and inspect a `donor_reply` LangSmith trace before marking Task 4.2 done.
+- **Details:** The first routing repair raised the configured-provider run to 27/31 (87.1%) with no provider-exhaustion failures. The remaining strict-schema Groq decline failure, Gemini AFC/request configuration, deterministic multilingual date and offered-slot resolution, and prompt edge cases are fixed. Rerun all 31 cases, confirm at least 90% accuracy with Groq answering most cases, and inspect a `donor_reply` LangSmith trace before marking Task 4.2 done.

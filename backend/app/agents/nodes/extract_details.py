@@ -1,28 +1,33 @@
 """Conditional date, slot, and decline-reason extraction."""
 
 import json
-from datetime import date
-from uuid import UUID
-
-from pydantic import BaseModel
+from typing import Literal
 
 from app.agents.llm.router import get_structured_llm
+from app.agents.nodes.schemas import StrictOutputModel
 from app.agents.prompts import load_prompt
+from app.agents.resolution import resolve_offered_slot, resolve_requested_date
 from app.agents.state import ReplyState
 from app.models.enums import DeclineReason, ResponseIntent
 
 
-class RescheduleDetails(BaseModel):
-    """Structured date and offered-slot selection."""
+class RescheduleExpression(StrictOutputModel):
+    """Exact reschedule expression extracted without resolving its value."""
 
-    requested_date: date | None
-    selected_slot_id: UUID | None
+    expression: str
 
 
-class DeclineDetails(BaseModel):
+class DeclineDetails(StrictOutputModel):
     """Structured decline reason."""
 
-    decline_reason: DeclineReason | None
+    decline_reason: Literal[
+        "travelling",
+        "health",
+        "recently_donated",
+        "not_interested",
+        "other",
+        "none",
+    ]
 
 
 async def extract_details(state: ReplyState) -> dict[str, object]:
@@ -33,17 +38,25 @@ async def extract_details(state: ReplyState) -> dict[str, object]:
 
 
 async def _reschedule_details(state: ReplyState) -> dict[str, object]:
+    existing_date = state.get("requested_date")
+    existing_slot = state.get("selected_slot_id")
+    if existing_date is not None or existing_slot is not None:
+        return {"requested_date": existing_date, "selected_slot_id": existing_slot}
     context = {
         "text": state["text"],
-        "today": state["today"].isoformat(),
         "awaiting": state["awaiting"],
-        "offered_slots": [slot.model_dump(mode="json") for slot in state["offered_slots"]],
+        "offered_slots": [slot.label for slot in state["offered_slots"]],
     }
     prompt = load_prompt("extract_date.md").format(context=json.dumps(context, ensure_ascii=False))
-    result: RescheduleDetails = await get_structured_llm(RescheduleDetails).ainvoke(prompt)
-    offered_ids = {slot.id for slot in state["offered_slots"]}
-    selected = result.selected_slot_id if result.selected_slot_id in offered_ids else None
-    return {"requested_date": result.requested_date, "selected_slot_id": selected}
+    result = await get_structured_llm(RescheduleExpression).ainvoke(prompt)
+    expression = "" if result.expression == "none" else result.expression
+    selected = None
+    if state["awaiting"] == "slot_choice":
+        selected = resolve_offered_slot(expression, state["offered_slots"])
+    return {
+        "requested_date": resolve_requested_date(expression, state["today"]),
+        "selected_slot_id": selected.id if selected is not None else None,
+    }
 
 
 async def _decline_details(state: ReplyState) -> dict[str, object]:
@@ -54,4 +67,5 @@ async def _decline_details(state: ReplyState) -> dict[str, object]:
         )
     )
     result: DeclineDetails = await get_structured_llm(DeclineDetails).ainvoke(prompt)
-    return {"decline_reason": result.decline_reason}
+    reason = None if result.decline_reason == "none" else DeclineReason(result.decline_reason)
+    return {"decline_reason": reason}

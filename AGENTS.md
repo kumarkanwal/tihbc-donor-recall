@@ -75,6 +75,11 @@ Rules for these documents:
 Codex has no memory between sessions. These files are the project's memory. Keeping them accurate is
 part of every task, not optional.
 
+`AGENTS.md`, `docs/decisions.md`, and `docs/session-log.md` are append-only records: never rewrite,
+compact, truncate, or delete their existing history. Only append new instructions or entries. For
+`docs/progress.md` and `docs/known-issues.md`, make only the narrow status/detail lifecycle updates
+required below; never rewrite or compact the files as a whole.
+
 | File | Purpose | Codex must |
 |---|---|---|
 | `docs/session-log.md` | Short entry per session: done, next, blockers | Read the latest entry first; add a new entry at the end of every session |

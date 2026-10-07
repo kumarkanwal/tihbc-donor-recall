@@ -336,3 +336,15 @@ Done: Fixed provider-local fallback, shared cooldowns, strict Groq output, safe 
 Verification: Ruff lint/format and strict mypy pass; 300 backend tests pass with 40 expected opt-in skips.
 Next: Rerun `uv run python -m app.agents.evaluate --delay-ms 1500` and inspect the LangSmith trace.
 Blockers: Real-provider evaluation and hosted trace verification remain pending under KI-015.
+
+S-050 verification addendum: After adding Google GenAI `code` status compatibility, the final full backend suite passes with 324 tests and 40 expected opt-in skips; the router-focused suite passes all 13 tests.
+
+## S-050 | 2026-10-07 | Strict agent schemas and deterministic rescheduling
+Done: Replaced nullable provider schemas with closed required schemas and explicit missing-value sentinels; changed reschedule LLM output to expression-only extraction; resolved supported English, Urdu, and Roman Urdu dates, weekdays, ordinals, and offered-slot weekdays against demo-clock context before provider calls; configured Gemini native JSON Schema output with automatic function calling disabled; added sanitized diagnostics for every provider failure; added the append-only project-memory rule; recorded D-054.
+Verification: Ruff lint and format checks pass, strict mypy passes across 190 source files, 47 focused agent tests pass, and the full backend suite passes with 323 tests and 40 expected opt-in skips. The full suite used the mandated `--basetemp=.pytest_tmp_codex -o cache_dir=.pytest_tmp_codex/cache` arguments from a fresh OS temp working directory because the repository-local Codex temp directory has a Windows ACL lock.
+Next: Run `uv run python -m app.agents.evaluate --delay-ms 1500`, confirm at least 90% accuracy with Groq answering most cases, and inspect a `donor_reply` LangSmith trace.
+Blockers: Real-provider evaluation and hosted trace verification remain pending under KI-015.
+
+S-050 final verification correction: The final focused agent set contains 48 passing tests, and the final full backend suite contains 324 passing tests with 40 expected opt-in skips. These final counts supersede the earlier S-050 verification counts above.
+
+S-050 final verification addendum 2: After adding the next-week precedence regression case, the complete backend suite passes with 325 tests and 40 expected opt-in skips. This is the final suite count for S-050.
