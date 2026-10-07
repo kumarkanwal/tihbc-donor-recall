@@ -20,6 +20,7 @@ def message_created_payload(message: Message) -> dict[str, object]:
             str(message.reply_to_message_id) if message.reply_to_message_id else None
         ),
         "status": message.status.value,
+        "scheduled_at": message.scheduled_at.isoformat(),
         "created_at": message.created_at.isoformat(),
         "sent_at": message.sent_at.isoformat() if message.sent_at else None,
         "delivered_at": message.delivered_at.isoformat() if message.delivered_at else None,

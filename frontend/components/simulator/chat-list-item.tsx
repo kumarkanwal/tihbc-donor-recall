@@ -1,5 +1,6 @@
 import { MaskedPhone } from "@/components/shared/masked-phone";
 import type { SimulatorConversation } from "@/lib/simulator";
+import { effectiveMessageTime } from "@/lib/simulator/message-ordering";
 import { cn } from "@/lib/utils/class-names";
 
 function initials(name: string): string {
@@ -59,7 +60,7 @@ export function ChatListItem({
             {donor.name}
           </span>
           <span className="text-sim-secondary shrink-0 text-[0.58rem] tabular-nums">
-            {messageTime(lastMessage?.created_at)}
+            {lastMessage ? messageTime(effectiveMessageTime(lastMessage)) : ""}
           </span>
         </span>
         <span className="text-sim-secondary mt-0.5 flex min-w-0 items-center justify-between gap-1 text-[0.65rem]">

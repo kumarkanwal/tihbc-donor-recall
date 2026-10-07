@@ -8,6 +8,10 @@ import type {
   SimulatorLanguage,
   SimulatorMessage,
 } from "@/lib/simulator";
+import {
+  compareSimulatorMessages,
+  effectiveMessageTime,
+} from "@/lib/simulator/message-ordering";
 
 import { DateSeparator } from "./date-separator";
 import { SimulatorMessageBubble } from "./message-bubble";
@@ -34,18 +38,23 @@ export function MessageList({
   isTyping,
   onButtonReply,
 }: MessageListProps): React.JSX.Element {
+  const orderedMessages = messages.slice().sort(compareSimulatorMessages);
+  const messageCount = messages.length;
+  const latestDonorReply = orderedMessages
+    .filter(({ direction }) => direction === "inbound")
+    .at(-1);
   const viewportRef = useRef<HTMLDivElement>(null);
   const [isNearBottom, setIsNearBottom] = useState(true);
-  const [acknowledgedCount, setAcknowledgedCount] = useState(messages.length);
-  const hasNewMessages = messages.length > acknowledgedCount && !isNearBottom;
+  const [acknowledgedCount, setAcknowledgedCount] = useState(messageCount);
+  const hasNewMessages = messageCount > acknowledgedCount && !isNearBottom;
 
   const scrollToBottom = useCallback((): void => {
     const viewport = viewportRef.current;
     if (!viewport) return;
     viewport.scrollTo({ top: viewport.scrollHeight, behavior: "smooth" });
     setIsNearBottom(true);
-    setAcknowledgedCount(messages.length);
-  }, [messages.length]);
+    setAcknowledgedCount(messageCount);
+  }, [messageCount]);
 
   useEffect(() => {
     if (isNearBottom) scrollToBottom();
@@ -74,16 +83,20 @@ export function MessageList({
             This business uses a secure service to manage this chat.
           </div>
         </div>
-        {messages.length === 0 ? (
+        {orderedMessages.length === 0 ? (
           <p className="text-sim-secondary py-16 text-center text-xs">
             No messages in this conversation.
           </p>
         ) : null}
-        {messages.map((message, index) => {
-          const replied = messages.some(
+        {orderedMessages.map((message, index) => {
+          const replied = orderedMessages.some(
             ({ reply_to_message_id }) => reply_to_message_id === message.id,
           );
-          const previous = messages[index - 1];
+          const predatesLatestReply = Boolean(
+            latestDonorReply &&
+            compareSimulatorMessages(message, latestDonorReply) < 0,
+          );
+          const previous = orderedMessages[index - 1];
           return (
             <SimulatorMessageBubble
               key={message.id}
@@ -95,10 +108,10 @@ export function MessageList({
                 message.direction === "outbound" ? "incoming" : "outgoing"
               }
               language={language}
-              timestamp={timeLabel(message.created_at)}
+              timestamp={timeLabel(effectiveMessageTime(message))}
               status={message.status}
               showTail={!previous || previous.direction !== message.direction}
-              buttonsDisabled={replied}
+              buttonsDisabled={replied || predatesLatestReply}
               onButtonReply={(button) => onButtonReply(message, button)}
             />
           );

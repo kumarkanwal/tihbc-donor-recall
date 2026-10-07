@@ -14,6 +14,7 @@ import {
   type ConversationFilters,
   type SimulatorReply,
 } from "@/lib/simulator";
+import { compareSimulatorMessages } from "@/lib/simulator/message-ordering";
 import { simulatorKeys } from "@/lib/simulator/query-keys";
 import { simulatorPollInterval } from "@/lib/simulator/refresh-policy";
 import {
@@ -68,7 +69,8 @@ export function useSimulatorMessages(donorId: string | null) {
   const messages = query.data?.pages
     .slice()
     .reverse()
-    .flatMap((page) => page.items);
+    .flatMap((page) => page.items)
+    .sort(compareSimulatorMessages);
   return { ...query, data: messages, isTyping: typing.data };
 }
 

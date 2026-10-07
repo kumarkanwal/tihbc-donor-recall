@@ -1,5 +1,6 @@
 """Stable cursor slices, masked previews, and read receipts."""
 
+from datetime import timedelta
 from unittest.mock import AsyncMock
 from uuid import UUID, uuid4
 
@@ -31,9 +32,14 @@ async def test_message_page_is_chronological_and_uses_stable_tie_breaker() -> No
     assert [item.id for item in page.items] == [UUID(int=2), UUID(int=3)]
     assert page.next_before == UUID(int=2)
     messages.get.return_value = rows[1]
+    rows[1].sent_at = NOW + timedelta(minutes=5)
     messages.visible_page.return_value = (rows[2],)
     older = await service.messages(person.id, before=page.next_before, limit=2)
-    messages.visible_page.assert_awaited_with(person.id, before=(NOW, UUID(int=2)), limit=3)
+    messages.visible_page.assert_awaited_with(
+        person.id,
+        before=(NOW + timedelta(minutes=5), UUID(int=2)),
+        limit=3,
+    )
     assert older.next_before is None
 
 

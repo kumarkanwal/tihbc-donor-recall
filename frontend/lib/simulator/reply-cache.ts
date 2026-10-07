@@ -37,6 +37,7 @@ export function optimisticReply(
   request: SimulatorReply,
   history?: MessageHistory,
 ): SimulatorMessage {
+  const timestamp = new Date().toISOString();
   const latest = history?.pages[0]?.items;
   const source =
     request.type === "button"
@@ -60,7 +61,8 @@ export function optimisticReply(
     button_id: request.type === "button" ? request.button_id : null,
     reply_to_message_id: source?.id ?? null,
     status: "sent",
-    created_at: new Date().toISOString(),
+    scheduled_at: timestamp,
+    created_at: timestamp,
     sent_at: null,
     delivered_at: null,
     read_at: null,

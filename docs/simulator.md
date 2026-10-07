@@ -37,7 +37,8 @@ Each donor has their own phone, so the entry screen is a donor picker styled lik
   - Media header: video thumbnail with play icon and duration, or image. Clicking plays/opens in a lightbox.
   - Body text with **bold**, _italic_ WhatsApp formatting rendered.
   - Quick-reply buttons rendered as separate full-width rows under the bubble, separated by thin lines,
-    centered blue-green text. After the donor replies to that message, its buttons become disabled.
+    centered blue-green text. After the donor replies, buttons on that message and every older message
+    become disabled.
   - Slot options (reschedule) use the same button style (max 3 per message).
 - **Outgoing bubble (donor):** light green, right, timestamp and ticks bottom-right.
   - Button replies show as a normal outgoing bubble with the button label.
@@ -48,9 +49,10 @@ Each donor has their own phone, so the entry screen is a donor picker styled lik
   `simulator.typing` is true.
 - **Input bar:** emoji icon (non-functional), text field "Message", attach and camera icons
   (non-functional), send button (appears when text is entered). Enter sends.
-- **Right-to-left:** Urdu messages render RTL with an Urdu font (`docs/brand.md`); mixed content
-  uses `dir="auto"`.
-- Auto-scroll to the newest message; "new messages" pill if scrolled up.
+- **Right-to-left:** only Urdu bubble body text uses `dir="rtl"` and the Urdu font (`docs/brand.md`).
+  Latin/numeric runs inside it use `<bdi dir="ltr">`; timestamp/tick rows always use `dir="ltr"`.
+- Order messages by effective time (`sent_at`, then `created_at`, then `scheduled_at`). Auto-scroll to
+  the newest message; "new messages" pill if scrolled up.
 
 ## 3. Behavior
 - New messages arrive in real time via `message.created`; ticks update via `message.status_updated`.

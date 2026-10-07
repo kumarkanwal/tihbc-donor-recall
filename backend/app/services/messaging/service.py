@@ -106,6 +106,7 @@ class MessagingService:
         return (
             enrollment.campaign.status == CampaignStatus.RUNNING
             and enrollment.status in SENDABLE_STATUSES
+            and enrollment.responded_at is None
             and enrollment.next_action_at is not None
             and enrollment.next_action_at <= now
         )

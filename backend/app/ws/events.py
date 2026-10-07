@@ -58,6 +58,7 @@ class MessagePayload(BaseModel):
     button_id: str | None
     reply_to_message_id: UUID | None
     status: MessageStatus
+    scheduled_at: datetime
     created_at: datetime
     sent_at: datetime | None
     delivered_at: datetime | None

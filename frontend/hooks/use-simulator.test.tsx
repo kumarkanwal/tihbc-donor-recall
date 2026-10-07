@@ -74,7 +74,15 @@ describe("simulator message queries", () => {
       next_before: "older-cursor",
     });
     source.listMessagePage.mockResolvedValueOnce({
-      items: [{ ...message, id: "older" }],
+      items: [
+        {
+          ...message,
+          id: "older",
+          scheduled_at: "2026-10-04T08:30:00Z",
+          created_at: "2026-10-04T08:30:00Z",
+          sent_at: "2026-10-04T08:30:01Z",
+        },
+      ],
       limit: 50,
       next_before: null,
     });

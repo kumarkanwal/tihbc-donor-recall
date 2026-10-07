@@ -4,9 +4,10 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import DateTime, ForeignKey, Index, String, Text
+from sqlalchemy import DateTime, ForeignKey, Index, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.sql.elements import ColumnElement
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 from app.models.enums import (
@@ -60,3 +61,13 @@ class Message(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     step: Mapped["SeriesStep | None"] = relationship(back_populates="messages")
     reply_to_message: Mapped["Message | None"] = relationship(remote_side="Message.id")
     donor_response: Mapped["DonorResponse | None"] = relationship(back_populates="message")
+
+    @property
+    def effective_at(self) -> datetime:
+        """Return the timestamp that determines conversation chronology."""
+        return self.sent_at or self.created_at or self.scheduled_at
+
+    @classmethod
+    def effective_at_expression(cls) -> ColumnElement[datetime]:
+        """Return the SQL equivalent of :attr:`effective_at`."""
+        return func.coalesce(cls.sent_at, cls.created_at, cls.scheduled_at)

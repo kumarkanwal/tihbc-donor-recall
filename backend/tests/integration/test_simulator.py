@@ -142,7 +142,7 @@ async def test_simulator_http_reply_applies_deterministic_flow(
 
 
 @pytest.mark.asyncio
-async def test_cursor_pages_preserve_timestamp_ties_and_hide_failed_messages(
+async def test_cursor_pages_use_effective_time_and_hide_failed_messages(
     postgres_session_factory: async_sessionmaker[AsyncSession],
 ) -> None:
     from app.repositories.donor import DonorRepository
@@ -162,8 +162,9 @@ async def test_cursor_pages_preserve_timestamp_ties_and_hide_failed_messages(
                 body=f"Reminder {index}",
                 media_type=MediaType.NONE,
                 status=MessageStatus.SENT,
-                scheduled_at=NOW,
-                created_at=NOW,
+                scheduled_at=NOW - timedelta(days=1),
+                sent_at=NOW + timedelta(minutes=index),
+                created_at=NOW + timedelta(minutes=10 - index),
             )
             for index in range(5)
         ]
@@ -193,6 +194,9 @@ async def test_cursor_pages_preserve_timestamp_ties_and_hide_failed_messages(
             fixture.enrollment.donor_id, before=second.next_before, limit=2
         )
         returned_ids = [item.id for page in (third, second, first) for item in page.items]
-        assert returned_ids == sorted(message.id for message in messages)
+        assert returned_ids == [message.id for message in messages]
+        assert [item.sent_at for page in (third, second, first) for item in page.items] == [
+            message.sent_at for message in messages
+        ]
         assert third.next_before is None
         assert failed.id not in returned_ids

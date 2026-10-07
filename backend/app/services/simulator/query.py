@@ -79,7 +79,7 @@ class SimulatorQueryService:
             anchor = await self._messages.get(before)
             if anchor is None or anchor.donor_id != donor_id:
                 raise ValidationError("Cursor does not belong to this conversation")
-            cursor = (anchor.created_at, anchor.id)
+            cursor = (anchor.effective_at, anchor.id)
         rows = await self._messages.visible_page(donor_id, before=cursor, limit=limit + 1)
         selected = rows[:limit]
         return MessagePage(

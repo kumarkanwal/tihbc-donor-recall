@@ -25,13 +25,14 @@ class SimulatorMessageRepository(BaseRepository[Message]):
         before: tuple[datetime, UUID] | None,
         limit: int,
     ) -> tuple[Message, ...]:
+        effective_at = Message.effective_at_expression()
         statement = select(Message).where(
             Message.donor_id == donor_id,
             Message.status != MessageStatus.FAILED,
         )
         if before is not None:
-            statement = statement.where(tuple_(Message.created_at, Message.id) < tuple_(*before))
-        statement = statement.order_by(Message.created_at.desc(), Message.id.desc()).limit(limit)
+            statement = statement.where(tuple_(effective_at, Message.id) < tuple_(*before))
+        statement = statement.order_by(effective_at.desc(), Message.id.desc()).limit(limit)
         return tuple(await self._session.scalars(statement))
 
     async def latest_outbound(self, donor_id: UUID) -> Message | None:
@@ -46,7 +47,7 @@ class SimulatorMessageRepository(BaseRepository[Message]):
                 ),
                 Message.enrollment_id.is_not(None),
             )
-            .order_by(Message.created_at.desc(), Message.id.desc())
+            .order_by(Message.effective_at_expression().desc(), Message.id.desc())
             .limit(1)
         )
 
@@ -73,7 +74,7 @@ class SimulatorMessageRepository(BaseRepository[Message]):
                 Message.direction == MessageDirection.OUTBOUND,
                 Message.status == MessageStatus.DELIVERED,
             )
-            .order_by(Message.created_at, Message.id)
+            .order_by(Message.effective_at_expression(), Message.id)
             .with_for_update(of=Message)
             .options(selectinload(Message.enrollment))
         )

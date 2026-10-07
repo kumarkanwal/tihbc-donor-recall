@@ -83,6 +83,7 @@ function initialMessage(donor: SimulatorDonor, body: string): SimulatorMessage {
     button_id: null,
     reply_to_message_id: null,
     status: "delivered",
+    scheduled_at: "2026-10-04T09:30:00Z",
     created_at: "2026-10-04T09:30:00Z",
     sent_at: "2026-10-04T09:30:01Z",
     delivered_at: "2026-10-04T09:30:02Z",

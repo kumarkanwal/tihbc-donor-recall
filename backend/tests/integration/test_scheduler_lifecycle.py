@@ -157,6 +157,30 @@ async def test_scheduled_campaign_starts_and_paused_campaign_is_skipped(
 
 
 @pytest.mark.asyncio
+async def test_tick_never_sends_a_due_step_after_donor_response(
+    postgres_session_factory: async_sessionmaker[AsyncSession],
+) -> None:
+    async with postgres_session_factory() as session:
+        fixture = await add_messaging_fixture(session, NOW)
+        fixture.enrollment.responded_at = NOW - timedelta(minutes=1)
+        await session.commit()
+    provider = RecordingProvider()
+    tick = build_test_tick(postgres_session_factory, FixedClock(NOW), provider)
+
+    result = await tick.run()
+
+    async with postgres_session_factory() as session:
+        message_count = await session.scalar(
+            select(func.count())
+            .select_from(Message)
+            .where(Message.enrollment_id == fixture.enrollment.id)
+        )
+    assert result.messages_sent == 0
+    assert message_count == 0
+    assert provider.sends == []
+
+
+@pytest.mark.asyncio
 async def test_unreachable_enrollment_finishes_campaign(
     postgres_session_factory: async_sessionmaker[AsyncSession],
 ) -> None:

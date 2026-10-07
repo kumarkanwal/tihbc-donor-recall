@@ -187,6 +187,7 @@ export class MockSimulatorSource implements SimulatorDataSource {
       button_id: options.buttonId ?? null,
       reply_to_message_id: options.replyTo ?? null,
       status: options.status,
+      scheduled_at: timestamp,
       created_at: timestamp,
       sent_at: timestamp,
       delivered_at: options.status === "delivered" ? timestamp : null,

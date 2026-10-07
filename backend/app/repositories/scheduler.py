@@ -62,6 +62,7 @@ class SchedulerRepository:
             .where(
                 Campaign.status == CampaignStatus.RUNNING,
                 Enrollment.status.in_(DUE_ENROLLMENT_STATUSES),
+                Enrollment.responded_at.is_(None),
                 Enrollment.next_action_at.is_not(None),
                 Enrollment.next_action_at <= now,
             )

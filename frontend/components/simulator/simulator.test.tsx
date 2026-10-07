@@ -23,6 +23,7 @@ const baseMessage: SimulatorMessage = {
   button_id: null,
   reply_to_message_id: null,
   status: "delivered",
+  scheduled_at: "2026-10-04T09:30:00Z",
   created_at: "2026-10-04T09:30:00Z",
   sent_at: "2026-10-04T09:30:01Z",
   delivered_at: "2026-10-04T09:30:02Z",
@@ -65,18 +66,74 @@ describe("simulator presentation", () => {
     expect(screen.getByRole("button", { name: "Confirm" })).toBeDisabled();
   });
 
-  it("uses automatic direction and the Urdu font for Urdu content", () => {
+  it("orders by effective time and disables buttons older than the latest donor reply", () => {
+    Element.prototype.scrollTo = vi.fn();
+    const olderReminder: SimulatorMessage = {
+      ...baseMessage,
+      id: "older-reminder",
+      body: "Last reminder",
+      created_at: "2026-10-04T12:00:00Z",
+      sent_at: "2026-10-04T09:53:00Z",
+    };
+    const donorReply: SimulatorMessage = {
+      ...baseMessage,
+      id: "donor-reply",
+      direction: "inbound",
+      kind: "text",
+      body: "I can donate",
+      buttons: [],
+      reply_to_message_id: null,
+      scheduled_at: "2026-10-04T11:09:00Z",
+      created_at: "2026-10-04T11:09:00Z",
+      sent_at: "2026-10-04T11:09:00Z",
+    };
+    const botAnswer: SimulatorMessage = {
+      ...baseMessage,
+      id: "bot-answer",
+      kind: "text",
+      body: "Thank you",
+      buttons: [],
+      scheduled_at: "2026-10-04T11:10:00Z",
+      created_at: "2026-10-04T11:10:00Z",
+      sent_at: "2026-10-04T11:10:00Z",
+    };
     render(
-      <SimulatorMessageBubble
-        body="آپ دوبارہ خون عطیہ کر سکتے ہیں۔"
-        language="ur"
+      <MessageList
+        messages={[donorReply, botAnswer, olderReminder]}
+        language="en"
+        isTyping={false}
+        onButtonReply={vi.fn()}
       />,
     );
-    const content = screen
-      .getByText("آپ دوبارہ خون عطیہ کر سکتے ہیں۔")
-      .closest('[dir="auto"]');
-    expect(content).toHaveAttribute("dir", "auto");
-    expect(content).toHaveClass("font-urdu");
+
+    expect(
+      screen
+        .getAllByTestId("simulator-message")
+        .map((item) => item.textContent),
+    ).toEqual([
+      expect.stringContaining("Last reminder"),
+      expect.stringContaining("I can donate"),
+      expect.stringContaining("Thank you"),
+    ]);
+    expect(screen.getByRole("button", { name: "Confirm" })).toBeDisabled();
+  });
+
+  it("isolates Latin values in RTL Urdu text and keeps metadata LTR", () => {
+    render(
+      <SimulatorMessageBubble
+        body="السلام علیکم Madiha Siddiqui، وقت 10:30 AM ہے۔"
+        language="ur"
+        timestamp="11:10 PM"
+      />,
+    );
+    const isolatedName = screen.getByText("Madiha Siddiqui");
+    expect(isolatedName.tagName).toBe("BDI");
+    expect(isolatedName).toHaveAttribute("dir", "ltr");
+    expect(isolatedName.closest("p")).toHaveAttribute("dir", "rtl");
+    expect(isolatedName.closest("p")).toHaveAttribute("lang", "ur");
+    expect(isolatedName.closest("p")).toHaveClass("font-urdu");
+    expect(screen.getByText("10:30 AM").tagName).toBe("BDI");
+    expect(screen.getByText("11:10 PM")).toHaveAttribute("dir", "ltr");
   });
 
   it("greys unreachable donors and explains why", () => {

@@ -2648,6 +2648,11 @@ export interface components {
             read_at: string | null;
             /** Reply To Message Id */
             reply_to_message_id: string | null;
+            /**
+             * Scheduled At
+             * Format: date-time
+             */
+            scheduled_at: string;
             /** Sent At */
             sent_at: string | null;
             status: components["schemas"]["MessageStatus"];

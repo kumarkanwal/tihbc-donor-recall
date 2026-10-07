@@ -4,6 +4,12 @@ export interface WhatsAppFormatToken {
 }
 
 const FORMATTING_PATTERN = /(\*[^*\n]+\*|_[^_\n]+_)/g;
+const LTR_RUN_PATTERN = /([A-Za-z0-9](?:[A-Za-z0-9 .,:/'&()+-]*[A-Za-z0-9])?)/g;
+
+export interface BidiTextSegment {
+  isolate: boolean;
+  value: string;
+}
 
 /** Parse the small bold/italic formatting subset supported by WhatsApp. */
 export function parseWhatsAppFormat(input: string): WhatsAppFormatToken[] {
@@ -19,4 +25,12 @@ export function parseWhatsAppFormat(input: string): WhatsAppFormatToken[] {
       }
       return { kind: "text", value: part };
     });
+}
+
+/** Identify Latin/numeric runs that need isolation inside an Urdu paragraph. */
+export function splitBidiText(input: string): BidiTextSegment[] {
+  return input
+    .split(LTR_RUN_PATTERN)
+    .filter(Boolean)
+    .map((value) => ({ isolate: /[A-Za-z0-9]/.test(value), value }));
 }

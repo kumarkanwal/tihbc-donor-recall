@@ -177,11 +177,12 @@ batch has at least one valid donor.
   "body": "string", "media_type": "video", "media_url": "string|null",
   "buttons": [{"id": "btn_confirm", "label": "Confirm"}],
   "button_id": null, "reply_to_message_id": null,
-  "status": "delivered", "created_at": "...", "sent_at": "...", "delivered_at": "...", "read_at": null
+  "status": "delivered", "scheduled_at": "...", "created_at": "...", "sent_at": "...",
+  "delivered_at": "...", "read_at": null
 }
 ```
 Buttons are returned already localized to the donor's language. Buttons on a message become disabled
-in the UI once the donor has replied to that message.
+in the UI once the donor has replied to that message or a later donor reply makes the message stale.
 
 Conversation lists use standard `page`/`page_size` pagination. The nested donor contains `id`, `name`,
 masked `phone`, `language`, `sim_reachable`, `read_receipts`, and nullable `campaign_id` and
@@ -189,9 +190,10 @@ masked `phone`, `language`, `sim_reachable`, `read_receipts`, and nullable `camp
 previews for unreachable donors, but are excluded from chat history.
 
 Message history returns `{items, next_before, limit}`. `before` is an exclusive message UUID cursor
-belonging to that donor; `limit` defaults to 50 (maximum 100). Each page is chronological, with the
-latest page returned first; pass `next_before` to retrieve older messages. Equal creation timestamps
-are ordered by UUID. Opening returns `{read_count}` and changes only delivered outbound messages
+belonging to that donor; `limit` defaults to 50 (maximum 100). Each page is chronological by effective
+time (`sent_at`, then `created_at`, then `scheduled_at`), with the latest page returned first; pass
+`next_before` to retrieve older messages. Equal effective timestamps are ordered by UUID. Opening
+returns `{read_count}` and changes only delivered outbound messages
 when read receipts are enabled; repeating it returns zero if no additional messages qualify.
 
 Replies return HTTP 201 and the inbound message. Text is trimmed, nonempty, and at most 4096 characters.

@@ -10,4 +10,5 @@ export const simulatorSource: SimulatorDataSource =
     ? apiSimulatorSource
     : mockSimulatorSource;
 
+export * from "./message-ordering";
 export type * from "./types";

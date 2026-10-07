@@ -22,7 +22,7 @@
 
 - **Status:** Open
 - **Affects:** PostgreSQL simulator queries, read receipts, deterministic and agent reply flows, appointment booking, follow-ups, and live events
-- **Details:** The complete PostgreSQL/Redis suite passes, including HTTP replies, scheduling suspension, outbound-only delivery progression, stable cursor pagination, capacity-safe slot booking, classified responses, bilingual acknowledgements, follow-up create/update payload snapshots, and ordered typing/message/status events. The Donor Phone walkthrough with `LLM_ENABLED=true` remains pending before closing this issue.
+- **Details:** The complete PostgreSQL/Redis suite passes, including HTTP replies, scheduling suspension, no dispatch after a recorded response, effective-time cursor pagination, outbound-only delivery progression, capacity-safe slot booking, classified responses, bilingual acknowledgements, follow-up create/update payload snapshots, ordered typing/message/status events, and Urdu bidi rendering coverage. The Donor Phone walkthrough with `LLM_ENABLED=true` remains pending before closing this issue.
 
 ## KI-012 — Task 2.9 LangSmith acceptance pending
 
