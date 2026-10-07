@@ -53,7 +53,13 @@ describe("SettingsScreen", () => {
         quality_rating: "High",
         messaging_limit: "1,000 per day",
         templates: [
-          { name: "donor_recall_en", category: "utility", status: "approved" },
+          {
+            series_id: "series-id",
+            step_id: "step-id",
+            name: "donor_recall_en",
+            category: "utility",
+            status: "approved",
+          },
         ],
       },
       isPending: false,
@@ -73,6 +79,11 @@ describe("SettingsScreen", () => {
     expect(screen.getByText("Demo environment")).toBeVisible();
     expect(screen.getByText("Verified")).toBeVisible();
     expect(screen.getByText("donor_recall_en")).toBeVisible();
+    expect(
+      screen.getByRole("link", {
+        name: "Open donor_recall_en in Content Series",
+      }),
+    ).toHaveAttribute("href", "/series/series-id?step=step-id");
   });
 
   it("hides administrator demo controls from coordinators", () => {

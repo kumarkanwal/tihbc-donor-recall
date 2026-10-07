@@ -360,3 +360,9 @@ Done: Ordered simulator messages, cursors, reply context, conversation previews,
 Verification: Focused PostgreSQL regressions pass for effective-time cursor pagination and no post-reply dispatch. Backend Ruff lint and format checks pass, strict mypy passes across 190 source files, and the complete isolated PostgreSQL/Redis suite passes all 370 tests. Frontend lint and strict typecheck pass, all 81 Vitest tests pass, and the Next.js production build succeeds.
 Next: Rebuild and deploy the demo, reseed it, then verify the affected seeded Urdu conversation and secondary-reminder flow in the live Donor Phone before the client rehearsal.
 Blockers: No implementation blocker remains; the broader live Donor Phone walkthrough remains tracked under KI-011.
+
+## S-053 | 2026-10-07 | Settings template step links
+Done: Added content-series and step identifiers to the mocked integration-template contract, regenerated the frontend API artifacts, and made every Settings message-template row an accessible link to the matching series editor step and phone preview while preserving the table's read-only behavior. Added backend contract and frontend navigation/selection regressions.
+Verification: Backend Ruff lint and format checks pass, strict mypy passes across 190 source files, and the complete isolated PostgreSQL/Redis suite passes all 370 tests. Frontend lint and strict typecheck pass, all 82 Vitest tests pass, and the Next.js production build succeeds.
+Next: Rebuild and deploy the demo, then verify a Settings message-template row opens the expected step and localized phone preview in the live browser.
+Blockers: None.

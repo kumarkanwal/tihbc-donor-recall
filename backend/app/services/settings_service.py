@@ -21,6 +21,8 @@ class IntegrationSettingsService:
         records = await self._repository.list_active_templates()
         templates = [
             IntegrationTemplateOut(
+                series_id=record.series_id,
+                step_id=record.step_id,
                 name=f"{record.series_name} - Step {record.step_order}",
                 status=MOCK_TEMPLATE_STATUS,
                 category=record.category,

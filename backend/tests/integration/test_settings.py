@@ -79,6 +79,8 @@ async def test_settings_and_reset_match_frontend_contract(
                     "messaging_limit": 1000,
                     "templates": [
                         {
+                            "series_id": str(fixture.primary.id),
+                            "step_id": str(active_step.id),
                             "name": f"{fixture.primary.name} - Step 1",
                             "status": "approved",
                             "category": "utility",

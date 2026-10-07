@@ -128,7 +128,9 @@ Each tab has campaign and date filters and "Export CSV".
 ## 9. Settings `/settings`
 Tabs:
 - **WhatsApp integration (mocked):** status rows for Business verification, Phone number, Display name,
-  Quality rating, Messaging limit; templates table (name, category, status). Note: "Demo environment".
+  Quality rating, Messaging limit; templates table (name, category, status). Each template row links to
+  its content-series editor with that step selected in the phone preview; the table remains read-only.
+  Note: "Demo environment".
 - **Users:** read-only list of users and roles.
 - **Demo controls (admin):** clock status, skip time buttons, "Reset demo data" (confirmation dialog).
 

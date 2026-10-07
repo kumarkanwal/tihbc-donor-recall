@@ -2634,12 +2634,24 @@
             "title": "Name",
             "type": "string"
           },
+          "series_id": {
+            "format": "uuid",
+            "title": "Series Id",
+            "type": "string"
+          },
           "status": {
             "title": "Status",
+            "type": "string"
+          },
+          "step_id": {
+            "format": "uuid",
+            "title": "Step Id",
             "type": "string"
           }
         },
         "required": [
+          "series_id",
+          "step_id",
           "name",
           "status",
           "category"

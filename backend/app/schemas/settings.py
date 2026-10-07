@@ -1,5 +1,7 @@
 """Settings integration response schemas."""
 
+from uuid import UUID
+
 from pydantic import BaseModel
 
 from app.models.enums import MessageCategory
@@ -8,6 +10,8 @@ from app.models.enums import MessageCategory
 class IntegrationTemplateOut(BaseModel):
     """One mocked provider template sourced from an active series step."""
 
+    series_id: UUID
+    step_id: UUID
     name: str
     status: str
     category: MessageCategory

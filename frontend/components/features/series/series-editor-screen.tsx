@@ -28,14 +28,18 @@ import {
 /** Two-column content-series editor with server-rendered phone preview. */
 export function SeriesEditorScreen({
   seriesId,
+  initialStepId,
 }: {
   seriesId: string;
+  initialStepId?: string;
 }): React.JSX.Element {
   const canManage = useCan(["admin"]);
   const seriesQuery = useContentSeriesDetail(seriesId);
   const updateSeries = useUpdateContentSeries(seriesId);
   const reorderSteps = useReorderSeriesSteps(seriesId);
-  const [selectedStepId, setSelectedStepId] = useState<string | null>(null);
+  const [selectedStepId, setSelectedStepId] = useState<string | null>(
+    initialStepId ?? null,
+  );
   const [drawerStep, setDrawerStep] = useState<SeriesStep | null | undefined>(
     undefined,
   );

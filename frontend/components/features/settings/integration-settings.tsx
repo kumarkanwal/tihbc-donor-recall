@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -76,7 +78,10 @@ export function IntegrationSettings(): React.JSX.Element {
             </thead>
             <tbody>
               {query.data.templates.map((template) => (
-                <tr key={template.name} className="border-border border-t">
+                <tr
+                  key={template.step_id}
+                  className="border-border hover:bg-surface-muted focus-within:bg-surface-muted relative border-t transition-colors"
+                >
                   <td className="px-5 py-3 font-medium">{template.name}</td>
                   <td className="px-5 py-3 capitalize">{template.category}</td>
                   <td className="px-5 py-3">
@@ -88,6 +93,15 @@ export function IntegrationSettings(): React.JSX.Element {
                       }
                       label={template.status}
                     />
+                    <Link
+                      href={`/series/${template.series_id}?step=${template.step_id}`}
+                      aria-label={`Open ${template.name} in Content Series`}
+                      className="focus-visible:outline-ring absolute inset-0 cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-offset-[-2px]"
+                    >
+                      <span className="sr-only">
+                        Open {template.name} in Content Series
+                      </span>
+                    </Link>
                   </td>
                 </tr>
               ))}

@@ -2086,8 +2086,18 @@ export interface components {
             category: components["schemas"]["MessageCategory"];
             /** Name */
             name: string;
+            /**
+             * Series Id
+             * Format: uuid
+             */
+            series_id: string;
             /** Status */
             status: string;
+            /**
+             * Step Id
+             * Format: uuid
+             */
+            step_id: string;
         };
         /**
          * LanguageBreakdown

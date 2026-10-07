@@ -237,7 +237,7 @@ All accept `campaign_id` (optional), `from`, `to`.
 
 | Method | Path | Role | Description |
 |---|---|---|---|
-| GET | `/settings/integration` | C | Mocked: `{business_verified, phone_number, display_name, quality_rating, messaging_limit, templates: [{name, status, category}]}` |
+| GET | `/settings/integration` | C | Mocked: `{business_verified, phone_number, display_name, quality_rating, messaging_limit, templates: [{series_id, step_id, name, status, category}]}` |
 | GET | `/demo/clock` | C | `{now, offset_seconds}` |
 | POST | `/demo/clock/actions/advance` | A | `{days?, hours?}` → advances clock, runs dispatcher once, returns new clock |
 | POST | `/demo/clock/actions/reset` | A | Offset to 0 |

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Linked each Settings message-template row to its exact content-series step and phone preview while keeping the table read-only.
 - Fixed donor-phone chronology, post-reply scheduler suppression, stale quick replies, and mixed Urdu/Latin bidi rendering.
 - Updated the Gemini fallback model, separated transient Groq parse failures from persistent request errors, and improved recent-donation recognition in English, Urdu, and Roman Urdu.
 - Fixed strict structured-output compatibility across LLM providers, repaired Gemini JSON-schema requests, and made multilingual reschedule dates and offered-slot choices deterministic against demo time.

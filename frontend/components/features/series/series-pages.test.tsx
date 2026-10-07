@@ -11,7 +11,10 @@ import { SeriesStepContentFields } from "@/components/features/series/series-ste
 import type { SeriesStepFormValues } from "@/components/features/series/series-step-form";
 import type { ContentSeriesDetail } from "@/hooks/use-content-series";
 
-const mocks = vi.hoisted(() => ({ canManage: vi.fn() }));
+const mocks = vi.hoisted(() => ({
+  canManage: vi.fn(),
+  preview: vi.fn(),
+}));
 const idleMutation = {
   mutate: vi.fn(),
   mutateAsync: vi.fn(),
@@ -33,11 +36,7 @@ vi.mock("@/hooks/use-content-series", () => ({
   }),
   useUpdateContentSeries: () => idleMutation,
   useReorderSeriesSteps: () => idleMutation,
-  useSeriesPreview: () => ({
-    data: previewMessage,
-    isPending: false,
-    error: null,
-  }),
+  useSeriesPreview: mocks.preview,
   useCreateSeriesStep: () => idleMutation,
   useUpdateSeriesStep: () => idleMutation,
   useDeleteSeriesStep: () => idleMutation,
@@ -56,7 +55,7 @@ const activeSeries: ContentSeriesDetail = {
   languages: ["en", "ur"],
   response_window_hours: 48,
   tags: ["regular", "recall"],
-  step_count: 1,
+  step_count: 2,
   created_by: { id: "user-id", full_name: "Admin User" },
   created_at: "2026-10-04T10:00:00Z",
   updated_at: "2026-10-04T10:00:00Z",
@@ -75,6 +74,19 @@ const activeSeries: ContentSeriesDetail = {
           language: "ur",
           body: "السلام علیکم {{donor_name}}",
         },
+      ],
+      buttons: [],
+    },
+    {
+      id: "step-two",
+      step_order: 2,
+      delay_days: 3,
+      category: "utility",
+      media_type: "none",
+      media_url: null,
+      contents: [
+        { id: "content-two-en", language: "en", body: "Reminder" },
+        { id: "content-two-ur", language: "ur", body: "یاد دہانی" },
       ],
       buttons: [],
     },
@@ -133,6 +145,11 @@ describe("Content series pages", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.canManage.mockReturnValue(true);
+    mocks.preview.mockReturnValue({
+      data: previewMessage,
+      isPending: false,
+      error: null,
+    });
   });
   afterEach(cleanup);
 
@@ -223,5 +240,16 @@ describe("Content series pages", () => {
     expect(
       screen.queryByRole("button", { name: "Activate series" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("selects a linked step for the phone preview", () => {
+    render(
+      <SeriesEditorScreen seriesId="series-id" initialStepId="step-two" />,
+    );
+
+    expect(mocks.preview).toHaveBeenCalledWith("series-id", "step-two", "en");
+    expect(
+      screen.getByRole("button", { name: /Step 2/ }).closest("li"),
+    ).toHaveClass("border-primary");
   });
 });
